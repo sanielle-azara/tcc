@@ -1,0 +1,268 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// USERS
+// ─────────────────────────────────────────────
+
+model User {
+  id            String       @id @default(uuid())
+  name          String       @db.VarChar(100)
+  email         String       @unique @db.VarChar(150)
+  passwordHash  String       @db.VarChar(255)
+  role          UserRole     @default(PSICOPEDAGOGO)
+  status        UserStatus   @default(ACTIVE)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  deletedAt     DateTime?
+
+  refreshTokens RefreshToken[]
+  passwordResets PasswordReset[]
+  aplicacoes    Aplicacao[]
+  relatorios    Relatorio[]
+
+  @@index([email])
+  @@index([status])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique @db.VarChar(512)
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid())
+  token     String   @unique @db.VarChar(512)
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@map("password_resets")
+}
+
+// ─────────────────────────────────────────────
+// APRENDENTES
+// ─────────────────────────────────────────────
+
+model Aprendente {
+  id                  String     @id @default(uuid())
+  name                String     @db.VarChar(150)
+  birthDate           DateTime
+  sexo                Sexo
+  responsavelNome     String     @db.VarChar(150)
+  responsavelRelacao  String?    @db.VarChar(50)
+  contatoPrincipal    String     @db.VarChar(20)
+  contatoSecundario   String?    @db.VarChar(20)
+  email               String?    @db.VarChar(150)
+  escolaNome          String?    @db.VarChar(150)
+  escolaSerie         String?    @db.VarChar(50)
+  escolaTurno         String?    @db.VarChar(50)
+  observacoes         String?    @db.Text
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  deletedAt           DateTime?
+
+  historico   HistoricoAprendente[]
+  aplicacoes  Aplicacao[]
+
+  @@index([name])
+  @@index([deletedAt])
+  @@map("aprendentes")
+}
+
+model HistoricoAprendente {
+  id           String     @id @default(uuid())
+  aprendentId  String
+  descricao    String     @db.Text
+  data         DateTime   @default(now())
+  createdAt    DateTime   @default(now())
+
+  aprendente   Aprendente @relation(fields: [aprendentId], references: [id], onDelete: Cascade)
+
+  @@index([aprendentId])
+  @@map("historico_aprendentes")
+}
+
+// ─────────────────────────────────────────────
+// AVALIAÇÕES
+// ─────────────────────────────────────────────
+
+model Avaliacao {
+  id          String           @id @default(uuid())
+  name        String           @db.VarChar(150)
+  description String?          @db.Text
+  category    String?          @db.VarChar(100)
+  version     Int              @default(1)
+  status      AvaliacaoStatus  @default(DRAFT)
+  parentId    String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  deletedAt   DateTime?
+
+  questions   Question[]
+  aplicacoes  Aplicacao[]
+  parent      Avaliacao?       @relation("AvaliacaoVersions", fields: [parentId], references: [id])
+  versions    Avaliacao[]      @relation("AvaliacaoVersions")
+
+  @@index([status])
+  @@index([category])
+  @@index([deletedAt])
+  @@map("avaliacoes")
+}
+
+model Question {
+  id             String       @id @default(uuid())
+  avaliacaoId    String
+  text           String       @db.VarChar(500)
+  type           QuestionType
+  required       Boolean      @default(true)
+  order          Int
+  options        Json?
+  scaleMin       Int?
+  scaleMax       Int?
+  scaleMinLabel  String?      @db.VarChar(50)
+  scaleMaxLabel  String?      @db.VarChar(50)
+  helpText       String?      @db.VarChar(300)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  avaliacao      Avaliacao    @relation(fields: [avaliacaoId], references: [id], onDelete: Cascade)
+  respostas      Resposta[]
+
+  @@index([avaliacaoId])
+  @@index([order])
+  @@map("questions")
+}
+
+// ─────────────────────────────────────────────
+// APLICAÇÕES
+// ─────────────────────────────────────────────
+
+model Aplicacao {
+  id              String          @id @default(uuid())
+  aprendentId     String
+  avaliacaoId     String
+  aplicadorId     String
+  status          AplicacaoStatus @default(PENDING)
+  dataAplicacao   DateTime?
+  observacoes     String?         @db.Text
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  finalizadaAt    DateTime?
+
+  aprendente      Aprendente      @relation(fields: [aprendentId], references: [id])
+  avaliacao       Avaliacao       @relation(fields: [avaliacaoId], references: [id])
+  aplicador       User            @relation(fields: [aplicadorId], references: [id])
+  respostas       Resposta[]
+  relatorio       Relatorio?
+
+  @@index([aprendentId])
+  @@index([avaliacaoId])
+  @@index([aplicadorId])
+  @@index([status])
+  @@map("aplicacoes")
+}
+
+model Resposta {
+  id           String    @id @default(uuid())
+  aplicacaoId  String
+  questionId   String
+  valor        Json?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  aplicacao    Aplicacao @relation(fields: [aplicacaoId], references: [id], onDelete: Cascade)
+  question     Question  @relation(fields: [questionId], references: [id])
+
+  @@unique([aplicacaoId, questionId])
+  @@index([aplicacaoId])
+  @@map("respostas")
+}
+
+// ─────────────────────────────────────────────
+// RELATÓRIOS
+// ─────────────────────────────────────────────
+
+model Relatorio {
+  id                      String    @id @default(uuid())
+  aplicacaoId             String    @unique
+  autorId                 String
+  conclusao               String?   @db.Text
+  observacoesProfissional String?   @db.Text
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  aplicacao               Aplicacao @relation(fields: [aplicacaoId], references: [id], onDelete: Cascade)
+  autor                   User      @relation(fields: [autorId], references: [id])
+
+  @@index([aplicacaoId])
+  @@index([autorId])
+  @@map("relatorios")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  PSICOPEDAGOGO
+  VIEWER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum Sexo {
+  MASCULINO
+  FEMININO
+  OUTRO
+}
+
+enum AvaliacaoStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum QuestionType {
+  TEXT
+  LONG_TEXT
+  NUMERIC
+  DATE
+  SINGLE_SELECT
+  MULTI_SELECT
+  SCALE
+  YES_NO
+}
+
+enum AplicacaoStatus {
+  PENDING
+  IN_PROGRESS
+  DRAFT
+  COMPLETED
+}

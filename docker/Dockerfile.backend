@@ -1,0 +1,27 @@
+FROM node:20-alpine
+WORKDIR /app
+RUN apk add --no-cache libc6-compat openssl
+
+# Copy package manifests for all workspaces
+COPY package.json ./
+COPY apps/backend/package.json ./apps/backend/
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/shared-utils/package.json ./packages/shared-utils/
+COPY packages/shared-validation/package.json ./packages/shared-validation/
+
+# Install all workspace deps (hoisted to /app/node_modules)
+RUN npm install --workspaces --include-workspace-root
+
+# Copy source code
+COPY packages/ ./packages/
+COPY apps/backend/ ./apps/backend/
+
+WORKDIR /app/apps/backend
+
+# Generate Prisma client
+RUN npx prisma generate
+
+ENV NODE_ENV=production
+EXPOSE 3001
+
+CMD ["node", "src/server.js"]

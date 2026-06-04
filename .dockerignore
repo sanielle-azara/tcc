@@ -1,0 +1,12 @@
+node_modules
+apps/*/node_modules
+packages/*/node_modules
+apps/frontend/dist
+apps/*/coverage
+**/*.log
+.git
+.gitignore
+.env
+.env.local
+*.md
+docs/
