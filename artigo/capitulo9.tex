@@ -1,0 +1,79 @@
+\chapter[Desenvolvimento do Frontend]{Desenvolvimento do Frontend} \label{capitulo9}
+
+O frontend do sistema foi desenvolvido utilizando React 18 e Vite 5, constituindo a interface web do Sistema de Apoio à Avaliação Psicopedagógica. A aplicação foi estruturada como uma Single Page Application (SPA), sendo responsável pela interação com os usuários e pelo consumo dos recursos disponibilizados pela API REST. Para a construção da interface visual foi utilizado o Material UI (MUI) versão 5, enquanto o gerenciamento da navegação foi realizado com o React Router versão 6.
+
+A aplicação foi organizada de forma modular, separando componentes reutilizáveis, páginas, contexto de autenticação, funções de comunicação com a API, hooks, configuração visual e funções auxiliares. Essa estrutura busca facilitar a manutenção do código e a organização das funcionalidades de acordo com os diferentes módulos do sistema.
+
+\section{Estrutura da interface}
+
+A estrutura do frontend está organizada a partir de diferentes diretórios: 
+
+\begin{itemize}
+    \item o diretório \textit{api} concentra as funções responsáveis pelas chamadas à API; 
+    \item \textit{components} reúne componentes reutilizáveis da interface, incluindo componentes comuns e componentes relacionados ao layout; 
+    \item \textit{contexts} contém o \textit{AuthContext}, utilizado no gerenciamento do contexto de autenticação; 
+    \item hooks reúne hooks auxiliares, como \textit{useNotification}; 
+    \item e \textit{pages} organiza as páginas de acordo com os módulos funcionais do sistema.
+\end{itemize}
+
+As páginas estão separadas nos módulos de autenticação, dashboard, aprendentes, avaliações, aplicações, relatórios e usuários. Essa organização acompanha a divisão funcional do sistema e permite que cada conjunto de telas mantenha seus recursos relacionados em uma estrutura própria.
+
+Também foram definidos diretórios específicos para o tema visual da aplicação e para funções auxiliares do frontend. A pasta \textit{theme} concentra a configuração do Material UI, enquanto \textit{utils} reúne funções auxiliares utilizadas pela interface.
+
+\section{Componentes e padronização visual}
+
+A construção da interface utiliza o Material UI, que fornece componentes reutilizáveis para a composição das telas. Entre os componentes comuns definidos no projeto estão \textit{DataTable}, \textit{PageHeader}, \textit{StatusChip} e \textit{ConfirmDialog}. Também foram definidos componentes relacionados ao layout, como \textit{AppLayout} e \textit{ProtectedRoute}.
+
+A utilização desses componentes permite padronizar elementos que aparecem em diferentes partes do sistema. Por exemplo, componentes de tabela podem ser reutilizados na apresentação de registros, enquanto componentes de confirmação podem ser empregados em operações que exigem uma ação explícita do usuário.
+
+A configuração do tema da aplicação é mantida separadamente no diretório \textit{theme}, permitindo centralizar as definições relacionadas à apresentação visual da interface.
+
+\section{Navegação e proteção das rotas}
+
+A navegação entre as diferentes funcionalidades do sistema é realizada utilizando o React Router versão 6. As páginas são organizadas de acordo com os módulos da aplicação, permitindo que o usuário navegue entre as funcionalidades de acordo com seu perfil de acesso.
+
+O projeto também possui um componente \textit{ProtectedRoute}, associado à estrutura de layout da aplicação. Esse componente participa da proteção das páginas que exigem autenticação, enquanto o \textit{AuthContext} concentra informações relacionadas ao contexto de autenticação no frontend.
+
+A existência desses mecanismos permite separar as áreas públicas das áreas que dependem de autenticação, evitando que as páginas destinadas aos usuários autenticados sejam apresentadas indiscriminadamente.
+
+\section{Comunicação com a API}
+
+A comunicação entre o frontend e o backend é realizada por meio de requisições HTTP. Para essa finalidade, o projeto utiliza Axios, enquanto as funções responsáveis pelas chamadas à API são organizadas no diretório \textit{api}.
+
+O gerenciamento do estado relacionado aos dados obtidos da API utiliza o TanStack Query, versão 5. Essa biblioteca permite organizar as operações de consulta e atualização dos dados provenientes do backend, mantendo separada a lógica de comunicação com o servidor da camada responsável pela apresentação das informações.
+
+Dessa forma, a interface não realiza acesso direto ao banco de dados. As informações são solicitadas ao backend por meio da API REST, e os resultados retornados são utilizados para atualizar os componentes apresentados ao usuário.
+
+\section{Formulários e validação}
+
+Os formulários da aplicação utilizam React Hook Form, em conjunto com Zod para validação. Essa combinação permite organizar o preenchimento dos campos e estabelecer regras para verificar as informações fornecidas pelo usuário antes que elas sejam submetidas ao backend.
+
+A utilização dessa abordagem é relevante para as funcionalidades que dependem de entrada estruturada de informações, como o cadastro de aprendentes, usuários e avaliações. Também contribui para manter um comportamento consistente na apresentação e validação dos dados inseridos nas diferentes telas do sistema.
+
+No caso dos instrumentos avaliativos, a estrutura do backend permite diferentes tipos de questões, e a interface precisa apresentar os elementos de entrada correspondentes às configurações definidas para cada avaliação. Dessa forma, o frontend participa da construção da experiência de preenchimento dos instrumentos sem assumir a responsabilidade pela interpretação dos resultados.
+
+\section{Autenticação e perfis de acesso}
+
+A autenticação do usuário está integrada à estrutura do frontend por meio do \textit{AuthContext} e dos componentes responsáveis pela proteção das rotas. Após o processo de autenticação, a interface disponibiliza as funcionalidades correspondentes ao perfil do usuário.
+
+Foram definidos três perfis de acesso no sistema. O perfil \textit{ADMIN} possui acesso total às funcionalidades, incluindo o gerenciamento de usuários. O perfil \textit{PSICOPEDAGOGO} possui permissões para criar e editar aprendentes, avaliações, aplicações e relatórios. Já o perfil \textit{VIEWER} possui permissão somente para visualização.
+
+Essa divisão permite que a interface apresente os recursos de acordo com o perfil do usuário, contribuindo para a organização do fluxo de utilização do sistema. O controle efetivo das permissões, entretanto, permanece associado ao backend, evitando que a restrição da interface seja utilizada como único mecanismo de segurança.
+
+\section{Módulos de avaliação psicopedagógica}
+
+As páginas do frontend estão organizadas em módulos correspondentes às principais funcionalidades do sistema: aprendentes, avaliações, aplicações, relatórios, usuários e dashboard, além do módulo de autenticação.
+
+O módulo de aprendentes disponibiliza a interface para o gerenciamento dos indivíduos acompanhados pelo profissional. O módulo de avaliações está relacionado ao gerenciamento dos instrumentos avaliativos, enquanto o módulo de aplicações permite utilizar esses instrumentos no acompanhamento dos aprendentes.
+
+Os relatórios possuem um módulo próprio, permitindo consultar e gerenciar as devolutivas associadas às aplicações. O dashboard, por sua vez, concentra a apresentação das informações gerais disponibilizadas pelo backend.
+
+A divisão da interface em módulos acompanha a organização funcional do sistema e permite manter relacionadas as páginas e componentes pertencentes a cada área.
+
+\section{Testes do frontend}
+
+O frontend utiliza Vitest e React Testing Library para a realização de testes. Essas ferramentas permitem verificar o comportamento dos componentes e das funcionalidades da interface durante o desenvolvimento.
+
+O projeto também disponibiliza comandos específicos para instalação das dependências, execução do ambiente de desenvolvimento, geração da versão de produção e execução dos testes. O ambiente de desenvolvimento pode ser iniciado por meio do comando \textit{npm run dev}, enquanto a construção da aplicação para produção é realizada com \textit{npm run build}.
+
+Dessa forma, o desenvolvimento do frontend estabeleceu a camada de interação do sistema, integrando autenticação, navegação, formulários, gerenciamento dos dados provenientes da API e apresentação das funcionalidades relacionadas aos aprendentes, avaliações, aplicações, relatórios e demais módulos. A organização adotada separa os componentes visuais, as páginas e os mecanismos de comunicação com o backend, contribuindo para a manutenção e evolução da aplicação.

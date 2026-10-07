@@ -1,0 +1,59 @@
+\chapter[Desenvolvimento do Backend]{Desenvolvimento do Backend} \label{capitulo8}
+
+O backend do sistema foi desenvolvido utilizando Node.js como ambiente de execução e Express.js como framework para construção da API REST. A camada de persistência utiliza o Prisma ORM, com banco de dados MySQL, enquanto a autenticação dos usuários é realizada por meio de JSON Web Tokens (JWT), utilizando tokens de acesso e de renovação. Para a validação dos dados recebidos pela API foi utilizado o Zod, e a documentação dos recursos disponibilizados é realizada por meio do padrão Swagger/OpenAPI.
+
+A aplicação foi organizada em módulos de negócio, buscando separar as responsabilidades relacionadas às diferentes funcionalidades do sistema. A estrutura do backend contém módulos específicos para autenticação, usuários, aprendentes, avaliações, aplicações, relatórios e dashboard. Além desses módulos, foram definidos diretórios específicos para configurações, middlewares e utilitários, conforme apresentado na estrutura do projeto.
+
+Essa organização permite concentrar em cada módulo as operações relacionadas a um determinado domínio da aplicação. O módulo de autenticação, por exemplo, concentra as funcionalidades relacionadas ao acesso ao sistema, enquanto os módulos de aprendentes, avaliações e aplicações estão relacionados diretamente ao processo de avaliação psicopedagógica. O módulo de relatórios é responsável pelas operações relacionadas às devolutivas produzidas a partir das aplicações, e o módulo de dashboard disponibiliza informações destinadas à visualização geral dos dados do sistema.
+
+\section{Acesso aos dados}
+
+A comunicação entre o frontend e o backend é realizada por meio de uma API REST, disponibilizada pelo Express.js. Os recursos são organizados em diferentes rotas, de acordo com os módulos funcionais do sistema.
+
+Entre os principais recursos disponibilizados estão as operações de autenticação, gerenciamento de usuários, gerenciamento de aprendentes, gerenciamento de avaliações, aplicações, relatórios e dashboard. O endpoint de autenticação disponibiliza a operação \textit{POST /api/auth/login}, enquanto os demais módulos possuem seus respectivos prefixos de rota.
+
+O gerenciamento de usuários é disponibilizado por meio das operações \textit{GET}, \textit{POST}, \textit{PUT} e \textit{DELETE} em \textit{/api/users}. De maneira semelhante, o módulo de aprendentes disponibiliza operações de consulta, cadastro, alteração e exclusão por meio de \textit{/api/aprendentes}, enquanto as avaliações são gerenciadas por meio de \textit{/api/avaliacoes}. Para aplicações, são disponibilizadas operações de consulta e criação em \textit{/api/aplicacoes}, e os relatórios possuem operações correspondentes em \textit{/api/relatorios}. O sistema também disponibiliza o endpoint \textit{GET /api/dashboard} para acesso às informações utilizadas no painel da aplicação.
+
+A utilização de uma API com recursos separados por domínio permite que o frontend consuma as funcionalidades do sistema de maneira padronizada, mantendo a lógica de processamento e acesso aos dados concentrada no backend.
+
+\section{Organização dos módulos e middlewares}
+
+A estrutura interna da aplicação está dividida entre configurações, middlewares, módulos de negócio e utilitários. O diretório \textit{config} concentra configurações relacionadas ao ambiente, ao Prisma e ao Swagger. Já o diretório \textit{middlewares} contém mecanismos relacionados à autenticação, validação e tratamento de erros.
+
+Os middlewares são utilizados como uma camada intermediária no processamento das requisições. Dessa forma, a autenticação pode ser aplicada antes do acesso a recursos protegidos, os dados recebidos podem ser submetidos às regras de validação e erros ocorridos durante o processamento podem ser tratados de maneira centralizada.
+
+A validação das informações de entrada é realizada com o Zod. Essa abordagem permite definir as estruturas esperadas para os dados recebidos pela API e verificar se as informações fornecidas estão de acordo com essas estruturas antes de serem processadas pela aplicação.
+
+\section{Autenticação e controle de acesso}
+
+A autenticação foi implementada utilizando JWT, com utilização de tokens de acesso e de renovação (refresh token). Essa estratégia permite identificar o usuário autenticado durante o acesso aos recursos protegidos da API e manter o gerenciamento da sessão por meio dos diferentes tipos de token.
+
+A autenticação está associada ao módulo \textit{auth} e ao middleware correspondente, responsável por participar do processo de proteção das rotas da aplicação. O backend também contempla diferentes perfis de usuário, definidos no modelo de dados como \textit{ADMIN}, \textit{PSICOPEDAGOGO} e \textit{VIEWER}, permitindo estabelecer diferentes níveis de acesso às funcionalidades do sistema.
+
+Além da autenticação, o backend possui mecanismos de validação das requisições e tratamento de erros. A combinação desses mecanismos contribui para que as operações disponibilizadas pela API sejam executadas somente após o processamento das informações necessárias para cada recurso.
+
+\section{Gerenciamento de aprendentes e avaliações}
+
+O módulo de aprendentes disponibiliza as operações necessárias para o cadastro e gerenciamento dos indivíduos acompanhados pelo profissional. Os dados são posteriormente utilizados nas aplicações dos instrumentos avaliativos, mantendo a associação entre o aprendente e os registros produzidos durante o processo de avaliação.
+
+O módulo de avaliações é responsável pelo gerenciamento dos instrumentos utilizados pelo sistema. A estrutura adotada permite representar avaliações compostas por diferentes questões e tipos de resposta. O versionamento desses instrumentos é mantido na camada de persistência, conforme apresentado na modelagem do banco de dados, permitindo relacionar diferentes versões de uma mesma avaliação.
+
+As aplicações são tratadas separadamente pelo módulo \textit{aplicacoes}, permitindo associar uma avaliação a um aprendente e registrar o andamento desse processo. Essa separação entre avaliação e aplicação possibilita que um mesmo instrumento seja utilizado em diferentes processos avaliativos, mantendo cada aplicação como um registro independente.
+
+\section{Relatórios e dashboard}
+
+O módulo \textit{relatorios} concentra as operações relacionadas aos relatórios produzidos a partir das aplicações realizadas. Esses registros permanecem associados à aplicação correspondente, permitindo relacionar a devolutiva produzida pelo profissional ao processo avaliativo que lhe deu origem.
+
+O backend também possui um módulo específico de \textit{dashboard}, disponibilizado por meio da rota \textit{GET /api/dashboard}. Esse módulo fornece os dados necessários para a apresentação das informações gerais do sistema na interface, evitando que o frontend precise realizar diretamente operações sobre o banco de dados.
+
+Nesse contexto, o backend atua como intermediário entre os dados persistidos e a interface do sistema, sendo responsável pelo processamento das requisições e pela disponibilização das informações necessárias às funcionalidades implementadas.
+
+\section{Documentação e testes}
+
+A API possui documentação baseada em Swagger/OpenAPI, disponibilizada durante a execução do sistema no endereço \textit{/api-docs}. A documentação permite consultar os recursos disponibilizados pela API e auxilia na compreensão e utilização dos endpoints durante o desenvolvimento e os testes.
+
+Para os testes automatizados do backend foram utilizadas as ferramentas Vitest e Supertest. O projeto disponibiliza comandos específicos para execução dos testes e para geração de informações de cobertura, permitindo verificar o comportamento das funcionalidades implementadas.
+
+Também foram definidos procedimentos para geração do cliente do Prisma, execução das migrações e população inicial do banco de dados. Essas operações permitem preparar o ambiente de desenvolvimento de forma padronizada e manter a estrutura do banco sincronizada com o modelo utilizado pela aplicação.
+
+Dessa forma, o desenvolvimento do backend estabeleceu a camada responsável pela disponibilização da API REST, autenticação, validação das requisições, aplicação das operações relacionadas aos módulos do sistema, comunicação com o banco de dados e disponibilização dos dados utilizados pelo frontend. A organização modular adotada também fornece uma estrutura para a manutenção e evolução das funcionalidades relacionadas ao processo de avaliação psicopedagógica.

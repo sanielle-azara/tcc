@@ -1,0 +1,26 @@
+\chapter[Arquitetura do sistema]{Arquitetura do sistema}\label{capitulo6}
+
+A arquitetura do sistema foi definida com o objetivo de organizar as responsabilidades da aplicação e facilitar a manutenção, evolução e integração entre seus diferentes componentes. Considerando as características do sistema desenvolvido, adotou-se uma arquitetura composta por três camadas principais: apresentação, aplicação e persistência de dados. Essa organização permite separar a interface utilizada pelo profissional, as regras responsáveis pelo processamento das operações e o armazenamento das informações.
+
+A camada de apresentação corresponde ao frontend da aplicação, desenvolvido utilizando React.js. É responsável pela interação com o usuário e pela disponibilização das funcionalidades do sistema por meio de uma interface web. Nessa camada são apresentadas as telas de autenticação, cadastro e consulta de aprendentes, gerenciamento dos instrumentos avaliativos, registros das avaliações e elaboração dos relatórios.
+
+A comunicação entre a camada de apresentação e as funcionalidades do sistema ocorre por meio de uma API REST desenvolvida em Node.js utilizando o framework Express.js. A API funciona como intermediária entre o frontend e o banco de dados, recebendo as requisições realizadas pela interface, realizando as validações e regras de negócio correspondentes e retornando as informações necessárias para a aplicação.
+
+A camada de aplicação concentra as regras de negócio do sistema. Nela são processadas operações relacionadas ao gerenciamento dos usuários, aprendentes, atendimentos, instrumentos avaliativos, registros das avaliações e relatórios. A utilização de uma camada específica para essas regras permite evitar que a lógica de negócio fique diretamente vinculada à interface, favorecendo a organização e a manutenção do código.
+
+A persistência dos dados é realizada por meio de um banco de dados relacional MySQL. Essa camada é responsável pelo armazenamento estruturado das informações utilizadas pelo sistema, incluindo os dados dos usuários, aprendentes, instrumentos, atendimentos e registros produzidos durante o processo de avaliação. O modelo relacional permite estabelecer os vínculos entre essas entidades e preservar a integridade das informações.
+
+De forma geral, o fluxo de comunicação da aplicação inicia-se na interface web, quando o profissional realiza uma operação no sistema. A solicitação é encaminhada à API, que realiza o processamento correspondente e, quando necessário, consulta ou altera os dados armazenados no banco de dados. Após o processamento, a API retorna uma resposta ao frontend, que atualiza a interface de acordo com o resultado da operação.
+
+Essa separação também contribui para a implementação dos mecanismos de segurança do sistema. A autenticação e a autorização são processadas no backend, permitindo que o acesso às operações da API seja controlado independentemente da interface apresentada ao usuário. Da mesma forma, os mecanismos relacionados ao registro de ações e à rastreabilidade das alterações podem ser tratados na camada de aplicação, mantendo essas responsabilidades separadas da apresentação.
+
+A arquitetura adotada pode ser representada de forma simplificada pela Figura \ref{fig:arquitetura_geral_do_sistema}, na qual são apresentadas as relações entre o frontend, a API e o banco de dados.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{arquitetura_sistema.png}
+    \caption{Arquitetura geral do sistema}
+    \label{fig:arquitetura_geral_do_sistema}
+\end{figure}
+
+A escolha dessa estrutura permitiu organizar o sistema de maneira modular, facilitando o desenvolvimento incremental das funcionalidades. Além disso, a separação entre apresentação, processamento e persistência possibilita que alterações realizadas em uma camada tenham menor impacto sobre as demais, contribuindo para a manutenção e evolução da aplicação.

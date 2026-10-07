@@ -1,0 +1,21 @@
+\chapter[Segurança e controle de acesso]{Segurança e controle de acesso} \label{capitulo13}
+
+A segurança foi considerada como um requisito transversal do sistema, especialmente em razão da natureza das informações armazenadas durante o processo de avaliação psicopedagógica. A aplicação possui diferentes perfis de usuário e mecanismos de autenticação e autorização, buscando restringir o acesso às funcionalidades de acordo com as responsabilidades atribuídas a cada usuário.
+
+A autenticação da aplicação foi implementada por meio de JSON Web Tokens (JWT), utilizando tokens de acesso e tokens de atualização (refresh tokens). Após a autenticação, o usuário recebe as credenciais necessárias para acessar os recursos protegidos da API. O backend utiliza middleware de autenticação para verificar as requisições direcionadas às rotas que exigem usuário autenticado, impedindo o acesso direto a esses recursos sem as credenciais correspondentes.
+
+Além da autenticação, o sistema possui controle de acesso baseado em perfis. Foram definidos os papéis \textit{ADMIN}, \textit{PSICOPEDAGOGO} e \textit{VIEWER}, permitindo diferenciar as permissões disponíveis para cada tipo de usuário. O perfil administrador possui acesso às funcionalidades de gerenciamento de usuários, enquanto o perfil de psicopedagogo pode realizar operações relacionadas aos aprendentes, avaliações, aplicações e relatórios. Já o perfil de visualização possui acesso somente para consulta das informações disponibilizadas pelo sistema.
+
+Essa diferenciação também está representada no banco de dados, na entidade \textit{users}, que possui o campo \textit{role} para identificação do perfil do usuário e o campo \textit{status}, responsável por indicar se a conta está ativa ou inativa. Dessa maneira, o controle de acesso considera tanto a identidade do usuário quanto as permissões associadas ao seu perfil.
+
+No frontend, o controle de acesso é complementado pelo uso do \textit{AuthContext} e do componente \textit{ProtectedRoute}. O contexto de autenticação mantém as informações necessárias para o gerenciamento da sessão do usuário, enquanto as rotas protegidas restringem o acesso às páginas que dependem de autenticação. A interface também considera os diferentes perfis de acesso para disponibilizar as funcionalidades correspondentes a cada usuário.
+
+A comunicação entre frontend e backend é realizada por meio da API REST, sendo as operações protegidas verificadas pelo backend. Essa separação permite que o controle de segurança não dependa exclusivamente das restrições apresentadas na interface, mantendo a validação das permissões no lado servidor.
+
+O gerenciamento das credenciais também conta com estruturas específicas para tokens de atualização e recuperação de senha. A entidade \textit{refresh\_tokens} armazena os tokens associados aos usuários, juntamente com seus prazos de validade e informações de revogação. Já a entidade \textit{password\_resets} permite registrar tokens destinados ao processo de recuperação de senha, incluindo prazo de validade e indicação de utilização.
+
+Outro mecanismo utilizado na implementação é a validação dos dados recebidos pela API. O backend utiliza Zod para validação das entradas, permitindo verificar se os dados enviados às operações atendem às estruturas esperadas antes de serem processados. Esse mecanismo complementa as medidas de autenticação e autorização ao contribuir para o controle das informações recebidas pela aplicação.
+
+A estrutura adotada também considera a necessidade de manter registros relacionados aos usuários e às operações realizadas no sistema de forma organizada. Essa preocupação está alinhada aos requisitos definidos no projeto, que destacaram segurança, controle de acesso e rastreabilidade como aspectos necessários para uma aplicação voltada ao registro de informações de avaliação psicopedagógica.
+
+Assim, a segurança implementada combina autenticação por JWT, controle de acesso por perfis, proteção das rotas, gerenciamento de sessão e validação das informações recebidas pela API. Esses mecanismos estabelecem uma camada de proteção para os recursos do sistema e organizam o acesso às funcionalidades de acordo com as responsabilidades atribuídas a cada usuário.

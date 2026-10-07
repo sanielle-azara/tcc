@@ -1,0 +1,90 @@
+\chapter[Levantamento e especificação dos requisitos]{Levantamento e especificação dos requisitos}\label{capitulo5}
+
+O levantamento e a especificação dos requisitos constituíram uma etapa fundamental para orientar o desenvolvimento do sistema web de apoio à avaliação psicopedagógica na Educação Infantil. A definição dos requisitos teve como objetivo identificar as funcionalidades necessárias para apoiar a organização das informações dos aprendentes, o gerenciamento dos instrumentos avaliativos, o registro das etapas do processo de avaliação e a elaboração das devolutivas pelos profissionais.
+
+Os requisitos foram definidos a partir dos objetivos estabelecidos para o sistema, da revisão bibliográfica e documental realizada na etapa inicial do trabalho e da análise das características do processo de avaliação psicopedagógica. Nesse processo, foram consideradas tanto as funcionalidades diretamente relacionadas às atividades realizadas pelos profissionais quanto os aspectos técnicos necessários para garantir segurança, privacidade, rastreabilidade, usabilidade e organização das informações.
+
+A especificação foi dividida em requisitos funcionais e não funcionais. Os requisitos funcionais descrevem os serviços e comportamentos que o sistema deve oferecer aos usuários, enquanto os requisitos não funcionais estabelecem características e restrições relacionadas à qualidade, segurança, desempenho e utilização do sistema.
+
+\section{Requisitos funcionais}
+
+Os requisitos funcionais foram definidos considerando as principais etapas do processo de avaliação psicopedagógica contempladas pelo sistema. Entre elas estão o gerenciamento dos aprendentes, o registro de informações, o gerenciamento dos instrumentos avaliativos, a aplicação das avaliações, o acompanhamento dos registros e a elaboração de relatórios.
+
+O sistema deve permitir a autenticação dos usuários e o controle de acesso às funcionalidades de acordo com suas permissões. Após a autenticação, o profissional deve ser capaz de cadastrar e gerenciar os dados dos aprendentes, mantendo as informações organizadas e disponíveis para consulta durante os diferentes atendimentos.
+
+Também deve ser possível registrar informações relacionadas ao processo de avaliação, incluindo dados provenientes de entrevistas, anamnese, observações e aplicação de instrumentos. Dessa forma, os registros de um aprendente podem ser mantidos de maneira estruturada, permitindo o acompanhamento das informações ao longo do processo avaliativo.
+
+Outro requisito está relacionado ao gerenciamento dos instrumentos utilizados na avaliação. O sistema deve possibilitar o cadastro e a organização dos instrumentos, contemplando informações de identificação e características relevantes para sua utilização. Deve ainda ser possível manter diferentes versões de um instrumento, permitindo registrar alterações e adaptações realizadas pelo profissional sem eliminar o histórico das versões anteriores. 
+
+Durante a aplicação de um instrumento, o profissional deve poder vinculá-lo a um determinado aprendente e registrar as informações obtidas no atendimento. As adaptações realizadas durante sua utilização devem ser identificáveis, de modo que o registro preserve informações suficientes para compreender em qual versão e em quais condições o instrumento foi aplicado. 
+
+O sistema deve permitir ainda a consulta ao histórico de avaliações e registros associados ao aprendente, possibilitando que o profissional acompanhe as informações produzidas em diferentes momentos do processo avaliativo. A organização longitudinal desses registros busca facilitar a consulta e a comparação das informações produzidas ao longo do acompanhamento.
+
+Por fim, deve ser possível elaborar devolutivas e relatórios a partir dos registros realizados no sistema, permitindo sua organização em um documento e sua posterior geração em formato PDF. O sistema atua, portanto, como instrumento de apoio à organização das informações, sem substituir a análise e a interpretação realizadas pelo profissional.
+
+Com base nessas definições, os principais requisitos funcionais contemplados no desenvolvimento são apresentados na Tabela \ref{tab:requisitos_funcionais}.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{2cm} p{13cm}}
+\hline
+\textbf{Código} & \textbf{Requisito funcional} \\
+\hline
+RF01 & Permitir o cadastro e a autenticação de usuários. \\
+RF02 & Permitir o controle de acesso às funcionalidades do sistema. \\
+RF03 & Permitir o cadastro, edição e consulta dos dados dos aprendentes. \\
+RF04 & Permitir o registro de informações relacionadas ao processo de avaliação. \\
+RF05 & Permitir o cadastro e gerenciamento dos instrumentos avaliativos. \\
+RF06 & Permitir o gerenciamento de diferentes versões dos instrumentos. \\
+RF07 & Permitir o registro de adaptações realizadas nos instrumentos. \\
+RF08 & Permitir vincular um instrumento a um aprendente durante um atendimento. \\
+RF09 & Permitir registrar os resultados e observações obtidos durante a aplicação dos instrumentos. \\
+RF10 & Permitir consultar o histórico de avaliações e registros de um aprendente. \\
+RF11 & Permitir elaborar e armazenar devolutivas e relatórios. \\
+RF12 & Permitir gerar relatórios em formato PDF. \\
+RF13 & Registrar as ações realizadas pelos usuários para fins de rastreabilidade e auditoria. \\
+\hline
+\end{tabular}
+\caption{Requisitos funcionais}
+\label{tab:requisitos_funcionais}
+\end{table}
+
+\section{Requisitos não funcionais}
+
+Os requisitos não funcionais foram definidos a partir das características de qualidade necessárias para a utilização do sistema em um contexto que envolve o armazenamento e o processamento de informações relacionadas a crianças. Nesse sentido, aspectos como segurança, privacidade, controle de acesso, rastreabilidade, usabilidade e organização dos dados foram considerados durante a definição da solução.
+
+A segurança constitui um requisito essencial, uma vez que o sistema armazena informações relacionadas aos aprendentes e aos profissionais responsáveis pelos atendimentos. O acesso às informações deve ser restrito aos usuários autorizados, sendo necessário utilizar mecanismos de autenticação e autorização para proteger os recursos disponibilizados pela aplicação.
+
+A privacidade dos dados também deve ser considerada durante o desenvolvimento, de modo que as informações armazenadas sejam tratadas de acordo com os princípios de proteção de dados aplicáveis ao sistema. Além disso, os registros devem permanecer organizados e íntegros, evitando alterações não identificadas ou perda do histórico das informações.
+
+Outro aspecto relevante é a rastreabilidade. As operações realizadas pelos usuários devem ser registradas por meio de mecanismos de auditoria, permitindo identificar ações realizadas, usuários envolvidos e momentos em que determinadas alterações ocorreram. Esse mecanismo contribui para a preservação do histórico e para o acompanhamento das alterações realizadas nos registros.
+
+A usabilidade também foi considerada como requisito do sistema, uma vez que as funcionalidades devem ser apresentadas de maneira organizada e compreensível para os profissionais que utilizarão a aplicação. A interface deve facilitar a localização das informações e a execução das principais atividades relacionadas ao processo de avaliação.
+
+Além disso, a aplicação deve apresentar uma arquitetura organizada e modular, possibilitando a separação entre a interface, as regras de negócio e a camada de persistência dos dados. Essa organização contribui para a manutenção e evolução do sistema ao longo do desenvolvimento.
+
+Os principais requisitos não funcionais definidos são apresentados na Tabela \ref{tab:requisitos_nao_funcionais}.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{2cm} p{13cm}}
+\hline
+\textbf{Código} & \textbf{Requisito não funcional} \\
+\hline
+RNF01 & O sistema deve utilizar autenticação para controlar o acesso aos usuários. \\
+RNF02 & O sistema deve utilizar mecanismos de autorização para restringir o acesso às funcionalidades e informações. \\
+RNF03 & Os dados dos aprendentes devem ser armazenados de forma segura, considerando os princípios de proteção de dados da LGPD. \\
+RNF04 & As ações relevantes realizadas pelos usuários devem possuir mecanismos de rastreabilidade e auditoria. \\
+RNF05 & O sistema deve preservar o histórico das versões e alterações realizadas nos instrumentos avaliativos. \\
+RNF06 & A interface deve apresentar organização e usabilidade adequadas às atividades realizadas pelos profissionais. \\
+RNF07 & A aplicação deve apresentar uma arquitetura modular, facilitando sua manutenção e evolução. \\
+RNF08 & Os dados devem possuir mecanismos de integridade e consistência durante seu armazenamento e manipulação. \\
+RNF09 & O sistema deve possuir tratamento adequado de erros, evitando a exposição de informações internas da aplicação. \\
+RNF10 & O sistema deve permitir a manutenção e evolução dos seus módulos sem comprometer as funcionalidades existentes. \\
+\hline
+\end{tabular}
+\caption{Requisitos não funcionais}
+\label{tab:requisitos_nao_funcionais}
+\end{table}
