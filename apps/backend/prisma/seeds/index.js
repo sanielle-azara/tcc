@@ -48,6 +48,7 @@ async function main() {
       escolaSerie: '4º ano',
       escolaTurno: 'Manhã',
       observacoes: 'Apresenta dificuldades em leitura e escrita.',
+      responsavelId: profissional.id,
     },
   });
 
@@ -61,6 +62,7 @@ async function main() {
       category: 'Linguagem',
       version: 1,
       status: 'ACTIVE',
+      autorId: profissional.id,
       questions: {
         create: [
           {
@@ -125,6 +127,7 @@ async function main() {
       category: 'Psicomotricidade',
       version: 1,
       status: 'ACTIVE',
+      autorId: profissional.id,
       questions: {
         create: [
           {

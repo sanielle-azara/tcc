@@ -1,6 +1,16 @@
 const prisma = require('../../config/prisma');
 
-const getStats = async () => {
+const ownerFilter = (userId, userRole) =>
+  userRole === 'ADMIN' ? {} : { responsavelId: userId };
+
+const ownerFilterAvaliacoes = (userId, userRole) =>
+  userRole === 'ADMIN' ? {} : { autorId: userId };
+
+const getStats = async (userId, userRole) => {
+  const aprendenteWhere = { deletedAt: null, ...ownerFilter(userId, userRole) };
+  const avaliacaoWhere = { deletedAt: null, status: 'ACTIVE', ...ownerFilterAvaliacoes(userId, userRole) };
+  const aplicacaoWhere = userRole === 'ADMIN' ? {} : { aplicadorId: userId };
+
   const [
     totalAprendentes,
     totalAvaliacoes,
@@ -9,11 +19,12 @@ const getStats = async () => {
     ultimasAplicacoes,
     avaliacoesAtivas,
   ] = await Promise.all([
-    prisma.aprendente.count({ where: { deletedAt: null } }),
-    prisma.avaliacao.count({ where: { deletedAt: null, status: 'ACTIVE' } }),
-    prisma.aplicacao.count(),
-    prisma.aplicacao.groupBy({ by: ['status'], _count: { id: true } }),
+    prisma.aprendente.count({ where: aprendenteWhere }),
+    prisma.avaliacao.count({ where: avaliacaoWhere }),
+    prisma.aplicacao.count({ where: aplicacaoWhere }),
+    prisma.aplicacao.groupBy({ by: ['status'], where: aplicacaoWhere, _count: { id: true } }),
     prisma.aplicacao.findMany({
+      where: aplicacaoWhere,
       take: 10,
       orderBy: { createdAt: 'desc' },
       include: {
@@ -23,7 +34,7 @@ const getStats = async () => {
       },
     }),
     prisma.avaliacao.findMany({
-      where: { deletedAt: null, status: 'ACTIVE' },
+      where: avaliacaoWhere,
       take: 5,
       orderBy: { createdAt: 'desc' },
       select: { id: true, name: true, category: true, _count: { select: { aplicacoes: true } } },

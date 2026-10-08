@@ -1,10 +1,14 @@
 const prisma = require('../../config/prisma');
 const { parsePagination } = require('@psicopedagogia/shared-utils');
 
-const list = async (query) => {
+const ownerFilter = (userId, userRole) =>
+  userRole === 'ADMIN' ? {} : { autorId: userId };
+
+const list = async (query, userId, userRole) => {
   const { page, limit, skip } = parsePagination(query);
   const where = {
     deletedAt: null,
+    ...ownerFilter(userId, userRole),
     ...(query.search && {
       OR: [
         { name: { contains: query.search } },
@@ -34,9 +38,10 @@ const list = async (query) => {
   return { data, total, page, limit };
 };
 
-const findById = async (id) => {
+const findById = async (id, userId, userRole) => {
+  const where = { id, deletedAt: null, ...ownerFilter(userId, userRole) };
   const item = await prisma.avaliacao.findFirst({
-    where: { id, deletedAt: null },
+    where,
     include: {
       questions: { orderBy: { order: 'asc' } },
       _count: { select: { aplicacoes: true } },
@@ -47,11 +52,12 @@ const findById = async (id) => {
   return item;
 };
 
-const create = async (data) => {
+const create = async (data, userId) => {
   const { questions, ...avaliacaoData } = data;
   return prisma.avaliacao.create({
     data: {
       ...avaliacaoData,
+      autorId: userId,
       questions: {
         create: questions.map((q) => ({
           text: q.text,
@@ -71,11 +77,11 @@ const create = async (data) => {
   });
 };
 
-const update = async (id, data) => {
-  const avaliacao = await findById(id);
+const update = async (id, data, userId, userRole) => {
+  const avaliacao = await findById(id, userId, userRole);
 
   if (avaliacao._count.aplicacoes > 0 && data.questions) {
-    return createNewVersion(id, data);
+    return createNewVersion(id, data, userId);
   }
 
   const { questions, ...avaliacaoData } = data;
@@ -105,8 +111,13 @@ const update = async (id, data) => {
   });
 };
 
-const createNewVersion = async (parentId, data) => {
-  const parent = await findById(parentId);
+const createNewVersion = async (parentId, data, userId) => {
+  const parent = await prisma.avaliacao.findFirst({
+    where: { id: parentId, deletedAt: null },
+    include: { questions: { orderBy: { order: 'asc' } } },
+  });
+  if (!parent) throw Object.assign(new Error('Avaliação não encontrada'), { status: 404 });
+
   const { questions, ...avaliacaoData } = data;
 
   await prisma.avaliacao.update({ where: { id: parentId }, data: { status: 'ARCHIVED' } });
@@ -119,6 +130,7 @@ const createNewVersion = async (parentId, data) => {
       status: avaliacaoData.status || 'ACTIVE',
       version: parent.version + 1,
       parentId,
+      autorId: userId,
       questions: {
         create: (questions || parent.questions).map((q) => ({
           text: q.text,
@@ -138,15 +150,15 @@ const createNewVersion = async (parentId, data) => {
   });
 };
 
-const remove = async (id) => {
-  await findById(id);
+const remove = async (id, userId, userRole) => {
+  await findById(id, userId, userRole);
   await prisma.avaliacao.update({ where: { id }, data: { deletedAt: new Date() } });
 };
 
-const getCategories = async () => {
+const getCategories = async (userId, userRole) => {
   const result = await prisma.avaliacao.groupBy({
     by: ['category'],
-    where: { deletedAt: null, category: { not: null } },
+    where: { deletedAt: null, category: { not: null }, ...ownerFilter(userId, userRole) },
   });
   return result.map((r) => r.category).filter(Boolean);
 };

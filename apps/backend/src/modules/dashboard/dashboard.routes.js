@@ -18,7 +18,7 @@ router.use(authenticate);
  */
 router.get('/', async (req, res, next) => {
   try {
-    const stats = await dashboardService.getStats();
+    const stats = await dashboardService.getStats(req.user.id, req.user.role);
     res.json(buildSuccessResponse(stats));
   } catch (err) {
     next(err);

@@ -22,10 +22,12 @@ model User {
   updatedAt     DateTime     @updatedAt
   deletedAt     DateTime?
 
-  refreshTokens RefreshToken[]
+  refreshTokens  RefreshToken[]
   passwordResets PasswordReset[]
-  aplicacoes    Aplicacao[]
-  relatorios    Relatorio[]
+  aplicacoes     Aplicacao[]
+  relatorios     Relatorio[]
+  aprendentes    Aprendente[]
+  avaliacoes     Avaliacao[]
 
   @@index([email])
   @@index([status])
@@ -80,14 +82,17 @@ model Aprendente {
   escolaSerie         String?    @db.VarChar(50)
   escolaTurno         String?    @db.VarChar(50)
   observacoes         String?    @db.Text
+  responsavelId       String
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
   deletedAt           DateTime?
 
+  responsavel User                  @relation(fields: [responsavelId], references: [id])
   historico   HistoricoAprendente[]
   aplicacoes  Aplicacao[]
 
   @@index([name])
+  @@index([responsavelId])
   @@index([deletedAt])
   @@map("aprendentes")
 }
@@ -117,15 +122,18 @@ model Avaliacao {
   version     Int              @default(1)
   status      AvaliacaoStatus  @default(DRAFT)
   parentId    String?
+  autorId     String
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   deletedAt   DateTime?
 
+  autor       User             @relation(fields: [autorId], references: [id])
   questions   Question[]
   aplicacoes  Aplicacao[]
   parent      Avaliacao?       @relation("AvaliacaoVersions", fields: [parentId], references: [id])
   versions    Avaliacao[]      @relation("AvaliacaoVersions")
 
+  @@index([autorId])
   @@index([status])
   @@index([category])
   @@index([deletedAt])
