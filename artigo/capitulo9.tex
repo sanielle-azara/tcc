@@ -56,9 +56,11 @@ No caso dos instrumentos avaliativos, a estrutura do backend permite diferentes 
 
 A autenticação do usuário está integrada à estrutura do frontend por meio do \textit{AuthContext} e dos componentes responsáveis pela proteção das rotas. Após o processo de autenticação, a interface disponibiliza as funcionalidades correspondentes ao perfil do usuário.
 
-Foram definidos três perfis de acesso no sistema. O perfil \textit{ADMIN} possui acesso total às funcionalidades, incluindo o gerenciamento de usuários. O perfil \textit{PSICOPEDAGOGO} possui permissões para criar e editar aprendentes, avaliações, aplicações e relatórios. Já o perfil \textit{VIEWER} possui permissão somente para visualização.
+Foram definidos três perfis de acesso no sistema. O perfil \textit{ADMIN} possui acesso total às funcionalidades, incluindo o gerenciamento de usuários e a visualização de todos os aprendentes e avaliações cadastrados no sistema. O perfil \textit{PSICOPEDAGOGO} possui permissões para criar e editar aprendentes, avaliações, aplicações e relatórios, visualizando somente os registros vinculados ao seu próprio usuário. Já o perfil \textit{VIEWER} possui permissão somente para visualização, sendo bloqueado nas rotas de criação e edição pelo middleware de autorização do backend.
 
-Essa divisão permite que a interface apresente os recursos de acordo com o perfil do usuário, contribuindo para a organização do fluxo de utilização do sistema. O controle efetivo das permissões, entretanto, permanece associado ao backend, evitando que a restrição da interface seja utilizada como único mecanismo de segurança.
+O controle efetivo das permissões por perfil é aplicado no backend, por meio do middleware \textit{authorize}, que restringe o acesso às operações de escrita para os perfis sem permissão. A interface, por sua vez, utiliza o perfil do usuário autenticado para condicionar a exibição de elementos interativos — como o botão de salvar relatório — reduzindo a exposição de ações que o usuário não pode executar. 
+
+A filtragem dos registros por titularidade também é aplicada integralmente na camada de serviço do backend, de forma que a interface recebe apenas os dados que o usuário autenticado tem permissão de visualizar.
 
 \section{Módulos de avaliação psicopedagógica}
 

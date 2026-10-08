@@ -10,11 +10,13 @@ A especificação foi dividida em requisitos funcionais e não funcionais. Os re
 
 Os requisitos funcionais foram definidos considerando as principais etapas do processo de avaliação psicopedagógica contempladas pelo sistema. Entre elas estão o gerenciamento dos aprendentes, o registro de informações, o gerenciamento dos instrumentos avaliativos, a aplicação das avaliações, o acompanhamento dos registros e a elaboração de relatórios.
 
-O sistema deve permitir a autenticação dos usuários e o controle de acesso às funcionalidades de acordo com suas permissões. Após a autenticação, o profissional deve ser capaz de cadastrar e gerenciar os dados dos aprendentes, mantendo as informações organizadas e disponíveis para consulta durante os diferentes atendimentos.
+O sistema deve permitir a autenticação dos usuários e o controle de acesso às funcionalidades de acordo com suas permissões. Após a autenticação, o profissional deve ser capaz de cadastrar e gerenciar os dados dos aprendentes, mantendo as informações organizadas e disponíveis para consulta durante os diferentes atendimentos. 
+
+A visibilidade dos aprendentes cadastrados deve ser restrita ao psicopedagogo responsável por cada um deles, de modo que um profissional não tenha acesso aos registros de aprendentes vinculados a outros usuários. O mesmo princípio se aplica aos instrumentos avaliativos: cada psicopedagogo visualiza somente os instrumentos que criou. O perfil administrador constitui exceção a essa restrição, possuindo acesso irrestrito a todos os registros do sistema.
 
 Também deve ser possível registrar informações relacionadas ao processo de avaliação, incluindo dados provenientes de entrevistas, anamnese, observações e aplicação de instrumentos. Dessa forma, os registros de um aprendente podem ser mantidos de maneira estruturada, permitindo o acompanhamento das informações ao longo do processo avaliativo.
 
-Outro requisito está relacionado ao gerenciamento dos instrumentos utilizados na avaliação. O sistema deve possibilitar o cadastro e a organização dos instrumentos, contemplando informações de identificação e características relevantes para sua utilização. Deve ainda ser possível manter diferentes versões de um instrumento, permitindo registrar alterações e adaptações realizadas pelo profissional sem eliminar o histórico das versões anteriores. 
+Outro aspecto relevante é a rastreabilidade. Os registros do sistema devem conter informações suficientes para identificar quem os criou, quando foram criados e quando foram modificados. Essa rastreabilidade é implementada por meio dos campos de controle presentes nas entidades — \textit{createdAt}, \textit{updatedAt} e \textit{deletedAt} — e das referências ao usuário responsável por cada registro, como \textit{responsavelId} em aprendentes, \textit{autorId} em avaliações, \textit{aplicadorId} em aplicações e \textit{autorId} em relatórios. Essa abordagem permite reconstituir a autoria e o histórico das operações a partir da estrutura de dados, sem necessidade de um mecanismo de log de auditoria separado.
 
 Durante a aplicação de um instrumento, o profissional deve poder vinculá-lo a um determinado aprendente e registrar as informações obtidas no atendimento. As adaptações realizadas durante sua utilização devem ser identificáveis, de modo que o registro preserve informações suficientes para compreender em qual versão e em quais condições o instrumento foi aplicado. 
 
@@ -32,18 +34,20 @@ Com base nessas definições, os principais requisitos funcionais contemplados n
 \textbf{Código} & \textbf{Requisito funcional} \\
 \hline
 RF01 & Permitir o cadastro e a autenticação de usuários. \\
-RF02 & Permitir o controle de acesso às funcionalidades do sistema. \\
+RF02 & Permitir o controle de acesso às funcionalidades do sistema de acordo com o perfil do usuário. \\
 RF03 & Permitir o cadastro, edição e consulta dos dados dos aprendentes. \\
-RF04 & Permitir o registro de informações relacionadas ao processo de avaliação. \\
-RF05 & Permitir o cadastro e gerenciamento dos instrumentos avaliativos. \\
-RF06 & Permitir o gerenciamento de diferentes versões dos instrumentos. \\
-RF07 & Permitir o registro de adaptações realizadas nos instrumentos. \\
-RF08 & Permitir vincular um instrumento a um aprendente durante um atendimento. \\
-RF09 & Permitir registrar os resultados e observações obtidos durante a aplicação dos instrumentos. \\
-RF10 & Permitir consultar o histórico de avaliações e registros de um aprendente. \\
-RF11 & Permitir elaborar e armazenar devolutivas e relatórios. \\
-RF12 & Permitir gerar relatórios em formato PDF. \\
-RF13 & Registrar as ações realizadas pelos usuários para fins de rastreabilidade e auditoria. \\
+RF04 & Restringir a visualização dos aprendentes ao psicopedagogo responsável por cada um deles, com exceção do perfil administrador, que possui acesso irrestrito. \\
+RF05 & Permitir o registro de informações relacionadas ao processo de avaliação. \\
+RF06 & Permitir o cadastro e gerenciamento dos instrumentos avaliativos. \\
+RF07 & Restringir a visualização dos instrumentos avaliativos ao psicopedagogo que os criou, com exceção do perfil administrador. \\
+RF08 & Permitir o gerenciamento de diferentes versões dos instrumentos. \\
+RF09 & Permitir o registro de adaptações realizadas nos instrumentos. \\
+RF10 & Permitir vincular um instrumento a um aprendente durante um atendimento. \\
+RF11 & Permitir registrar os resultados e observações obtidos durante a aplicação dos instrumentos. \\
+RF12 & Permitir consultar o histórico de avaliações e registros de um aprendente. \\
+RF13 & Permitir elaborar e armazenar devolutivas e relatórios. \\
+RF14 & Permitir gerar relatórios em formato PDF. \\
+RF15 & Manter nos registros as informações de autoria e temporalidade necessárias para identificar quem criou cada dado e quando foi criado ou modificado. \\
 \hline
 \end{tabular}
 \caption{Requisitos funcionais}
@@ -74,9 +78,9 @@ Os principais requisitos não funcionais definidos são apresentados na Tabela \
 \textbf{Código} & \textbf{Requisito não funcional} \\
 \hline
 RNF01 & O sistema deve utilizar autenticação para controlar o acesso aos usuários. \\
-RNF02 & O sistema deve utilizar mecanismos de autorização para restringir o acesso às funcionalidades e informações. \\
+RNF02 & O sistema deve utilizar mecanismos de autorização para restringir o acesso às funcionalidades e informações, inclusive limitando a visualização de aprendentes e avaliações ao usuário responsável por cada registro. \\
 RNF03 & Os dados dos aprendentes devem ser armazenados de forma segura, considerando os princípios de proteção de dados da LGPD. \\
-RNF04 & As ações relevantes realizadas pelos usuários devem possuir mecanismos de rastreabilidade e auditoria. \\
+RNF04 & Os registros do sistema devem conter informações de autoria e temporalidade que permitam reconstituir quem criou ou alterou cada dado e quando. \\
 RNF05 & O sistema deve preservar o histórico das versões e alterações realizadas nos instrumentos avaliativos. \\
 RNF06 & A interface deve apresentar organização e usabilidade adequadas às atividades realizadas pelos profissionais. \\
 RNF07 & A aplicação deve apresentar uma arquitetura modular, facilitando sua manutenção e evolução. \\

@@ -28,7 +28,9 @@ A validação das informações de entrada é realizada com o Zod. Essa abordage
 
 A autenticação foi implementada utilizando JWT, com utilização de tokens de acesso e de renovação (refresh token). Essa estratégia permite identificar o usuário autenticado durante o acesso aos recursos protegidos da API e manter o gerenciamento da sessão por meio dos diferentes tipos de token.
 
-A autenticação está associada ao módulo \textit{auth} e ao middleware correspondente, responsável por participar do processo de proteção das rotas da aplicação. O backend também contempla diferentes perfis de usuário, definidos no modelo de dados como \textit{ADMIN}, \textit{PSICOPEDAGOGO} e \textit{VIEWER}, permitindo estabelecer diferentes níveis de acesso às funcionalidades do sistema.
+A autenticação está associada ao módulo \textit{auth} e ao middleware correspondente, responsável por participar do processo de proteção das rotas da aplicação. O backend também contempla diferentes perfis de usuário, definidos no modelo de dados como \textit{ADMIN}, \textit{PSICOPEDAGOGO} e \textit{VIEWER}, permitindo estabelecer diferentes níveis de acesso às funcionalidades do sistema. 
+
+Além do controle por perfil, o sistema implementa restrição de visibilidade baseada em titularidade: aprendentes e avaliações são vinculados ao usuário que os criou, e as operações de leitura retornam somente os registros pertencentes ao usuário autenticado, exceto para o perfil \textit{ADMIN}, que possui acesso irrestrito.
 
 Além da autenticação, o backend possui mecanismos de validação das requisições e tratamento de erros. A combinação desses mecanismos contribui para que as operações disponibilizadas pela API sejam executadas somente após o processamento das informações necessárias para cada recurso.
 
@@ -36,7 +38,11 @@ Além da autenticação, o backend possui mecanismos de validação das requisi�
 
 O módulo de aprendentes disponibiliza as operações necessárias para o cadastro e gerenciamento dos indivíduos acompanhados pelo profissional. Os dados são posteriormente utilizados nas aplicações dos instrumentos avaliativos, mantendo a associação entre o aprendente e os registros produzidos durante o processo de avaliação.
 
+A visibilidade dos aprendentes é controlada pelo campo \textit{responsavelId}, preenchido automaticamente com o identificador do usuário autenticado no momento do cadastro. Nas operações de listagem e consulta individual, o módulo aplica um filtro que restringe os resultados ao usuário responsável. O perfil \textit{ADMIN} constitui exceção a essa regra, tendo acesso irrestrito a todos os registros. Essa lógica é implementada na camada de serviço, antes da consulta ao banco de dados, sem expor ao cliente a distinção entre registros próprios e de outros usuários.
+
 O módulo de avaliações é responsável pelo gerenciamento dos instrumentos utilizados pelo sistema. A estrutura adotada permite representar avaliações compostas por diferentes questões e tipos de resposta. O versionamento desses instrumentos é mantido na camada de persistência, conforme apresentado na modelagem do banco de dados, permitindo relacionar diferentes versões de uma mesma avaliação.
+
+De maneira análoga ao módulo de aprendentes, a visibilidade das avaliações é controlada pelo campo \textit{autorId}, atribuído automaticamente ao usuário que criou o instrumento. As consultas de listagem e de detalhe aplicam o mesmo filtro de restrição por responsável, garantindo que cada profissional acesse somente os instrumentos que criou. Ao criar uma nova versão de uma avaliação, o campo \textit{autorId} é propagado para o novo registro, mantendo a consistência da titularidade ao longo do histórico de versões.
 
 As aplicações são tratadas separadamente pelo módulo \textit{aplicacoes}, permitindo associar uma avaliação a um aprendente e registrar o andamento desse processo. Essa separação entre avaliação e aplicação possibilita que um mesmo instrumento seja utilizado em diferentes processos avaliativos, mantendo cada aplicação como um registro independente.
 
@@ -55,5 +61,7 @@ A API possui documentação baseada em Swagger/OpenAPI, disponibilizada durante 
 Para os testes automatizados do backend foram utilizadas as ferramentas Vitest e Supertest. O projeto disponibiliza comandos específicos para execução dos testes e para geração de informações de cobertura, permitindo verificar o comportamento das funcionalidades implementadas.
 
 Também foram definidos procedimentos para geração do cliente do Prisma, execução das migrações e população inicial do banco de dados. Essas operações permitem preparar o ambiente de desenvolvimento de forma padronizada e manter a estrutura do banco sincronizada com o modelo utilizado pela aplicação.
+
+A rastreabilidade das informações é mantida por meio da estrutura do banco de dados, sem a utilização de um mecanismo de log de auditoria separado. Todas as entidades relevantes possuem campos \textit{createdAt} e \textit{updatedAt}, que registram automaticamente os momentos de criação e atualização de cada registro. As exclusões são realizadas de forma lógica por meio do campo \textit{deletedAt}, preservando o histórico dos dados sem removê-los fisicamente. Adicionalmente, os vínculos de autoria presentes no modelo — \textit{responsavelId} em aprendentes, \textit{autorId} em avaliações e relatórios, e \textit{aplicadorId} em aplicações — permitem identificar o usuário associado a cada registro. Essa abordagem possibilita reconstituir a autoria e a temporalidade das operações diretamente a partir dos dados persistidos.
 
 Dessa forma, o desenvolvimento do backend estabeleceu a camada responsável pela disponibilização da API REST, autenticação, validação das requisições, aplicação das operações relacionadas aos módulos do sistema, comunicação com o banco de dados e disponibilização dos dados utilizados pelo frontend. A organização modular adotada também fornece uma estrutura para a manutenção e evolução das funcionalidades relacionadas ao processo de avaliação psicopedagógica.
