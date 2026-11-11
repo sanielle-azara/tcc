@@ -1,0 +1,129 @@
+\chapter[Materiais e Métodos]{Materiais e Métodos}\label{capitulo4}
+
+Este capítulo descreve os materiais e os procedimentos metodológicos adotados na pesquisa, situada no campo da psicopedagogia articulada à engenharia de software. O estudo caracteriza-se como pesquisa aplicada, pois busca propor uma solução tecnológica para um problema concreto identificado na prática psicopedagógica: a ausência de sistemas web específicos e estruturados para registro, organização e análise de atendimentos clínicos. Do ponto de vista dos objetivos, assume natureza exploratória, uma vez que aprofunda a compreensão de conceitos, tecnologias e práticas relacionadas ao desenvolvimento de sistemas digitais voltados às áreas educacional e de saúde. 
+
+Os procedimentos adotados são predominantemente qualitativos, com ênfase em pesquisa bibliográfica e análise documental. Foram consultados artigos científicos, livros, documentos técnicos, diretrizes oficiais e legislações recentes, de modo a mapear lacunas na literatura e na infraestrutura tecnológica disponível, identificar requisitos funcionais e não funcionais e fundamentar a proposta do sistema web apresentada neste projeto. A perspectiva metodológica contempla, ainda, o delineamento de um plano de desenvolvimento incremental do sistema, compatível com a etapa de TCC 1, em que se priorizam a análise, a modelagem e a especificação da solução.
+
+\section{Softwares e Tecnologias Utilizadas}
+
+O desenvolvimento do sistema web proposto tomará como base um conjunto de tecnologias amplamente utilizadas no ambiente profissional, de modo a combinar robustez, escalabilidade e facilidade de manutenção com aderência às exigências de segurança e proteção de dados. O ecossistema tecnológico previsto compreende:
+
+\begin{itemize}
+    \item camada de frontend implementada em React.js, explorando componentes reutilizáveis, gerenciamento de estado e organização modular da interface, o que favorece a manutenção e a evolução futura do sistema;
+    \item camada de backend desenvolvida em Node.js com o uso do framework Express.js, possibilitando a criação de uma API REST estruturada, com rotas bem definidas e separação entre lógica de negócio e acesso a dados;
+    \item banco de dados relacional MySQL, escolhido por sua maturidade, suporte transacional adequado e ampla documentação, aspectos relevantes para o armazenamento de informações sensíveis e para a modelagem de relações entre atendimentos, instrumentos e registros qualitativos;
+    \item ferramenta de prototipagem Figma, utilizada para elaboração de wireframes, protótipos de alta fidelidade e fluxos de navegação, permitindo antecipar questões de usabilidade antes da implementação;
+    \item uso de Git para controle de versão do código-fonte e GitHub como repositório remoto, garantindo rastreabilidade das alterações, histórico de desenvolvimento e possibilidade de colaboração;
+    \item ferramenta Postman para testes de rotas da API, simulação de requisições e inspeção de respostas, apoiando a verificação da consistência entre frontend, backend e banco de dados.
+\end{itemize}
+
+A seleção dessas tecnologias considera, portanto, critérios de maturidade, comunidade ativa de desenvolvimento, compatibilidade com boas práticas de engenharia de software e capacidade de atender a requisitos de segurança, registro longitudinal e controle de acesso.
+
+\section{Referenciais Documentais e Instrumentos Psicopedagógicos}
+
+A definição dos requisitos funcionais e da lógica de organização dos módulos do sistema fundamenta-se em referenciais documentais amplamente utilizados na avaliação do desenvolvimento infantil e na prática psicopedagógica. Entre os principais instrumentos e documentos analisados, destacam-se:
+
+\begin{itemize}
+    \item Inventário Portage Operacionalizado \cite{PORTAGE_2018};
+    \item IDADI, Inventário Dimensional de Avaliação do Desenvolvimento Infantil \cite{IDADI_2020};
+    \item Denver II, teste de triagem do desenvolvimento \cite{DENVER_2018};
+    \item PRELEC, Protocolo de Avaliação dos Pré-Requisitos para Leitura, Escrita e Compreensão \cite{PRELEC_2024};
+    \item Diretrizes da Base Nacional Comum Curricular pertinentes ao desenvolvimento infantil \cite{bncc2017}.
+\end{itemize}
+
+A leitura desses materiais permite identificar dimensões do desenvolvimento frequentemente avaliadas, tipos de tarefas e formatos de registro empregados na prática profissional. Com base nessa análise, são delineadas estruturas de formulários, categorias de registro e campos para observações qualitativas que o sistema deverá contemplar. Os instrumentos não serão digitalizados integralmente neste TCC 1, mas servirão como referência para a modelagem dos cadastros de protocolos, dos metadados associados a eles e dos relatórios gerados pelo sistema.
+
+\section{Público-alvo e Contexto de Uso}
+
+O sistema proposto é direcionado a psicopedagogos atuantes em contextos clínicos, em consultórios ou serviços especializados, que demandam registros organizados de avaliações, devolutivas e planos de acompanhamento. O público-alvo, portanto, é composto exclusivamente por profissionais, e não por crianças ou famílias. O uso previsto abrange:
+
+\begin{itemize}
+    \item registro de dados de identificação de aprendentes e de responsáveis;
+    \item documentação de entrevistas iniciais, anamnese, observações e aplicação de instrumentos;
+    \item elaboração de relatórios interpretativos e registro de encaminhamentos.
+\end{itemize}
+
+Embora o foco do trabalho desses profissionais seja o atendimento a crianças de zero a seis anos, a interação com o sistema ocorre apenas por parte dos psicopedagogos. Em eventuais etapas de validação futura da ferramenta com usuários, somente profissionais adultos serão convidados, sem coleta direta de informações provenientes de crianças. Esse recorte garante, na etapa atual, que o desenvolvimento do sistema se concentre na modelagem técnico-metodológica, sem envolver, neste momento, pesquisa empírica com menores de idade.
+
+\section{Coleta de Dados}
+
+A coleta de dados para fundamentação da proposta tecnológica ocorre em três frentes complementares, articuladas entre si:
+
+\begin{itemize}
+    \item revisão bibliográfica narrativa, com foco em literatura recente sobre desenvolvimento infantil, avaliação psicopedagógica, instrumentos de triagem e diagnóstico, uso de tecnologias digitais na educação e requisitos para sistemas de informação em saúde e educação;
+    \item análise documental de instrumentos psicopedagógicos e protocolos de avaliação do desenvolvimento infantil, com identificação de categorias de registro, tipos de evidências coletadas e formas de devolutiva presentes nesses materiais;
+    \item levantamento de requisitos por meio de análise das tarefas psicopedagógicas descritas na literatura, identificação de limitações dos registros manuais e estudo comparativo de funcionalidades oferecidas por sistemas escolares e de gestão educacional amplamente utilizados, como SED, i-Educar e soluções afins.
+\end{itemize}
+
+Em um momento posterior, caso se opte por realizar entrevistas ou questionários com psicopedagogos para refinar requisitos e protótipos, esses procedimentos serão descritos em novo delineamento metodológico e submetidos à apreciação de comitê de ética em pesquisa, quando aplicável.
+
+\section{Análise de Dados}
+
+Os dados coletados por meio da literatura, dos instrumentos e da análise de sistemas existentes são tratados predominantemente de forma qualitativa. Adota-se um procedimento de análise temática, identificando categorias recorrentes associadas a:
+
+\begin{itemize}
+    \item necessidade de padronização e rastreabilidade dos registros;
+    \item dificuldades de organização e interpretação de dados oriundos de registros manuais;
+    \item limitações de instrumentos e formulários não informatizados;
+    \item ausência, em sistemas educacionais generalistas, de relatórios clínicos estruturados e de módulos específicos para psicopedagogia.
+\end{itemize}
+
+Essas categorias são, então, relacionadas com princípios de engenharia de software e requisitos de sistemas de informação discutidos na fundamentação teórica. A partir dessa articulação, elabora-se um conjunto de requisitos funcionais e não funcionais que orienta a modelagem do sistema. A análise não se limita a listar problemas, mas procura traduzi-los em decisões de projeto, tais como necessidade de base de dados orientada a registros longitudinais, módulos distintos para etapas da avaliação e mecanismos de controle de acesso e de versão de protocolos.
+
+\section{Desenvolvimento do Sistema}
+
+No que diz respeito ao desenvolvimento do sistema, adota-se como referência um modelo incremental e iterativo, em que os artefatos de análise e de projeto podem ser progressivamente refinados à medida que novos elementos são incorporados. Para fins deste TCC 1, enfatizam-se as etapas relacionadas à definição de requisitos, prototipagem de interfaces e modelagem de dados. A implementação plena e a validação sistemática com usuários configuram desdobramentos previstos para etapas seguintes do trabalho.
+
+As etapas metodológicas de desenvolvimento previstas são:
+
+\begin{enumerate}
+    \item Definição de requisitos
+    \begin{enumerate}
+        \item identificação de funcionalidades essenciais, como registro de entrevistas iniciais, anamnese, observações, aplicação de instrumentos e elaboração de relatórios;
+        \item especificação de requisitos não funcionais, incluindo segurança da informação, usabilidade, acessibilidade e conformidade com a Lei Geral de Proteção de Dados.
+    \end{enumerate}
+    \item Prototipagem de interfaces
+    \begin{enumerate}
+        \item construção de wireframes e protótipos de alta fidelidade no Figma, contemplando fluxos de navegação, formulários e telas de consulta;
+        \item quando viável, realização de validações exploratórias com psicopedagogos convidados, em caráter piloto, para coleta de impressões sobre clareza, organização e adequação das telas.
+    \end{enumerate}
+    \item Modelagem do sistema
+    \begin{enumerate}
+        \item definição do modelo de dados, com tabelas, relacionamentos e campos necessários para representar atendimentos, instrumentos e registros qualitativos;
+        \item especificação de fluxos de uso do sistema, incluindo cenários de cadastro, edição, consulta e geração de relatórios;
+        \item definição de modelos de relatório que representem, em formato estruturado, a lógica da devolutiva psicopedagógica.
+    \end{enumerate}
+    \item Implementação inicial
+    \begin{enumerate}
+        \item desenvolvimento da camada de backend e da camada de frontend de forma integrada ao banco de dados;
+        \item implementação de rotinas básicas de autenticação, autorização, logs de auditoria e controle de versões de instrumentos.
+    \end{enumerate}
+    \item Testes
+    \begin{enumerate}
+        \item realização de testes funcionais para verificar o comportamento das funcionalidades previstas;
+        \item realização de testes exploratórios de usabilidade, com foco em clareza de interface e fluxo de tarefas;
+        \item verificação de aspectos mínimos de segurança e consistência de dados, como proteção de rotas sensíveis e tratamento adequado de erros.
+    \end{enumerate}
+\end{enumerate}
+
+No escopo deste TCC 1, a ênfase recai sobre as etapas de levantamento e consolidação de requisitos, prototipagem e modelagem, podendo a implementação e os testes serem iniciados em caráter de protótipo funcional. A consolidação de um ambiente plenamente operacional e o uso em cenário real são perspectivas para continuidade do projeto.
+
+\section{Procedimentos Éticos}
+
+Considerando que a proposta envolve dados potencialmente sensíveis relativos a atendimentos psicopedagógicos, são observados princípios éticos compatíveis com a legislação vigente e com diretrizes de proteção de dados no contexto educacional e de saúde. Entre as medidas previstas destacam-se:
+
+\begin{itemize}
+    \item adoção de princípios da Lei Geral de Proteção de Dados, como necessidade, minimização de dados, finalidade e transparência;
+    \item previsão de anonimização ou pseudonimização de registros utilizados em ambientes de teste e demonstração;
+    \item armazenamento seguro em banco de dados protegido, com uso de mecanismos de autenticação e autorização por perfis de acesso;
+    \item registro de logs de acesso e alteração para fins de auditoria e responsabilização;
+    \item quando houver participação de profissionais em procedimentos de validação, obtenção prévia de Termo de Consentimento Livre e Esclarecido, em conformidade com as normas éticas aplicáveis.
+\end{itemize}
+
+Na etapa de TCC 1, não haverá coleta direta de dados de crianças nem análise de prontuários reais. As informações utilizadas para modelagem serão oriundas de literatura, documentos públicos e instrumentos, ou simuladas em ambiente de teste, o que reduz o risco ético envolvido neste momento.
+
+\section{Limitações do Método}
+
+O delineamento metodológico adotado apresenta limitações que precisam ser reconhecidas. Em primeiro lugar, a validação empírica do protótipo, caso realizada, tende a envolver um número restrito de profissionais, o que limita a generalização das percepções sobre usabilidade e adequação funcional. Em segundo lugar, a ausência de coleta direta com crianças impede, na etapa atual, analisar o impacto do sistema sobre práticas concretas de avaliação em contexto real, restringindo a avaliação a uma perspectiva de viabilidade técnica e metodológica. Em terceiro lugar, a implementação ocorrerá inicialmente em ambiente de desenvolvimento controlado, sem implantação em larga escala em instituições, o que impossibilita, neste momento, examinar aspectos como desempenho em alta carga, integração com sistemas legados e adesão institucional.
+
+Apesar dessas limitações, o método adotado é adequado aos objetivos de TCC 1, na medida em que permite consolidar uma proposta tecnológica coerente com a literatura, tecnicamente fundamentada e suficientemente detalhada para subsidiar etapas posteriores de implementação, validação ampliada e eventual implantação em contextos psicopedagógicos reais.
