@@ -16,6 +16,33 @@ const loginFailed = async (user, email, motivo) => {
   });
 };
 
+const register = async (name, email, password) => {
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    throw Object.assign(new Error('Email já cadastrado'), { status: 409 });
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+  const user = await prisma.user.create({
+    data: { name, email, passwordHash, role: 'PSICOPEDAGOGO', status: 'ACTIVE' },
+  });
+
+  await logEvent({ action: 'CREATE', userId: user.id, userRole: user.role, entity: 'User', entityId: user.id });
+
+  const accessToken = generateAccessToken(user.id, user.role);
+  const refreshTokenValue = generateRefreshToken(user.id);
+
+  await prisma.refreshToken.create({
+    data: { token: refreshTokenValue, userId: user.id, expiresAt: getRefreshTokenExpiry() },
+  });
+
+  return {
+    accessToken,
+    refreshToken: refreshTokenValue,
+    user: { id: user.id, name: user.name, email: user.email, role: user.role },
+  };
+};
+
 const login = async (email, password) => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || user.deletedAt) {
@@ -130,4 +157,4 @@ const changePassword = async (userId, currentPassword, newPassword) => {
   await prisma.user.update({ where: { id: userId }, data: { passwordHash: hash } });
 };
 
-module.exports = { login, refreshToken, logout, forgotPassword, resetPassword, changePassword };
+module.exports = { register, login, refreshToken, logout, forgotPassword, resetPassword, changePassword };

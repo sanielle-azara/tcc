@@ -33,6 +33,15 @@ const authService = require('./auth.service');
  *       401:
  *         description: Credenciais inválidas
  */
+const register = async (req, res, next) => {
+  try {
+    const result = await authService.register(req.body.name, req.body.email, req.body.password);
+    res.status(201).json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const login = async (req, res, next) => {
   try {
     const result = await authService.login(req.body.email, req.body.password);
@@ -216,4 +225,4 @@ const me = (req, res) => {
   res.json({ success: true, data: req.user });
 };
 
-module.exports = { login, refresh, logout, forgotPassword, resetPassword, changePassword, me };
+module.exports = { register, login, refresh, logout, forgotPassword, resetPassword, changePassword, me };

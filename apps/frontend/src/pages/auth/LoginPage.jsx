@@ -99,6 +99,13 @@ const LoginPage = () => {
             >
               {isSubmitting ? 'Entrando...' : 'Entrar'}
             </Button>
+
+            <Box textAlign="center" mt={2}>
+              <Typography variant="body2" color="text.secondary">
+                Não tem uma conta?{' '}
+                <Link to="/cadastro" style={{ fontSize: 14, color: '#1976d2' }}>Criar conta</Link>
+              </Typography>
+            </Box>
           </Box>
         </CardContent>
       </Card>

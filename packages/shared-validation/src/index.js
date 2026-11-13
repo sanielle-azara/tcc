@@ -37,6 +37,22 @@ export const changePasswordSchema = z
     path: ['confirmPassword'],
   });
 
+export const registerSchema = z
+  .object({
+    name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').max(100),
+    email: z.string().email('Email inválido'),
+    password: z
+      .string()
+      .min(6, 'Senha deve ter pelo menos 6 caracteres')
+      .regex(/[A-Z]/, 'Senha deve conter pelo menos uma letra maiúscula')
+      .regex(/[0-9]/, 'Senha deve conter pelo menos um número'),
+    confirmPassword: z.string().min(1, 'Confirmação de senha é obrigatória'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Senhas não conferem',
+    path: ['confirmPassword'],
+  });
+
 export const createUserSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').max(100),
   email: z.string().email('Email inválido'),
