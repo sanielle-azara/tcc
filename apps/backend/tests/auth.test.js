@@ -1,8 +1,12 @@
-const { describe, it, expect, beforeEach, vi } = require('vitest');
-const request = require('supertest');
-const app = require('../src/app');
-const prisma = require('../src/config/prisma');
-const bcrypt = require('bcryptjs');
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { createRequire } from 'node:module';
+import request from 'supertest';
+
+// App e Prisma são carregados pelo require nativo para usar o mock registrado em setup.js
+const nodeRequire = createRequire(import.meta.url);
+const app = nodeRequire('../src/app');
+const prisma = nodeRequire('../src/config/prisma');
+const bcrypt = nodeRequire('bcryptjs');
 
 describe('POST /api/auth/login', () => {
   beforeEach(() => vi.clearAllMocks());

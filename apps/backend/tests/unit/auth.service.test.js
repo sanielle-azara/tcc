@@ -1,31 +1,23 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { createRequire } from 'node:module';
 
-vi.mock('../../src/config/prisma', () => ({
-  default: {
-    user: {
-      findUnique: vi.fn(),
-    },
-    refreshToken: {
-      create: vi.fn(),
-      updateMany: vi.fn(),
-    },
-  },
-}));
-
-vi.mock('bcryptjs', () => ({
-  default: {
-    compare: vi.fn(),
-    hash: vi.fn(),
-  },
-}));
-
-import prisma from '../../src/config/prisma';
-import bcrypt from 'bcryptjs';
-import { login } from '../../src/modules/auth/auth.service';
+// O service é CommonJS: o Prisma vem do mock registrado em setup.js e o bcrypt
+// é espionado no próprio objeto do módulo, que é o mesmo usado pelo service.
+const nodeRequire = createRequire(import.meta.url);
+const prisma = nodeRequire('../../src/config/prisma');
+const bcrypt = nodeRequire('bcryptjs');
+const { login } = nodeRequire('../../src/modules/auth/auth.service');
 
 describe('AuthService', () => {
+  let compareSpy;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    compareSpy = vi.spyOn(bcrypt, 'compare');
+  });
+
+  afterEach(() => {
+    compareSpy.mockRestore();
   });
 
   describe('login', () => {
@@ -43,14 +35,14 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue({
         id: '1', status: 'ACTIVE', email: 'test@test.com', passwordHash: 'hash',
       });
-      bcrypt.compare.mockResolvedValue(false);
+      compareSpy.mockResolvedValue(false);
       await expect(login('test@test.com', 'wrongpass')).rejects.toMatchObject({ status: 401 });
     });
 
     it('should return tokens on successful login', async () => {
       const user = { id: '1', name: 'Test', email: 'test@test.com', role: 'PSICOPEDAGOGO', status: 'ACTIVE', passwordHash: 'hash' };
       prisma.user.findUnique.mockResolvedValue(user);
-      bcrypt.compare.mockResolvedValue(true);
+      compareSpy.mockResolvedValue(true);
       prisma.refreshToken.create.mockResolvedValue({});
 
       const result = await login('test@test.com', 'password');
