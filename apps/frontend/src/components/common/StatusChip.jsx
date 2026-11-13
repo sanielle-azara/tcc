@@ -10,7 +10,6 @@ const statusConfig = {
   COMPLETED: { label: 'Finalizada', color: 'success' },
   ADMIN: { label: 'Admin', color: 'error' },
   PSICOPEDAGOGO: { label: 'Psicopedagogo', color: 'primary' },
-  VIEWER: { label: 'Visualizador', color: 'default' },
 };
 
 const StatusChip = ({ status, size = 'small' }) => {

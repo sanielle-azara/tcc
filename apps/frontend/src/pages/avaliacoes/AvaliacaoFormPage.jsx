@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box, Button, Card, CardContent, Grid, TextField, MenuItem, Typography,
-  Alert, CircularProgress, Divider, IconButton, Tooltip, Chip,
+  Alert, CircularProgress, IconButton, Tooltip, Chip,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -13,22 +13,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { avaliacoesApi } from '../../api/avaliacoes';
 import { createAvaliacaoSchema, updateAvaliacaoSchema } from '@psicopedagogia/shared-validation';
 import PageHeader from '../../components/common/PageHeader';
+import { QUESTION_TYPES, toFormValues, toAvaliacaoPayload, sameQuestions } from './avaliacaoForm';
 
-const QUESTION_TYPES = [
-  { value: 'TEXT', label: 'Texto curto' },
-  { value: 'LONG_TEXT', label: 'Texto longo' },
-  { value: 'NUMERIC', label: 'Numérico' },
-  { value: 'DATE', label: 'Data' },
-  { value: 'SINGLE_SELECT', label: 'Seleção única' },
-  { value: 'MULTI_SELECT', label: 'Seleção múltipla' },
-  { value: 'SCALE', label: 'Escala' },
-  { value: 'YES_NO', label: 'Sim/Não' },
-];
-
-const QuestionCard = ({ index, register, errors, control, watch, remove }) => {
+const QuestionCard = ({ index, register, errors, watch, remove }) => {
   const type = watch(`questions.${index}.type`);
   const hasOptions = ['SINGLE_SELECT', 'MULTI_SELECT'].includes(type);
   const isScale = type === 'SCALE';
+  const qErrors = errors?.questions?.[index];
 
   return (
     <Card variant="outlined" sx={{ mb: 2 }}>
@@ -50,8 +41,8 @@ const QuestionCard = ({ index, register, errors, control, watch, remove }) => {
               {...register(`questions.${index}.text`)}
               label="Pergunta *"
               fullWidth
-              error={!!errors?.questions?.[index]?.text}
-              helperText={errors?.questions?.[index]?.text?.message}
+              error={!!qErrors?.text}
+              helperText={qErrors?.text?.message}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -61,7 +52,8 @@ const QuestionCard = ({ index, register, errors, control, watch, remove }) => {
               select
               fullWidth
               defaultValue="TEXT"
-              error={!!errors?.questions?.[index]?.type}
+              error={!!qErrors?.type}
+              helperText={qErrors?.type?.message}
             >
               {QUESTION_TYPES.map((t) => (
                 <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>
@@ -74,6 +66,8 @@ const QuestionCard = ({ index, register, errors, control, watch, remove }) => {
               label="Texto de ajuda"
               fullWidth
               size="small"
+              error={!!qErrors?.helpText}
+              helperText={qErrors?.helpText?.message}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -92,17 +86,27 @@ const QuestionCard = ({ index, register, errors, control, watch, remove }) => {
 
           {isScale && (
             <>
-              <Grid item xs={3}>
-                <TextField {...register(`questions.${index}.scaleMin`, { valueAsNumber: true })} label="Mínimo" type="number" fullWidth size="small" />
+              <Grid item xs={6} md={3}>
+                <TextField
+                  {...register(`questions.${index}.scaleMin`)}
+                  label="Mínimo" type="number" fullWidth size="small"
+                  error={!!qErrors?.scaleMin}
+                  helperText={qErrors?.scaleMin?.message}
+                />
               </Grid>
-              <Grid item xs={3}>
-                <TextField {...register(`questions.${index}.scaleMax`, { valueAsNumber: true })} label="Máximo" type="number" fullWidth size="small" />
+              <Grid item xs={6} md={3}>
+                <TextField
+                  {...register(`questions.${index}.scaleMax`)}
+                  label="Máximo" type="number" fullWidth size="small"
+                  error={!!qErrors?.scaleMax}
+                  helperText={qErrors?.scaleMax?.message}
+                />
               </Grid>
-              <Grid item xs={3}>
-                <TextField {...register(`questions.${index}.scaleMinLabel`)} label="Label mínimo" fullWidth size="small" />
+              <Grid item xs={6} md={3}>
+                <TextField {...register(`questions.${index}.scaleMinLabel`)} label="Rótulo do mínimo" fullWidth size="small" />
               </Grid>
-              <Grid item xs={3}>
-                <TextField {...register(`questions.${index}.scaleMaxLabel`)} label="Label máximo" fullWidth size="small" />
+              <Grid item xs={6} md={3}>
+                <TextField {...register(`questions.${index}.scaleMaxLabel`)} label="Rótulo do máximo" fullWidth size="small" />
               </Grid>
             </>
           )}
@@ -111,12 +115,13 @@ const QuestionCard = ({ index, register, errors, control, watch, remove }) => {
             <Grid item xs={12}>
               <TextField
                 {...register(`questions.${index}.options`)}
-                label="Opções (uma por linha)"
+                label="Opções (uma por linha) *"
                 fullWidth
                 multiline
                 rows={3}
                 size="small"
-                helperText="Digite uma opção por linha"
+                error={!!qErrors?.options}
+                helperText={qErrors?.options?.message || 'Digite uma opção por linha'}
               />
             </Grid>
           )}
@@ -131,6 +136,7 @@ const AvaliacaoFormPage = () => {
   const isEdit = !!id;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [formError, setFormError] = useState('');
 
   const { data: avaliacao, isLoading: loadingData } = useQuery({
     queryKey: ['avaliacao', id],
@@ -138,58 +144,64 @@ const AvaliacaoFormPage = () => {
     enabled: isEdit,
   });
 
+  // O Zod valida o payload da API, não os valores crus do formulário
+  const schemaResolver = zodResolver(isEdit ? updateAvaliacaoSchema : createAvaliacaoSchema);
   const { register, handleSubmit, reset, watch, control, formState: { errors, isSubmitting } } = useForm({
-    resolver: zodResolver(isEdit ? updateAvaliacaoSchema : createAvaliacaoSchema),
+    resolver: (values, context, options) => schemaResolver(toAvaliacaoPayload(values), context, options),
     defaultValues: { status: 'DRAFT', questions: [] },
   });
 
   const { fields, append, remove } = useFieldArray({ control, name: 'questions' });
 
   useEffect(() => {
-    if (avaliacao) {
-      reset({
-        ...avaliacao,
-        questions: avaliacao.questions.map((q) => ({
-          ...q,
-          options: Array.isArray(q.options)
-            ? q.options.join('\n')
-            : q.options
-            ? JSON.parse(q.options).join('\n')
-            : '',
-        })),
-      });
-    }
+    if (avaliacao) reset(toFormValues(avaliacao));
   }, [avaliacao, reset]);
 
   const mutation = useMutation({
-    mutationFn: (data) => {
-      const payload = {
-        ...data,
-        questions: (data.questions || []).map((q, i) => ({
-          ...q,
-          order: i + 1,
-          options: q.options && typeof q.options === 'string'
-            ? q.options.split('\n').filter((o) => o.trim())
-            : q.options,
-        })),
-      };
-      return isEdit ? avaliacoesApi.update(id, payload) : avaliacoesApi.create(payload);
-    },
+    mutationFn: (payload) => (isEdit ? avaliacoesApi.update(id, payload) : avaliacoesApi.create(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['avaliacoes'] });
+      queryClient.invalidateQueries({ queryKey: ['avaliacao', id] });
       navigate('/avaliacoes');
     },
   });
 
+  const onValid = (payload) => {
+    setFormError('');
+    // Perguntas inalteradas não são reenviadas, para não gerar uma nova versão sem necessidade
+    if (isEdit && avaliacao && sameQuestions(payload.questions, avaliacao)) {
+      const metadata = { ...payload };
+      delete metadata.questions;
+      return mutation.mutate(metadata);
+    }
+    return mutation.mutate(payload);
+  };
+
+  const onInvalid = () => setFormError('Há campos com erro. Revise os campos destacados.');
+
   const addQuestion = () => {
-    append({ text: '', type: 'TEXT', required: true, order: fields.length + 1 });
+    append({ text: '', type: 'TEXT', required: true, helpText: '', options: '', scaleMin: '', scaleMax: '', scaleMinLabel: '', scaleMaxLabel: '' });
   };
 
   if (isEdit && loadingData) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>;
 
+  const totalAplicacoes = avaliacao?._count?.aplicacoes || 0;
+  const questionsError = errors.questions?.root?.message || errors.questions?.message;
+
   return (
     <Box>
       <PageHeader title={isEdit ? 'Editar Avaliação' : 'Nova Avaliação'} />
+
+      {isEdit && totalAplicacoes > 0 && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Este instrumento já foi utilizado em {totalAplicacoes} aplicação(ões). Se as perguntas forem
+          alteradas, será criada a versão v{avaliacao.version + 1} e a versão atual será arquivada; as
+          aplicações já realizadas continuam ligadas à versão em que foram feitas. Alterações apenas no
+          nome, categoria, descrição ou status são aplicadas à versão atual.
+        </Alert>
+      )}
+
+      {formError && <Alert severity="error" sx={{ mb: 2 }}>{formError}</Alert>}
 
       {mutation.isError && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -197,7 +209,7 @@ const AvaliacaoFormPage = () => {
         </Alert>
       )}
 
-      <Box component="form" onSubmit={handleSubmit((d) => mutation.mutate(d))} noValidate>
+      <Box component="form" onSubmit={handleSubmit(onValid, onInvalid)} noValidate>
         <Card sx={{ mb: 2 }}>
           <CardContent>
             <Typography variant="subtitle1" fontWeight={600} mb={2}>Informações da Avaliação</Typography>
@@ -231,8 +243,8 @@ const AvaliacaoFormPage = () => {
           </Button>
         </Box>
 
-        {errors.questions?.message && (
-          <Alert severity="error" sx={{ mb: 2 }}>{errors.questions.message}</Alert>
+        {questionsError && (
+          <Alert severity="error" sx={{ mb: 2 }}>{questionsError}</Alert>
         )}
 
         {fields.map((field, index) => (
@@ -241,7 +253,6 @@ const AvaliacaoFormPage = () => {
             index={index}
             register={register}
             errors={errors}
-            control={control}
             watch={watch}
             remove={remove}
           />
@@ -258,9 +269,9 @@ const AvaliacaoFormPage = () => {
 
         <Box display="flex" gap={2} mt={3} justifyContent="flex-end">
           <Button variant="outlined" onClick={() => navigate('/avaliacoes')}>Cancelar</Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}
-            startIcon={isSubmitting ? <CircularProgress size={18} /> : null}>
-            {isSubmitting ? 'Salvando...' : 'Salvar Avaliação'}
+          <Button type="submit" variant="contained" disabled={isSubmitting || mutation.isPending}
+            startIcon={isSubmitting || mutation.isPending ? <CircularProgress size={18} /> : null}>
+            {isSubmitting || mutation.isPending ? 'Salvando...' : 'Salvar Avaliação'}
           </Button>
         </Box>
       </Box>

@@ -21,7 +21,7 @@ const makeAprendente = (responsavelId = 'user-001') => ({
 });
 
 async function getToken(role = 'PSICOPEDAGOGO') {
-  const hash = await bcrypt.hash('Senha@123', 12);
+  const hash = await bcrypt.hash('Senha@123', 4);
   const user = makeUser(role);
   user.passwordHash = hash;
   prisma.user.findUnique.mockResolvedValue(user);
@@ -75,20 +75,6 @@ describe('GET /api/aprendentes', () => {
 
 describe('POST /api/aprendentes', () => {
   beforeEach(() => vi.clearAllMocks());
-
-  it('retorna 403 para perfil VIEWER', async () => {
-    const token = await getToken('VIEWER');
-    prisma.user.findUnique.mockResolvedValue(makeUser('VIEWER'));
-
-    const res = await request(app)
-      .post('/api/aprendentes')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        name: 'Novo', birthDate: '2015-01-01', sexo: 'MASCULINO',
-        responsavelNome: 'Mãe', contatoPrincipal: '(31)99999-0001',
-      });
-    expect(res.status).toBe(403);
-  });
 
   it('cria aprendente com responsavelId do usuário logado', async () => {
     const token = await getToken('PSICOPEDAGOGO');

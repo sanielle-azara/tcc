@@ -56,7 +56,7 @@ describe('ProtectedRoute', () => {
     const routeComRoles = (
       <MemoryRouter initialEntries={['/protegida']}>
         <AuthContext.Provider value={{
-          user: { id: 'u1', role: 'VIEWER' }, loading: false,
+          user: { id: 'u1', role: 'PSICOPEDAGOGO' }, loading: false,
           login: vi.fn(), logout: vi.fn(), isAdmin: false,
         }}>
           <Routes>
@@ -64,8 +64,8 @@ describe('ProtectedRoute', () => {
             <Route
               path="/protegida"
               element={
-                <ProtectedRoute roles={['ADMIN', 'PSICOPEDAGOGO']}>
-                  <div>Só para admin/prof</div>
+                <ProtectedRoute roles={['ADMIN']}>
+                  <div>Só para admin</div>
                 </ProtectedRoute>
               }
             />
@@ -75,7 +75,7 @@ describe('ProtectedRoute', () => {
     );
     render(routeComRoles);
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.queryByText('Só para admin/prof')).not.toBeInTheDocument();
+    expect(screen.queryByText('Só para admin')).not.toBeInTheDocument();
   });
 
   it('exibe conteúdo quando perfil está na lista de roles permitidas', () => {

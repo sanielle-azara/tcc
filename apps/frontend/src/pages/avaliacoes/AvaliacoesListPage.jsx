@@ -25,7 +25,6 @@ const AvaliacoesListPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const canEdit = user?.role !== 'VIEWER';
   const isAdmin = user?.role === 'ADMIN';
 
   const { data, isLoading } = useQuery({
@@ -59,13 +58,11 @@ const AvaliacoesListPage = () => {
               <VisibilityIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          {canEdit && (
-            <Tooltip title="Editar">
-              <IconButton size="small" onClick={() => navigate(`/avaliacoes/${row.id}/editar`)}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
+          <Tooltip title="Editar">
+            <IconButton size="small" onClick={() => navigate(`/avaliacoes/${row.id}/editar`)}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           {isAdmin && (
             <Tooltip title="Excluir">
               <IconButton size="small" color="error" onClick={() => setDeleteId(row.id)}>
@@ -83,7 +80,7 @@ const AvaliacoesListPage = () => {
       <PageHeader
         title="Avaliações"
         subtitle="Formulários de avaliação psicopedagógica"
-        action={canEdit ? () => navigate('/avaliacoes/nova') : undefined}
+        action={() => navigate('/avaliacoes/nova')}
         actionLabel="Nova Avaliação"
       />
       <Box mb={2}>

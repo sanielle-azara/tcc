@@ -10,7 +10,6 @@ import SaveIcon from '@mui/icons-material/Save';
 import { relatoriosApi } from '../../api/relatorios';
 import { formatDate, formatDateTime, calculateAge } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
-import { useAuth } from '../../contexts/AuthContext';
 
 const SectionTitle = ({ children }) => (
   <Typography variant="subtitle1" fontWeight={700} sx={{ mt: 2, mb: 1, color: 'primary.main' }}>{children}</Typography>
@@ -27,8 +26,6 @@ const RelatorioDetailPage = () => {
   const { id, aplicacaoId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
-  const canEdit = user?.role !== 'VIEWER';
 
   const queryFn = id
     ? () => relatoriosApi.findById(id).then((r) => r.data.data)
@@ -161,38 +158,28 @@ const RelatorioDetailPage = () => {
           )}
 
           <SectionTitle>Observações do Profissional</SectionTitle>
-          {canEdit ? (
-            <TextField
-              fullWidth multiline rows={4}
-              value={observacoes !== '' ? observacoes : (r.observacoesProfissional || '')}
-              onChange={(e) => setObservacoes(e.target.value)}
-              placeholder="Descreva suas observações..."
-            />
-          ) : (
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{r.observacoesProfissional || '—'}</Typography>
-          )}
+          <TextField
+            fullWidth multiline rows={4}
+            value={observacoes !== '' ? observacoes : (r.observacoesProfissional || '')}
+            onChange={(e) => setObservacoes(e.target.value)}
+            placeholder="Descreva suas observações..."
+          />
 
           <SectionTitle>Conclusão</SectionTitle>
-          {canEdit ? (
-            <TextField
-              fullWidth multiline rows={6}
-              value={conclusao !== '' ? conclusao : (r.conclusao || '')}
-              onChange={(e) => setConclusao(e.target.value)}
-              placeholder="Descreva a conclusão do profissional..."
-            />
-          ) : (
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{r.conclusao || '—'}</Typography>
-          )}
+          <TextField
+            fullWidth multiline rows={6}
+            value={conclusao !== '' ? conclusao : (r.conclusao || '')}
+            onChange={(e) => setConclusao(e.target.value)}
+            placeholder="Descreva a conclusão do profissional..."
+          />
 
-          {canEdit && (
-            <Box display="flex" gap={2} mt={2} justifyContent="flex-end">
-              <Button variant="contained" startIcon={<SaveIcon />}
-                onClick={() => saveMutation.mutate()}
-                disabled={saveMutation.isPending}>
-                Salvar Relatório
-              </Button>
-            </Box>
-          )}
+          <Box display="flex" gap={2} mt={2} justifyContent="flex-end">
+            <Button variant="contained" startIcon={<SaveIcon />}
+              onClick={() => saveMutation.mutate()}
+              disabled={saveMutation.isPending}>
+              Salvar Relatório
+            </Button>
+          </Box>
         </CardContent>
       </Card>
 

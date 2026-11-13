@@ -1,7 +1,6 @@
 export const USER_ROLES = {
   ADMIN: 'ADMIN',
   PSICOPEDAGOGO: 'PSICOPEDAGOGO',
-  VIEWER: 'VIEWER',
 };
 
 export const USER_STATUS = {

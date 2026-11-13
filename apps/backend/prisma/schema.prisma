@@ -237,7 +237,6 @@ model Relatorio {
 enum UserRole {
   ADMIN
   PSICOPEDAGOGO
-  VIEWER
 }
 
 enum UserStatus {

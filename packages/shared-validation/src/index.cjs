@@ -47,14 +47,14 @@ const createUserSchema = z.object({
     .min(6, 'Senha deve ter pelo menos 6 caracteres')
     .regex(/[A-Z]/, 'Senha deve conter pelo menos uma letra maiúscula')
     .regex(/[0-9]/, 'Senha deve conter pelo menos um número'),
-  role: z.enum(['ADMIN', 'PSICOPEDAGOGO', 'VIEWER']).default('PSICOPEDAGOGO'),
+  role: z.enum(['ADMIN', 'PSICOPEDAGOGO']).default('PSICOPEDAGOGO'),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
 });
 
 const updateUserSchema = z.object({
   name: z.string().min(2).max(100).optional(),
   email: z.string().email().optional(),
-  role: z.enum(['ADMIN', 'PSICOPEDAGOGO', 'VIEWER']).optional(),
+  role: z.enum(['ADMIN', 'PSICOPEDAGOGO']).optional(),
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
 });
 
@@ -86,7 +86,15 @@ const questionSchema = z.object({
   scaleMinLabel: z.string().max(50).optional(),
   scaleMaxLabel: z.string().max(50).optional(),
   helpText: z.string().max(300).optional(),
-});
+})
+  .superRefine((q, ctx) => {
+    if (['SINGLE_SELECT', 'MULTI_SELECT'].includes(q.type) && !(q.options && q.options.length > 0)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['options'], message: 'Informe pelo menos uma opção' });
+    }
+    if (q.type === 'SCALE' && q.scaleMin !== undefined && q.scaleMax !== undefined && q.scaleMin >= q.scaleMax) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['scaleMax'], message: 'O máximo deve ser maior que o mínimo' });
+    }
+  });
 
 const createAvaliacaoSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').max(150),

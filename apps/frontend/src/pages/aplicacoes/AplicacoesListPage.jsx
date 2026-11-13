@@ -10,7 +10,6 @@ import PageHeader from '../../components/common/PageHeader';
 import DataTable from '../../components/common/DataTable';
 import StatusChip from '../../components/common/StatusChip';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-import { useAuth } from '../../contexts/AuthContext';
 
 const AplicacoesListPage = () => {
   const [page, setPage] = useState(0);
@@ -19,8 +18,6 @@ const AplicacoesListPage = () => {
   const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
-  const canEdit = user?.role !== 'VIEWER';
 
   const { data, isLoading } = useQuery({
     queryKey: ['aplicacoes', page, rowsPerPage],
@@ -53,7 +50,7 @@ const AplicacoesListPage = () => {
               <VisibilityIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          {canEdit && row.status !== 'COMPLETED' && (
+          {row.status !== 'COMPLETED' && (
             <Tooltip title="Excluir">
               <IconButton size="small" color="error" onClick={() => setDeleteId(row.id)}>
                 <DeleteIcon fontSize="small" />
@@ -70,7 +67,7 @@ const AplicacoesListPage = () => {
       <PageHeader
         title="Aplicações"
         subtitle="Aplicação de avaliações aos aprendentes"
-        action={canEdit ? () => navigate('/aplicacoes/nova') : undefined}
+        action={() => navigate('/aplicacoes/nova')}
         actionLabel="Nova Aplicação"
       />
       <DataTable

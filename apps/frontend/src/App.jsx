@@ -18,6 +18,7 @@ import AprendenteFormPage from './pages/aprendentes/AprendenteFormPage';
 import AprendenteDetailPage from './pages/aprendentes/AprendenteDetailPage';
 import AvaliacoesListPage from './pages/avaliacoes/AvaliacoesListPage';
 import AvaliacaoFormPage from './pages/avaliacoes/AvaliacaoFormPage';
+import AvaliacaoDetailPage from './pages/avaliacoes/AvaliacaoDetailPage';
 import AplicacoesListPage from './pages/aplicacoes/AplicacoesListPage';
 import AplicacaoFormPage from './pages/aplicacoes/AplicacaoFormPage';
 import AplicacaoDetailPage from './pages/aplicacoes/AplicacaoDetailPage';
@@ -59,7 +60,7 @@ function App() {
 
                 <Route path="/avaliacoes" element={<AvaliacoesListPage />} />
                 <Route path="/avaliacoes/nova" element={<AvaliacaoFormPage />} />
-                <Route path="/avaliacoes/:id" element={<AvaliacoesListPage />} />
+                <Route path="/avaliacoes/:id" element={<AvaliacaoDetailPage />} />
                 <Route path="/avaliacoes/:id/editar" element={<AvaliacaoFormPage />} />
 
                 <Route path="/aplicacoes" element={<AplicacoesListPage />} />

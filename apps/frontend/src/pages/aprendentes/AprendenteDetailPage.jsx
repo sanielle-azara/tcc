@@ -10,7 +10,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { aprendentesApi } from '../../api/aprendentes';
 import { formatDate, calculateAge } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
-import { useAuth } from '../../contexts/AuthContext';
 
 const InfoField = ({ label, value }) => (
   <Box mb={1.5}>
@@ -23,8 +22,6 @@ const AprendenteDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
-  const canEdit = user?.role !== 'VIEWER';
   const [tab, setTab] = useState(0);
   const [novaObs, setNovaObs] = useState('');
 
@@ -51,7 +48,7 @@ const AprendenteDetailPage = () => {
       <PageHeader
         title={a.name}
         subtitle={`${calculateAge(a.birthDate)} anos • ${a.escolaSerie || 'Série não informada'}`}
-        action={canEdit ? () => navigate(`/aprendentes/${id}/editar`) : undefined}
+        action={() => navigate(`/aprendentes/${id}/editar`)}
         actionLabel="Editar"
         actionIcon={<EditIcon />}
       />
@@ -119,28 +116,26 @@ const AprendenteDetailPage = () => {
 
       {tab === 1 && (
         <Box>
-          {canEdit && (
-            <Card sx={{ mb: 2 }}>
-              <CardContent>
-                <Typography variant="subtitle1" fontWeight={600} mb={1}>Registrar Acompanhamento</Typography>
-                <TextField
-                  multiline rows={3} fullWidth
-                  placeholder="Descreva a observação ou evolução do aprendente..."
-                  value={novaObs}
-                  onChange={(e) => setNovaObs(e.target.value)}
-                />
-                <Box mt={1} display="flex" justifyContent="flex-end">
-                  <Button
-                    variant="contained" startIcon={<AddIcon />}
-                    onClick={() => addHistoricoMutation.mutate(novaObs)}
-                    disabled={!novaObs.trim() || addHistoricoMutation.isPending}
-                  >
-                    Registrar
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          )}
+          <Card sx={{ mb: 2 }}>
+            <CardContent>
+              <Typography variant="subtitle1" fontWeight={600} mb={1}>Registrar Acompanhamento</Typography>
+              <TextField
+                multiline rows={3} fullWidth
+                placeholder="Descreva a observação ou evolução do aprendente..."
+                value={novaObs}
+                onChange={(e) => setNovaObs(e.target.value)}
+              />
+              <Box mt={1} display="flex" justifyContent="flex-end">
+                <Button
+                  variant="contained" startIcon={<AddIcon />}
+                  onClick={() => addHistoricoMutation.mutate(novaObs)}
+                  disabled={!novaObs.trim() || addHistoricoMutation.isPending}
+                >
+                  Registrar
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
 
           <Card>
             <CardContent>

@@ -13,7 +13,6 @@ import { aplicacoesApi } from '../../api/aplicacoes';
 import { formatDate } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 import StatusChip from '../../components/common/StatusChip';
-import { useAuth } from '../../contexts/AuthContext';
 
 const QuestionInput = ({ question, value, onChange }) => {
   switch (question.type) {
@@ -101,8 +100,6 @@ const AplicacaoDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
-  const canEdit = user?.role !== 'VIEWER';
   const [answers, setAnswers] = useState({});
   const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' });
 
@@ -168,7 +165,7 @@ const AplicacaoDetailPage = () => {
               {q.text}
             </Typography>
             {q.helpText && <Typography variant="caption" color="text.secondary" display="block" mb={1}>{q.helpText}</Typography>}
-            {!isCompleted && canEdit ? (
+            {!isCompleted ? (
               <QuestionInput
                 question={q}
                 value={answers[q.id]}
@@ -187,7 +184,7 @@ const AplicacaoDetailPage = () => {
         </Card>
       ))}
 
-      {!isCompleted && canEdit && (
+      {!isCompleted && (
         <Box display="flex" gap={2} justifyContent="flex-end" mt={2}>
           <Button variant="outlined" startIcon={<SaveIcon />}
             onClick={() => saveMutation.mutate({ isDraft: true })}

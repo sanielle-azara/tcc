@@ -59,7 +59,6 @@ const UserFormPage = () => {
                 <TextField {...register('role')} label="Perfil" select fullWidth defaultValue="PSICOPEDAGOGO">
                   <MenuItem value="ADMIN">Administrador</MenuItem>
                   <MenuItem value="PSICOPEDAGOGO">Psicopedagogo</MenuItem>
-                  <MenuItem value="VIEWER">Visualizador</MenuItem>
                 </TextField>
               </Grid>
               <Grid item xs={12} md={3}>

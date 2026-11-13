@@ -22,7 +22,7 @@ const makeAvaliacao = (autorId = 'user-001', aplicacoesCount = 0) => ({
 });
 
 async function getToken(role = 'PSICOPEDAGOGO') {
-  const hash = await bcrypt.hash('Senha@123', 12);
+  const hash = await bcrypt.hash('Senha@123', 4);
   const user = makeUser(role);
   user.passwordHash = hash;
   prisma.user.findUnique.mockResolvedValue(user);
@@ -74,15 +74,15 @@ describe('GET /api/avaliacoes', () => {
 describe('POST /api/avaliacoes', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('retorna 403 para perfil VIEWER', async () => {
-    const token = await getToken('VIEWER');
-    prisma.user.findUnique.mockResolvedValue(makeUser('VIEWER'));
+  it('retorna 403 quando PSICOPEDAGOGO tenta excluir avaliação (exclusivo do ADMIN)', async () => {
+    const token = await getToken('PSICOPEDAGOGO');
+    prisma.user.findUnique.mockResolvedValue(makeUser());
 
     const res = await request(app)
-      .post('/api/avaliacoes')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ name: 'Nova', questions: [] });
+      .delete('/api/avaliacoes/av-001')
+      .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(403);
+    expect(prisma.avaliacao.update).not.toHaveBeenCalled();
   });
 
   it('cria avaliação com autorId do usuário logado', async () => {
@@ -103,6 +103,39 @@ describe('POST /api/avaliacoes', () => {
     const [createArg] = prisma.avaliacao.create.mock.calls[0];
     expect(createArg.data.autorId).toBe('user-001');
   });
+
+  it('retorna 422 para pergunta de seleção sem opções', async () => {
+    const token = await getToken('PSICOPEDAGOGO');
+    prisma.user.findUnique.mockResolvedValue(makeUser());
+
+    const res = await request(app)
+      .post('/api/avaliacoes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Nova Avaliação',
+        questions: [{ text: 'Escolha', type: 'SINGLE_SELECT', required: true, order: 1 }],
+      });
+
+    expect(res.status).toBe(422);
+    expect(res.body.errors).toContainEqual({ field: 'questions.0.options', message: 'Informe pelo menos uma opção' });
+    expect(prisma.avaliacao.create).not.toHaveBeenCalled();
+  });
+
+  it('retorna 422 para escala com mínimo maior ou igual ao máximo', async () => {
+    const token = await getToken('PSICOPEDAGOGO');
+    prisma.user.findUnique.mockResolvedValue(makeUser());
+
+    const res = await request(app)
+      .post('/api/avaliacoes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Nova Avaliação',
+        questions: [{ text: 'Nível', type: 'SCALE', required: true, order: 1, scaleMin: 5, scaleMax: 5 }],
+      });
+
+    expect(res.status).toBe(422);
+    expect(prisma.avaliacao.create).not.toHaveBeenCalled();
+  });
 });
 
 describe('GET /api/avaliacoes/:id', () => {
@@ -118,6 +151,23 @@ describe('GET /api/avaliacoes/:id', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(404);
+  });
+
+  it('retorna perguntas, versão de origem e versões derivadas', async () => {
+    const token = await getToken('PSICOPEDAGOGO');
+    prisma.user.findUnique.mockResolvedValue(makeUser());
+    prisma.avaliacao.findFirst.mockResolvedValue(makeAvaliacao());
+
+    const res = await request(app)
+      .get('/api/avaliacoes/av-001')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    const [queryArg] = prisma.avaliacao.findFirst.mock.calls[0];
+    expect(queryArg.where).toMatchObject({ id: 'av-001', autorId: 'user-001' });
+    expect(queryArg.include).toHaveProperty('questions');
+    expect(queryArg.include).toHaveProperty('parent');
+    expect(queryArg.include).toHaveProperty('versions');
   });
 });
 

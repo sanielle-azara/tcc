@@ -45,7 +45,8 @@ const findById = async (id, userId, userRole) => {
     include: {
       questions: { orderBy: { order: 'asc' } },
       _count: { select: { aplicacoes: true } },
-      versions: { select: { id: true, version: true, status: true, createdAt: true } },
+      parent: { select: { id: true, version: true, status: true } },
+      versions: { select: { id: true, version: true, status: true, createdAt: true }, orderBy: { version: 'asc' } },
     },
   });
   if (!item) throw Object.assign(new Error('Avaliação não encontrada'), { status: 404 });

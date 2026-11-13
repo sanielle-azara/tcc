@@ -9,7 +9,7 @@ const ownerFilterAvaliacoes = (userId, userRole) =>
 const getStats = async (userId, userRole) => {
   const aprendenteWhere = { deletedAt: null, ...ownerFilter(userId, userRole) };
   const avaliacaoWhere = { deletedAt: null, status: 'ACTIVE', ...ownerFilterAvaliacoes(userId, userRole) };
-  const aplicacaoWhere = userRole === 'ADMIN' ? {} : { aplicadorId: userId };
+  const aplicacaoWhere = userRole === 'ADMIN' ? {} : { aprendente: { responsavelId: userId } };
 
   const [
     totalAprendentes,

@@ -29,7 +29,7 @@ const { buildPaginatedResponse, buildSuccessResponse } = require('@psicopedagogi
  *         schema: { type: string, enum: [ACTIVE, INACTIVE] }
  *       - in: query
  *         name: role
- *         schema: { type: string, enum: [ADMIN, PSICOPEDAGOGO, VIEWER] }
+ *         schema: { type: string, enum: [ADMIN, PSICOPEDAGOGO] }
  *     responses:
  *       200:
  *         description: Lista de usuários
@@ -86,7 +86,7 @@ const findById = async (req, res, next) => {
  *               name: { type: string }
  *               email: { type: string, format: email }
  *               password: { type: string }
- *               role: { type: string, enum: [ADMIN, PSICOPEDAGOGO, VIEWER] }
+ *               role: { type: string, enum: [ADMIN, PSICOPEDAGOGO] }
  *               status: { type: string, enum: [ACTIVE, INACTIVE] }
  *     responses:
  *       201:

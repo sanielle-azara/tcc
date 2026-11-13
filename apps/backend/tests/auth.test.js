@@ -26,7 +26,7 @@ describe('POST /api/auth/login', () => {
   });
 
   it('retorna 401 para senha incorreta', async () => {
-    const hash = await bcrypt.hash('SenhaCorreta@1', 12);
+    const hash = await bcrypt.hash('SenhaCorreta@1', 4);
     prisma.user.findUnique.mockResolvedValue({
       id: 'u1', email: 'prof@test.com', passwordHash: hash,
       role: 'PSICOPEDAGOGO', status: 'ACTIVE', deletedAt: null,
@@ -38,7 +38,7 @@ describe('POST /api/auth/login', () => {
   });
 
   it('retorna 403 para usuário inativo', async () => {
-    const hash = await bcrypt.hash('Senha@123', 12);
+    const hash = await bcrypt.hash('Senha@123', 4);
     prisma.user.findUnique.mockResolvedValue({
       id: 'u1', email: 'prof@test.com', passwordHash: hash,
       role: 'PSICOPEDAGOGO', status: 'INACTIVE', deletedAt: null,
@@ -50,7 +50,7 @@ describe('POST /api/auth/login', () => {
   });
 
   it('retorna 200 com tokens para credenciais válidas', async () => {
-    const hash = await bcrypt.hash('Senha@123', 12);
+    const hash = await bcrypt.hash('Senha@123', 4);
     prisma.user.findUnique.mockResolvedValue({
       id: 'u1', name: 'Prof', email: 'prof@test.com', passwordHash: hash,
       role: 'PSICOPEDAGOGO', status: 'ACTIVE', deletedAt: null,
@@ -75,7 +75,7 @@ describe('GET /api/auth/me', () => {
   });
 
   it('retorna dados do usuário autenticado', async () => {
-    const hash = await bcrypt.hash('Senha@123', 12);
+    const hash = await bcrypt.hash('Senha@123', 4);
     const user = {
       id: 'u1', name: 'Prof', email: 'prof@test.com', passwordHash: hash,
       role: 'PSICOPEDAGOGO', status: 'ACTIVE', deletedAt: null,

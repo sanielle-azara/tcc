@@ -8,7 +8,7 @@ users
 ├── name (VARCHAR 100)
 ├── email (VARCHAR 150, UNIQUE)
 ├── passwordHash (VARCHAR 255)
-├── role (ENUM: ADMIN, PSICOPEDAGOGO, VIEWER)
+├── role (ENUM: ADMIN, PSICOPEDAGOGO)
 ├── status (ENUM: ACTIVE, INACTIVE)
 ├── createdAt, updatedAt, deletedAt
 

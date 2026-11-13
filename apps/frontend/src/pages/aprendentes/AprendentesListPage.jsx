@@ -11,7 +11,6 @@ import { formatDate, calculateAge } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 import DataTable from '../../components/common/DataTable';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-import { useAuth } from '../../contexts/AuthContext';
 
 const AprendentesListPage = () => {
   const [page, setPage] = useState(0);
@@ -21,8 +20,6 @@ const AprendentesListPage = () => {
   const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
-  const canEdit = user?.role !== 'VIEWER';
 
   const { data, isLoading } = useQuery({
     queryKey: ['aprendentes', page, rowsPerPage, search],
@@ -57,20 +54,16 @@ const AprendentesListPage = () => {
               <VisibilityIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          {canEdit && (
-            <Tooltip title="Editar">
-              <IconButton size="small" onClick={() => navigate(`/aprendentes/${row.id}/editar`)}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
-          {canEdit && (
-            <Tooltip title="Excluir">
-              <IconButton size="small" color="error" onClick={() => setDeleteId(row.id)}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
+          <Tooltip title="Editar">
+            <IconButton size="small" onClick={() => navigate(`/aprendentes/${row.id}/editar`)}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Excluir">
+            <IconButton size="small" color="error" onClick={() => setDeleteId(row.id)}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Box>
       ),
     },
@@ -81,7 +74,7 @@ const AprendentesListPage = () => {
       <PageHeader
         title="Aprendentes"
         subtitle="Gerenciamento de estudantes"
-        action={canEdit ? () => navigate('/aprendentes/novo') : undefined}
+        action={() => navigate('/aprendentes/novo')}
         actionLabel="Novo Aprendente"
       />
 

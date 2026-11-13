@@ -1,9 +1,15 @@
 const prisma = require('../../config/prisma');
 const { parsePagination } = require('@psicopedagogia/shared-utils');
 
-const list = async (query) => {
+// A titularidade de uma aplicação segue a do aprendente: o psicopedagogo
+// responsável pelo aprendente acessa suas aplicações; o ADMIN acessa todas.
+const ownerFilter = (userId, userRole) =>
+  userRole === 'ADMIN' ? {} : { aprendente: { responsavelId: userId } };
+
+const list = async (query, userId, userRole) => {
   const { page, limit, skip } = parsePagination(query);
   const where = {
+    ...ownerFilter(userId, userRole),
     ...(query.aprendentId && { aprendentId: query.aprendentId }),
     ...(query.avaliacaoId && { avaliacaoId: query.avaliacaoId }),
     ...(query.aplicadorId && { aplicadorId: query.aplicadorId }),
@@ -29,9 +35,9 @@ const list = async (query) => {
   return { data, total, page, limit };
 };
 
-const findById = async (id) => {
-  const item = await prisma.aplicacao.findUnique({
-    where: { id },
+const findById = async (id, userId, userRole) => {
+  const item = await prisma.aplicacao.findFirst({
+    where: { id, ...ownerFilter(userId, userRole) },
     include: {
       aprendente: true,
       avaliacao: { include: { questions: { orderBy: { order: 'asc' } } } },
@@ -44,11 +50,17 @@ const findById = async (id) => {
   return item;
 };
 
-const create = async (data, userId) => {
-  const aprendente = await prisma.aprendente.findFirst({ where: { id: data.aprendentId, deletedAt: null } });
+const create = async (data, userId, userRole) => {
+  const isAdmin = userRole === 'ADMIN';
+
+  const aprendente = await prisma.aprendente.findFirst({
+    where: { id: data.aprendentId, deletedAt: null, ...(!isAdmin && { responsavelId: userId }) },
+  });
   if (!aprendente) throw Object.assign(new Error('Aprendente não encontrado'), { status: 404 });
 
-  const avaliacao = await prisma.avaliacao.findFirst({ where: { id: data.avaliacaoId, deletedAt: null } });
+  const avaliacao = await prisma.avaliacao.findFirst({
+    where: { id: data.avaliacaoId, deletedAt: null, ...(!isAdmin && { autorId: userId }) },
+  });
   if (!avaliacao) throw Object.assign(new Error('Avaliação não encontrada'), { status: 404 });
 
   return prisma.aplicacao.create({
@@ -68,8 +80,8 @@ const create = async (data, userId) => {
   });
 };
 
-const saveAnswers = async (id, answers, isDraft, userId) => {
-  const aplicacao = await findById(id);
+const saveAnswers = async (id, answers, isDraft, userId, userRole) => {
+  const aplicacao = await findById(id, userId, userRole);
   if (aplicacao.status === 'COMPLETED') {
     throw Object.assign(new Error('Aplicação já finalizada'), { status: 400 });
   }
@@ -89,18 +101,19 @@ const saveAnswers = async (id, answers, isDraft, userId) => {
       });
     }
 
+    // O aplicador registrado na criação é preservado, mantendo a autoria da aplicação
     const newStatus = isDraft ? 'DRAFT' : aplicacao.status === 'PENDING' ? 'IN_PROGRESS' : aplicacao.status;
     await tx.aplicacao.update({
       where: { id },
-      data: { status: newStatus, aplicadorId: userId },
+      data: { status: newStatus },
     });
   });
 
-  return findById(id);
+  return findById(id, userId, userRole);
 };
 
-const finalize = async (id, observacoes) => {
-  const aplicacao = await findById(id);
+const finalize = async (id, observacoes, userId, userRole) => {
+  const aplicacao = await findById(id, userId, userRole);
   if (aplicacao.status === 'COMPLETED') {
     throw Object.assign(new Error('Aplicação já finalizada'), { status: 400 });
   }
@@ -125,8 +138,8 @@ const finalize = async (id, observacoes) => {
   });
 };
 
-const remove = async (id) => {
-  const aplicacao = await findById(id);
+const remove = async (id, userId, userRole) => {
+  const aplicacao = await findById(id, userId, userRole);
   if (aplicacao.status === 'COMPLETED') {
     throw Object.assign(new Error('Não é possível excluir uma aplicação finalizada'), { status: 400 });
   }

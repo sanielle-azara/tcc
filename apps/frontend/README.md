@@ -47,6 +47,5 @@ src/
 
 | Perfil | Permissões |
 |--------|------------|
-| ADMIN | Acesso total, incluindo gestão de usuários |
-| PSICOPEDAGOGO | Criar/editar aprendentes, avaliações, aplicações e relatórios |
-| VIEWER | Apenas visualização |
+| ADMIN | Acesso total, incluindo gestão de usuários e todos os registros do sistema |
+| PSICOPEDAGOGO | Criar/editar aprendentes, avaliações, aplicações e relatórios, acessando apenas os próprios registros |

@@ -1,10 +1,17 @@
 const prisma = require('../../config/prisma');
 const { parsePagination } = require('@psicopedagogia/shared-utils');
 
-const list = async (query) => {
+// A titularidade de um relatório segue a do aprendente da aplicação:
+// o psicopedagogo responsável pelo aprendente acessa seus relatórios; o ADMIN acessa todos.
+const ownerFilter = (userId, userRole) =>
+  userRole === 'ADMIN' ? {} : { aplicacao: { aprendente: { responsavelId: userId } } };
+
+const list = async (query, userId, userRole) => {
   const { page, limit, skip } = parsePagination(query);
+  const where = ownerFilter(userId, userRole);
   const [data, total] = await Promise.all([
     prisma.relatorio.findMany({
+      where,
       skip,
       take: limit,
       orderBy: { createdAt: 'desc' },
@@ -18,14 +25,14 @@ const list = async (query) => {
         autor: { select: { id: true, name: true } },
       },
     }),
-    prisma.relatorio.count(),
+    prisma.relatorio.count({ where }),
   ]);
   return { data, total, page, limit };
 };
 
-const findById = async (id) => {
-  const item = await prisma.relatorio.findUnique({
-    where: { id },
+const findById = async (id, userId, userRole) => {
+  const item = await prisma.relatorio.findFirst({
+    where: { id, ...ownerFilter(userId, userRole) },
     include: {
       aplicacao: {
         include: {
@@ -42,9 +49,9 @@ const findById = async (id) => {
   return item;
 };
 
-const findByAplicacao = async (aplicacaoId) => {
-  return prisma.relatorio.findUnique({
-    where: { aplicacaoId },
+const findByAplicacao = async (aplicacaoId, userId, userRole) => {
+  return prisma.relatorio.findFirst({
+    where: { aplicacaoId, ...ownerFilter(userId, userRole) },
     include: {
       aplicacao: {
         include: {
@@ -59,13 +66,19 @@ const findByAplicacao = async (aplicacaoId) => {
   });
 };
 
-const createOrUpdate = async (data, userId) => {
-  const aplicacao = await prisma.aplicacao.findUnique({ where: { id: data.aplicacaoId } });
+const createOrUpdate = async (data, userId, userRole) => {
+  const aplicacao = await prisma.aplicacao.findFirst({
+    where: {
+      id: data.aplicacaoId,
+      ...(userRole !== 'ADMIN' && { aprendente: { responsavelId: userId } }),
+    },
+  });
   if (!aplicacao) throw Object.assign(new Error('Aplicação não encontrada'), { status: 404 });
   if (aplicacao.status !== 'COMPLETED') {
     throw Object.assign(new Error('Só é possível criar relatório para aplicações finalizadas'), { status: 400 });
   }
 
+  // O autor registrado na criação é preservado nas edições posteriores
   return prisma.relatorio.upsert({
     where: { aplicacaoId: data.aplicacaoId },
     create: {
@@ -77,7 +90,6 @@ const createOrUpdate = async (data, userId) => {
     update: {
       conclusao: data.conclusao,
       observacoesProfissional: data.observacoesProfissional,
-      autorId: userId,
     },
     include: {
       aplicacao: {

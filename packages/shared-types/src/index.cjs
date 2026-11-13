@@ -3,7 +3,6 @@
 const USER_ROLES = {
   ADMIN: 'ADMIN',
   PSICOPEDAGOGO: 'PSICOPEDAGOGO',
-  VIEWER: 'VIEWER',
 };
 
 const USER_STATUS = {

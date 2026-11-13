@@ -69,7 +69,7 @@ npm run dev
 ## Funcionalidades
 
 - **Autenticação**: Login, logout, refresh token, recuperação e alteração de senha
-- **Usuários**: Cadastro, edição, exclusão lógica com controle de perfis (Admin, Psicopedagogo, Viewer)
+- **Usuários**: Cadastro, edição, exclusão lógica com controle de perfis (Admin, Psicopedagogo)
 - **Aprendentes**: Cadastro completo com histórico de acompanhamento
 - **Avaliações**: Formulários dinâmicos com 8 tipos de perguntas e versionamento automático
 - **Aplicações**: Associar avaliação ao aprendente, salvar rascunho, finalizar
