@@ -23,6 +23,8 @@ const config = {
     from: process.env.SMTP_FROM || 'noreply@psicopedagogia.com',
   },
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+  // Número de proxies confiáveis (ex.: 1 atrás do Nginx); vazio = não confiar em X-Forwarded-For
+  trustProxy: process.env.TRUST_PROXY ? (Number(process.env.TRUST_PROXY) || process.env.TRUST_PROXY) : false,
   rateLimit: {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000,
     max: parseInt(process.env.RATE_LIMIT_MAX) || 100,

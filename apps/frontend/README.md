@@ -30,7 +30,7 @@ src/
 │   ├── common/   # DataTable, PageHeader, StatusChip, ConfirmDialog
 │   └── layout/   # AppLayout, ProtectedRoute
 ├── contexts/     # AuthContext
-├── hooks/        # useNotification
+├── hooks/        # useNotification (ainda não usado pelas páginas)
 ├── pages/        # Páginas por módulo
 │   ├── auth/
 │   ├── dashboard/
@@ -38,9 +38,10 @@ src/
 │   ├── avaliacoes/
 │   ├── aplicacoes/
 │   ├── relatorios/
-│   └── users/
+│   ├── users/
+│   └── auditoria/
 ├── theme/        # Configuração MUI
-└── utils/        # Helpers frontend
+└── print.css     # Estilos de impressão do relatório
 ```
 
 ## Perfis de Acesso

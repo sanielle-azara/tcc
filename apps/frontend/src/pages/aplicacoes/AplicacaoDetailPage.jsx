@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -106,20 +106,19 @@ const AplicacaoDetailPage = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['aplicacao', id],
     queryFn: () => aplicacoesApi.findById(id).then((r) => r.data.data),
-    onSuccess: (d) => {
-      const initial = {};
-      d.respostas?.forEach((r) => {
-        initial[r.questionId] = r.valor?.v;
-      });
-      setAnswers(initial);
-    },
   });
 
+  // O TanStack Query v5 não aceita mais onSuccess em useQuery; as respostas
+  // salvas são carregadas no estado sempre que os dados da aplicação chegam
+  useEffect(() => {
+    if (!data) return;
+    setAnswers(Object.fromEntries((data.respostas || []).map((r) => [r.questionId, r.valor?.v])));
+  }, [data]);
+
+  const answersPayload = () => Object.entries(answers).map(([questionId, value]) => ({ questionId, value }));
+
   const saveMutation = useMutation({
-    mutationFn: ({ isDraft }) => aplicacoesApi.saveAnswers(id, {
-      answers: Object.entries(answers).map(([questionId, value]) => ({ questionId, value })),
-      isDraft,
-    }),
+    mutationFn: ({ isDraft }) => aplicacoesApi.saveAnswers(id, { answers: answersPayload(), isDraft }),
     onSuccess: (_, { isDraft }) => {
       queryClient.invalidateQueries({ queryKey: ['aplicacao', id] });
       setSnack({ open: true, message: isDraft ? 'Rascunho salvo!' : 'Respostas salvas!', severity: 'success' });
@@ -127,14 +126,26 @@ const AplicacaoDetailPage = () => {
     onError: (err) => setSnack({ open: true, message: err.response?.data?.message || 'Erro ao salvar', severity: 'error' }),
   });
 
+  // As respostas da tela são salvas antes de finalizar, para que nada digitado se perca
   const finalizeMutation = useMutation({
-    mutationFn: () => aplicacoesApi.finalize(id, {}),
+    mutationFn: async () => {
+      const pending = answersPayload();
+      if (pending.length > 0) {
+        await aplicacoesApi.saveAnswers(id, { answers: pending, isDraft: false });
+      }
+      return aplicacoesApi.finalize(id, {});
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['aplicacao', id] });
       queryClient.invalidateQueries({ queryKey: ['aplicacoes'] });
-      navigate('/relatorios');
+      // Leva direto à elaboração do relatório da aplicação recém-finalizada
+      navigate(`/relatorios/aplicacao/${id}`);
     },
-    onError: (err) => setSnack({ open: true, message: err.response?.data?.message || 'Erro ao finalizar', severity: 'error' }),
+    onError: (err) => {
+      // Mesmo que a finalização seja recusada, as respostas já podem ter sido salvas
+      queryClient.invalidateQueries({ queryKey: ['aplicacao', id] });
+      setSnack({ open: true, message: err.response?.data?.message || 'Erro ao finalizar', severity: 'error' });
+    },
   });
 
   if (isLoading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>;

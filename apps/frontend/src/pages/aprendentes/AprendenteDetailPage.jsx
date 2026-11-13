@@ -10,6 +10,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { aprendentesApi } from '../../api/aprendentes';
 import { formatDate, calculateAge } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
+import AuditLogTable from '../../components/common/AuditLogTable';
 
 const InfoField = ({ label, value }) => (
   <Box mb={1.5}>
@@ -56,6 +57,7 @@ const AprendenteDetailPage = () => {
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
         <Tab label="Dados Cadastrais" />
         <Tab label="Histórico de Acompanhamento" />
+        <Tab label="Registro de Acessos" />
       </Tabs>
 
       {tab === 0 && (
@@ -160,6 +162,15 @@ const AprendenteDetailPage = () => {
               )}
             </CardContent>
           </Card>
+        </Box>
+      )}
+
+      {tab === 2 && (
+        <Box>
+          <Typography variant="body2" color="text.secondary" mb={2}>
+            Quem consultou, criou, alterou ou excluiu dados deste aprendente, inclusive o administrador do sistema.
+          </Typography>
+          <AuditLogTable params={{ aprendenteId: id }} emptyMessage="Nenhum acesso registrado" />
         </Box>
       )}
     </Box>

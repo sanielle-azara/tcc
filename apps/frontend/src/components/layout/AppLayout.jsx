@@ -13,6 +13,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
 import KeyIcon from '@mui/icons-material/Key';
 import { useAuth } from '../../contexts/AuthContext';
@@ -29,6 +30,7 @@ const navItems = [
 
 const adminItems = [
   { label: 'Usuários', path: '/users', icon: <PeopleIcon /> },
+  { label: 'Auditoria', path: '/auditoria', icon: <HistoryIcon /> },
 ];
 
 const AppLayout = () => {
@@ -99,7 +101,7 @@ const AppLayout = () => {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (t) => t.zIndex.drawer + 1 }}>
+      <AppBar position="fixed" className="no-print" sx={{ zIndex: (t) => t.zIndex.drawer + 1 }}>
         <Toolbar>
           <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2, display: { sm: 'none' } }}>
             <MenuIcon />
@@ -130,7 +132,7 @@ const AppLayout = () => {
           </Menu>
         </Toolbar>
       </AppBar>
-      <Box component="nav" sx={{ width: { sm: DRAWER_WIDTH }, flexShrink: { sm: 0 } }}>
+      <Box component="nav" className="no-print" sx={{ width: { sm: DRAWER_WIDTH }, flexShrink: { sm: 0 } }}>
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -148,8 +150,8 @@ const AppLayout = () => {
           <DrawerContent />
         </Drawer>
       </Box>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` } }}>
-        <Toolbar />
+      <Box component="main" className="app-main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` } }}>
+        <Toolbar className="no-print" />
         <Outlet />
       </Box>
     </Box>

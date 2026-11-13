@@ -20,9 +20,10 @@ API REST do Sistema de Apoio à Avaliação Psicopedagógica.
 | Usuários | `GET/POST/PUT/DELETE /api/users` |
 | Aprendentes | `GET/POST/PUT/DELETE /api/aprendentes` |
 | Avaliações | `GET/POST/PUT/DELETE /api/avaliacoes` |
-| Aplicações | `GET/POST /api/aplicacoes` |
-| Relatórios | `GET/POST /api/relatorios` |
+| Aplicações | `GET/POST/DELETE /api/aplicacoes`, `PUT /api/aplicacoes/:id/answers`, `POST /api/aplicacoes/:id/finalize` |
+| Relatórios | `GET/POST /api/relatorios`, `GET /api/relatorios/aplicacao/:aplicacaoId` |
 | Dashboard | `GET /api/dashboard` |
+| Auditoria | `GET /api/auditoria` |
 
 Documentação completa em `http://localhost:3001/api-docs`.
 
@@ -34,7 +35,7 @@ cp .env.example .env
 
 npm install
 npm run db:generate   # Gerar Prisma Client
-npm run db:migrate    # Executar migrations
+npx prisma db push    # Criar/atualizar as tabelas a partir do schema (não há migrações versionadas)
 npm run db:seed       # Popular banco de dados
 npm run dev           # Iniciar em desenvolvimento
 ```

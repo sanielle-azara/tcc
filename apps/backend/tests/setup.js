@@ -18,6 +18,7 @@ const prismaMock = {
   historicoAprendente: { create: vi.fn(), findMany: vi.fn() },
   question: { deleteMany: vi.fn(), createMany: vi.fn() },
   resposta: { upsert: vi.fn() },
+  auditLog: { create: vi.fn(), createMany: vi.fn(), findMany: vi.fn(), count: vi.fn() },
   $transaction: vi.fn((ops) => (Array.isArray(ops) ? Promise.all(ops) : ops({
     resposta: { upsert: vi.fn() },
     aplicacao: { update: vi.fn() },

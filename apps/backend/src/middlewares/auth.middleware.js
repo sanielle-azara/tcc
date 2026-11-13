@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/env');
 const prisma = require('../config/prisma');
+const { setUser } = require('../audit/context');
 
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -21,6 +22,7 @@ const authenticate = async (req, res, next) => {
     }
 
     req.user = user;
+    setUser(user);
     next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {

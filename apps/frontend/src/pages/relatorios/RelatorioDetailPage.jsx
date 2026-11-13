@@ -12,8 +12,18 @@ import { formatDate, formatDateTime, calculateAge } from '@psicopedagogia/shared
 import PageHeader from '../../components/common/PageHeader';
 
 const SectionTitle = ({ children }) => (
-  <Typography variant="subtitle1" fontWeight={700} sx={{ mt: 2, mb: 1, color: 'primary.main' }}>{children}</Typography>
+  <Typography className="print-section-title" variant="subtitle1" fontWeight={700} sx={{ mt: 2, mb: 1, color: 'primary.main' }}>{children}</Typography>
 );
+
+// 0 e false são respostas válidas; texto vazio e lista vazia não
+const hasAnswer = (valor) =>
+  valor !== undefined && valor !== null && valor !== '' && !(Array.isArray(valor) && valor.length === 0);
+
+const formatAnswer = (valor) => {
+  if (typeof valor === 'boolean') return valor ? 'Sim' : 'Não';
+  if (Array.isArray(valor)) return valor.join(', ');
+  return String(valor);
+};
 
 const Field = ({ label, value }) => (
   <Grid item xs={12} sm={6} md={4}>
@@ -33,7 +43,12 @@ const RelatorioDetailPage = () => {
 
   const queryKey = id ? ['relatorio', id] : ['relatorio-aplicacao', aplicacaoId];
 
-  const { data, isLoading, error } = useQuery({ queryKey, queryFn });
+  // 404 significa que o relatório ainda não existe: mostra o formulário de criação sem nova tentativa
+  const { data, isLoading, error } = useQuery({
+    queryKey,
+    queryFn,
+    retry: (failureCount, err) => err?.response?.status !== 404 && failureCount < 1,
+  });
 
   const [conclusao, setConclusao] = useState('');
   const [observacoes, setObservacoes] = useState('');
@@ -92,16 +107,21 @@ const RelatorioDetailPage = () => {
 
   const handlePrint = () => window.print();
 
+  const observacoesAtuais = observacoes !== '' ? observacoes : (r.observacoesProfissional || '');
+  const conclusaoAtual = conclusao !== '' ? conclusao : (r.conclusao || '');
+
   return (
     <Box>
-      <PageHeader
-        title="Relatório de Avaliação Psicopedagógica"
-        action={handlePrint}
-        actionLabel="Imprimir"
-        actionIcon={<PrintIcon />}
-      />
+      <Box className="no-print">
+        <PageHeader
+          title="Relatório de Avaliação Psicopedagógica"
+          action={handlePrint}
+          actionLabel="Imprimir"
+          actionIcon={<PrintIcon />}
+        />
+      </Box>
 
-      <Card sx={{ mb: 2, '@media print': { boxShadow: 'none' } }}>
+      <Card className="print-card" sx={{ mb: 2 }}>
         <CardContent>
           <Box textAlign="center" mb={2}>
             <Typography variant="h6" fontWeight={700}>RELATÓRIO DE AVALIAÇÃO PSICOPEDAGÓGICA</Typography>
@@ -135,45 +155,61 @@ const RelatorioDetailPage = () => {
           {(avaliacao?.questions || []).map((q, i) => {
             const resposta = ap?.respostas?.find((r) => r.questionId === q.id);
             const valor = resposta?.valor?.v;
+            const respondida = hasAnswer(valor);
             return (
-              <Box key={q.id} mb={2} pl={1} borderLeft="3px solid" sx={{ borderColor: 'primary.light' }}>
+              <Box key={q.id} className="print-block" mb={2} pl={1} borderLeft="3px solid" sx={{ borderColor: 'primary.light' }}>
                 <Typography variant="body2" fontWeight={500}>
                   {i + 1}. {q.text}
-                  {q.required && <Chip label="Obrig." size="small" color="error" sx={{ ml: 1 }} />}
+                  {q.required && <Chip className="no-print" label="Obrig." size="small" color="error" sx={{ ml: 1 }} />}
                 </Typography>
-                <Typography variant="body2" color={valor ? 'text.primary' : 'text.disabled'} mt={0.5}>
-                  {valor !== undefined && valor !== null
-                    ? Array.isArray(valor) ? valor.join(', ') : String(valor)
-                    : 'Sem resposta'}
+                <Typography variant="body2" color={respondida ? 'text.primary' : 'text.disabled'} mt={0.5}>
+                  {respondida ? formatAnswer(valor) : 'Sem resposta'}
                 </Typography>
               </Box>
             );
           })}
 
           {ap?.observacoes && (
-            <>
+            <Box className="print-block">
               <SectionTitle>Observações da Aplicação</SectionTitle>
               <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{ap.observacoes}</Typography>
-            </>
+            </Box>
           )}
 
           <SectionTitle>Observações do Profissional</SectionTitle>
-          <TextField
-            fullWidth multiline rows={4}
-            value={observacoes !== '' ? observacoes : (r.observacoesProfissional || '')}
-            onChange={(e) => setObservacoes(e.target.value)}
-            placeholder="Descreva suas observações..."
-          />
+          <Box className="no-print">
+            <TextField
+              fullWidth multiline rows={4}
+              value={observacoesAtuais}
+              onChange={(e) => setObservacoes(e.target.value)}
+              placeholder="Descreva suas observações..."
+            />
+          </Box>
+          {/* Na impressão, o texto completo substitui a caixa de edição, que cortaria o conteúdo */}
+          <Typography className="print-only" data-testid="print-observacoes" variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+            {observacoesAtuais || '—'}
+          </Typography>
 
           <SectionTitle>Conclusão</SectionTitle>
-          <TextField
-            fullWidth multiline rows={6}
-            value={conclusao !== '' ? conclusao : (r.conclusao || '')}
-            onChange={(e) => setConclusao(e.target.value)}
-            placeholder="Descreva a conclusão do profissional..."
-          />
+          <Box className="no-print">
+            <TextField
+              fullWidth multiline rows={6}
+              value={conclusaoAtual}
+              onChange={(e) => setConclusao(e.target.value)}
+              placeholder="Descreva a conclusão do profissional..."
+            />
+          </Box>
+          <Typography className="print-only" data-testid="print-conclusao" variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+            {conclusaoAtual || '—'}
+          </Typography>
 
-          <Box display="flex" gap={2} mt={2} justifyContent="flex-end">
+          <Box className="print-only print-block" data-testid="print-assinatura" sx={{ mt: 8, textAlign: 'center' }}>
+            <Box sx={{ borderTop: '1px solid #000', width: '60%', mx: 'auto', mb: 0.5 }} />
+            <Typography variant="body2">{r.autor?.name}</Typography>
+            <Typography variant="caption" color="text.secondary">Psicopedagogo(a) responsável</Typography>
+          </Box>
+
+          <Box className="no-print" display="flex" gap={2} mt={2} justifyContent="flex-end">
             <Button variant="contained" startIcon={<SaveIcon />}
               onClick={() => saveMutation.mutate()}
               disabled={saveMutation.isPending}>
@@ -183,7 +219,7 @@ const RelatorioDetailPage = () => {
         </CardContent>
       </Card>
 
-      <Snackbar open={snack.open} autoHideDuration={4000} onClose={() => setSnack((s) => ({ ...s, open: false }))}>
+      <Snackbar className="no-print" open={snack.open} autoHideDuration={4000} onClose={() => setSnack((s) => ({ ...s, open: false }))}>
         <Alert severity={snack.severity}>{snack.message}</Alert>
       </Snackbar>
     </Box>

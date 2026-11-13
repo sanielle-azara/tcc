@@ -42,13 +42,16 @@ npm install
 cp apps/backend/.env.example apps/backend/.env
 # Editar DATABASE_URL e demais variáveis
 
-# Executar migrations e seed
-npm run db:migrate
+# Criar as tabelas a partir do schema e popular o banco
+# (o projeto ainda não tem migrações versionadas; ver observação abaixo)
+npx prisma db push --schema apps/backend/prisma/schema.prisma
 npm run db:seed
 
 # Iniciar todos os serviços em paralelo
 npm run dev
 ```
+
+> **Migrações:** a pasta `apps/backend/prisma/migrations` ainda está vazia. O Docker cria e atualiza as tabelas com `prisma db push`, que sincroniza o banco com o schema sem gerar histórico de migrações. O comando `npm run db:migrate` (`prisma migrate dev`) cria uma migração inicial a partir do schema atual; se for usado, as migrações geradas devem ser versionadas e o Docker deve passar a usar `prisma migrate deploy`.
 
 ## Estrutura do Monorepo
 
@@ -75,6 +78,7 @@ npm run dev
 - **Aplicações**: Associar avaliação ao aprendente, salvar rascunho, finalizar
 - **Relatórios**: Geração, visualização, edição e impressão/PDF
 - **Dashboard**: Métricas e últimas atividades
+- **Auditoria**: Registro de quem criou, alterou, excluiu ou consultou dados clínicos (inclusive o ADMIN), com valores anteriores e novos
 
 ## Comandos Úteis
 

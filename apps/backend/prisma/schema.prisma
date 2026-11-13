@@ -231,6 +231,33 @@ model Relatorio {
 }
 
 // ─────────────────────────────────────────────
+// AUDITORIA
+// ─────────────────────────────────────────────
+
+// Registro das operações sobre os dados (criações, alterações, exclusões e
+// consultas a dados clínicos), preenchido automaticamente pela extensão de
+// auditoria do Prisma (src/audit). Não há chave estrangeira para users, para que
+// o registro não dependa de alterações posteriores no cadastro do usuário.
+model AuditLog {
+  id           String      @id @default(uuid())
+  userId       String?
+  userRole     String?     @db.VarChar(20)
+  action       AuditAction
+  entity       String      @db.VarChar(50)
+  entityId     String?     @db.VarChar(191)
+  aprendenteId String?
+  diff         Json?
+  ip           String?     @db.VarChar(45)
+  timestamp    DateTime    @default(now())
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([aprendenteId])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
+
+// ─────────────────────────────────────────────
 // ENUMS
 // ─────────────────────────────────────────────
 
@@ -272,4 +299,14 @@ enum AplicacaoStatus {
   IN_PROGRESS
   DRAFT
   COMPLETED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  READ
+  LIST
+  LOGIN
+  LOGIN_FAILED
 }

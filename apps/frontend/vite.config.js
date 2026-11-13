@@ -23,5 +23,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./tests/setup.js'],
     css: true,
+    // Testes de formulário com digitação simulada passam de 5 s quando executados em paralelo
+    testTimeout: 15000,
   },
 });

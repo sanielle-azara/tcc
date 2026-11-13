@@ -26,6 +26,7 @@ import RelatoriosListPage from './pages/relatorios/RelatoriosListPage';
 import RelatorioDetailPage from './pages/relatorios/RelatorioDetailPage';
 import UsersListPage from './pages/users/UsersListPage';
 import UserFormPage from './pages/users/UserFormPage';
+import AuditoriaPage from './pages/auditoria/AuditoriaPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,6 +85,10 @@ function App() {
                 <Route
                   path="/users/:id/editar"
                   element={<ProtectedRoute roles={['ADMIN']}><UserFormPage /></ProtectedRoute>}
+                />
+                <Route
+                  path="/auditoria"
+                  element={<ProtectedRoute roles={['ADMIN']}><AuditoriaPage /></ProtectedRoute>}
                 />
               </Route>
 

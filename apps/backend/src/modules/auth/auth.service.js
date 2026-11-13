@@ -4,20 +4,36 @@ const prisma = require('../../config/prisma');
 const config = require('../../config/env');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken, getRefreshTokenExpiry } = require('../../utils/jwt');
 const { sendPasswordResetEmail } = require('../../utils/email');
+const { logEvent } = require('../../audit/log');
+
+const loginFailed = async (user, email, motivo) => {
+  await logEvent({
+    action: 'LOGIN_FAILED',
+    userId: user?.id || null,
+    userRole: user?.role || null,
+    entityId: user?.id || null,
+    diff: { email, motivo },
+  });
+};
 
 const login = async (email, password) => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || user.deletedAt) {
+    await loginFailed(user, email, 'usuário inexistente ou excluído');
     throw Object.assign(new Error('Credenciais inválidas'), { status: 401 });
   }
   if (user.status !== 'ACTIVE') {
+    await loginFailed(user, email, 'usuário inativo');
     throw Object.assign(new Error('Usuário inativo'), { status: 403 });
   }
 
   const passwordValid = await bcrypt.compare(password, user.passwordHash);
   if (!passwordValid) {
+    await loginFailed(user, email, 'senha incorreta');
     throw Object.assign(new Error('Credenciais inválidas'), { status: 401 });
   }
+
+  await logEvent({ action: 'LOGIN', userId: user.id, userRole: user.role, entityId: user.id });
 
   const accessToken = generateAccessToken(user.id, user.role);
   const refreshTokenValue = generateRefreshToken(user.id);

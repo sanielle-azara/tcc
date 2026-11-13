@@ -67,6 +67,7 @@ Page Component
 | aplicacoes | Aplicação de avaliações, respostas, finalização |
 | relatorios | Relatórios das aplicações finalizadas |
 | dashboard | Métricas e últimas atividades |
+| auditoria | Consulta do registro de auditoria (ADMIN: completo; psicopedagogo: acessos aos próprios aprendentes) |
 
 ## Segurança
 
@@ -75,5 +76,6 @@ Page Component
 - Rate limiting: 100 req/15min por IP
 - Helmet (headers de segurança HTTP)
 - CORS restrito ao domínio do frontend
-- Validação de entrada com Zod em todas as rotas
+- Validação com Zod do corpo das requisições de login, criação e alteração e dos filtros da auditoria (os demais parâmetros de consulta, como paginação e busca, não passam por schema)
 - Soft delete (deletedAt) para dados sensíveis
+- Registro de auditoria (tabela audit_logs) preenchido por extensão do Prisma: criações, alterações e exclusões com valores anteriores e novos, consultas a dados clínicos e logins, com usuário, perfil, IP e data

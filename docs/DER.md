@@ -38,6 +38,7 @@ aprendentes
 ├── email (VARCHAR 150)
 ├── escolaNome, escolaSerie, escolaTurno
 ├── observacoes (TEXT)
+├── responsavelId (FK → users.id, psicopedagogo responsável; define a visibilidade)
 ├── createdAt, updatedAt, deletedAt
 
 historico_aprendentes
@@ -55,6 +56,7 @@ avaliacoes
 ├── version (INT, default 1)
 ├── status (ENUM: DRAFT, ACTIVE, ARCHIVED)
 ├── parentId (FK → avaliacoes.id, self-reference para versões)
+├── autorId (FK → users.id, autor do instrumento; define a visibilidade)
 ├── createdAt, updatedAt, deletedAt
 
 questions
@@ -96,11 +98,24 @@ relatorios
 ├── conclusao (TEXT)
 ├── observacoesProfissional (TEXT)
 ├── createdAt, updatedAt
+
+audit_logs
+├── id (PK, UUID)
+├── userId (usuário que realizou a operação; sem FK)
+├── userRole (VARCHAR 20)
+├── action (ENUM: CREATE, UPDATE, DELETE, READ, LIST, LOGIN, LOGIN_FAILED)
+├── entity (VARCHAR 50), entityId (VARCHAR 191)
+├── aprendenteId (aprendente a que o dado pertence; sem FK)
+├── diff (JSON, valores anteriores e novos)
+├── ip (VARCHAR 45)
+├── timestamp
 ```
 
 ## Relacionamentos
 
 ```
+users            1──N  aprendentes (como responsável)
+users            1──N  avaliacoes (como autor)
 users            1──N  refresh_tokens
 users            1──N  password_resets
 users            1──N  aplicacoes (como aplicador)
@@ -124,8 +139,13 @@ questions        1──N  respostas
 | Tabela | Índice |
 |--------|--------|
 | users | email (unique), status |
-| aprendentes | name, deletedAt |
-| avaliacoes | status, category, deletedAt |
-| aplicacoes | aprendentId, avaliacaoId, status |
+| aprendentes | name, responsavelId, deletedAt |
+| avaliacoes | autorId, status, category, deletedAt |
+| aplicacoes | aprendentId, avaliacaoId, aplicadorId, status |
+| historico_aprendentes | aprendentId |
+| questions | avaliacaoId, order |
 | respostas | aplicacaoId |
 | refresh_tokens | token (unique), userId |
+| password_resets | token (unique), userId |
+| relatorios | aplicacaoId (unique), autorId |
+| audit_logs | userId; (entity, entityId); aprendenteId; timestamp |

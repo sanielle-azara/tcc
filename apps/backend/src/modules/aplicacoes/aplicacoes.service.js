@@ -112,6 +112,15 @@ const saveAnswers = async (id, answers, isDraft, userId, userRole) => {
   return findById(id, userId, userRole);
 };
 
+// Resposta em branco (nula, texto vazio ou nenhuma opção marcada) não conta como respondida;
+// 0 e false são respostas válidas
+const hasValue = (value) => {
+  if (value === null || value === undefined) return false;
+  if (typeof value === 'string') return value.trim() !== '';
+  if (Array.isArray(value)) return value.length > 0;
+  return true;
+};
+
 const finalize = async (id, observacoes, userId, userRole) => {
   const aplicacao = await findById(id, userId, userRole);
   if (aplicacao.status === 'COMPLETED') {
@@ -119,7 +128,7 @@ const finalize = async (id, observacoes, userId, userRole) => {
   }
 
   const requiredQuestions = aplicacao.avaliacao.questions.filter((q) => q.required);
-  const answeredIds = aplicacao.respostas.map((r) => r.questionId);
+  const answeredIds = aplicacao.respostas.filter((r) => hasValue(r.valor?.v)).map((r) => r.questionId);
   const missing = requiredQuestions.filter((q) => !answeredIds.includes(q.id));
   if (missing.length > 0) {
     throw Object.assign(

@@ -201,3 +201,73 @@ describe('PUT /api/aplicacoes/:id/answers', () => {
     expect(updateArg.data).toEqual({ status: 'DRAFT' });
   });
 });
+
+describe('POST /api/aplicacoes/:id/finalize', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const comRespostas = (respostas) => ({
+    ...makeAplicacao(),
+    avaliacao: {
+      id: 'av-001', name: 'Leitura',
+      questions: [
+        { id: 'q1', text: 'Observações', type: 'TEXT', required: true },
+        { id: 'q2', text: 'Dificuldades', type: 'MULTI_SELECT', required: true },
+        { id: 'q3', text: 'Comentário livre', type: 'TEXT', required: false },
+      ],
+    },
+    respostas,
+  });
+
+  it('recusa quando uma obrigatória foi salva em branco', async () => {
+    const token = await getToken('PSICOPEDAGOGO');
+    prisma.aplicacao.findFirst.mockResolvedValue(comRespostas([
+      { questionId: 'q1', valor: { v: '   ' } },
+      { questionId: 'q2', valor: { v: [] } },
+    ]));
+
+    const res = await request(app)
+      .post('/api/aplicacoes/apl-001/finalize')
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Perguntas obrigatórias sem resposta: Observações, Dificuldades');
+    expect(prisma.aplicacao.update).not.toHaveBeenCalled();
+  });
+
+  it('finaliza quando as obrigatórias têm resposta, mesmo com opcional em branco', async () => {
+    const token = await getToken('PSICOPEDAGOGO');
+    prisma.aplicacao.findFirst.mockResolvedValue(comRespostas([
+      { questionId: 'q1', valor: { v: 'Atenta' } },
+      { questionId: 'q2', valor: { v: ['Inversão'] } },
+      { questionId: 'q3', valor: { v: '' } },
+    ]));
+    prisma.aplicacao.update.mockResolvedValue({ id: 'apl-001', status: 'COMPLETED' });
+
+    const res = await request(app)
+      .post('/api/aplicacoes/apl-001/finalize')
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(200);
+    const [updateArg] = prisma.aplicacao.update.mock.calls[0];
+    expect(updateArg.data.status).toBe('COMPLETED');
+  });
+
+  it('aceita 0 e false como respostas válidas', async () => {
+    const token = await getToken('PSICOPEDAGOGO');
+    const aplicacao = comRespostas([
+      { questionId: 'q1', valor: { v: 0 } },
+      { questionId: 'q2', valor: { v: false } },
+    ]);
+    prisma.aplicacao.findFirst.mockResolvedValue(aplicacao);
+    prisma.aplicacao.update.mockResolvedValue({ id: 'apl-001', status: 'COMPLETED' });
+
+    const res = await request(app)
+      .post('/api/aplicacoes/apl-001/finalize')
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(200);
+  });
+});
