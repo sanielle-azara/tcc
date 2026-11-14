@@ -1,0 +1,65 @@
+@startuml casos_de_uso
+' Diagrama de casos de uso do sistema (Seção de requisitos do TCC).
+' Gerar PNG: docker run --rm -v "$PWD/docs/diagramas:/data" plantuml/plantuml -tpng /data/casos_de_uso.puml
+left to right direction
+skinparam dpi 200
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam ArrowColor #222222
+skinparam ArrowFontSize 11
+skinparam actorBorderColor #2e5d8a
+skinparam actorBackgroundColor #ffffff
+skinparam usecase {
+  BackgroundColor #eaf1f8
+  BorderColor #2e5d8a
+  BorderThickness 1.5
+}
+skinparam rectangle {
+  BorderColor #2e5d8a
+  BorderThickness 1.5
+  FontStyle bold
+  FontColor #2e5d8a
+}
+
+actor "Psicopedagogo" as P
+actor "Administrador" as A
+A -|> P
+
+rectangle "Sistema de apoio à avaliação psicopedagógica" {
+  usecase "Cadastrar-se\n(RF01)" as UC01
+  usecase "Autenticar-se\n(RF01)" as UC02
+  usecase "Recuperar ou alterar senha" as UC03
+  usecase "Gerenciar aprendentes\n(RF03, RF04)" as UC04
+  usecase "Registrar e consultar histórico\ndo aprendente (RF05, RF12)" as UC05
+  usecase "Gerenciar instrumentos\n(RF06, RF07)" as UC06
+  usecase "Versionar instrumento\n(RF08, RF09)" as UC07
+  usecase "Aplicar instrumento\n(RF10, RF11)" as UC08
+  usecase "Finalizar aplicação" as UC09
+  usecase "Elaborar relatório\n(RF13)" as UC10
+  usecase "Imprimir ou salvar\nem PDF (RF14)" as UC11
+  usecase "Consultar acessos aos\nseus aprendentes (RF15)" as UC12
+  usecase "Gerenciar usuários\n(RF02)" as UC13
+  usecase "Excluir instrumentos" as UC14
+  usecase "Consultar registro de\nauditoria completo (RF15)" as UC15
+}
+
+P --> UC01
+P --> UC02
+P --> UC03
+P --> UC04
+P --> UC05
+P --> UC06
+P --> UC08
+P --> UC10
+P --> UC12
+
+A --> UC13
+A --> UC14
+A --> UC15
+
+UC06 ..> UC07 : <<include>>
+' Escrito no sentido inverso para que os casos base fiquem na coluna do ator
+UC08 <.. UC09 : <<extend>>
+UC10 <.. UC11 : <<extend>>
+@enduml

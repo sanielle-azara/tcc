@@ -55,6 +55,16 @@ RF15 & Manter nos registros as informações de autoria e temporalidade necessá
 \label{qua:requisitos_funcionais}
 \end{quadro}
 
+Os requisitos funcionais foram representados também por meio de um diagrama de casos de uso da UML \cite{omg2017_uml}, apresentado na Figura~\ref{fig:casos_de_uso}, que indica as funcionalidades disponíveis a cada perfil de usuário. O ator Administrador é uma especialização do ator Psicopedagogo: herda todos os seus casos de uso e possui, adicionalmente, o gerenciamento de usuários, a exclusão de instrumentos e a consulta ao registro de auditoria completo. O psicopedagogo, por sua vez, consulta apenas os acessos realizados aos dados dos aprendentes sob sua responsabilidade. A criação de uma nova versão é incluída no gerenciamento de instrumentos sempre que as questões de um instrumento já aplicado são alteradas, enquanto a finalização da aplicação e a impressão do relatório estendem, respectivamente, a aplicação do instrumento e a elaboração do relatório.
+
+\begin{figure}[H]
+    \centering
+    \caption{Diagrama de casos de uso do sistema}
+    \label{fig:casos_de_uso}
+    \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{casos_de_uso.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
 \subsection{Requisitos não funcionais}
 
 Os requisitos não funcionais foram definidos a partir das características de qualidade necessárias para a utilização do sistema em um contexto que envolve o armazenamento e o processamento de informações relacionadas a crianças. Nesse sentido, aspectos como segurança, privacidade, controle de acesso, rastreabilidade, usabilidade e organização dos dados foram considerados durante a definição da solução.
