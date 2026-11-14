@@ -2,17 +2,23 @@
 
 O backend do sistema foi desenvolvido utilizando Node.js como ambiente de execução e Express.js como framework para construção da API REST. A camada de persistência utiliza o Prisma ORM, com banco de dados MySQL, enquanto a autenticação dos usuários é realizada por meio de JSON Web Tokens (JWT), utilizando tokens de acesso e de renovação. Para a validação dos dados recebidos pela API foi utilizado o Zod, e a documentação dos recursos disponibilizados é realizada por meio do padrão Swagger/OpenAPI.
 
-A aplicação foi organizada em módulos de negócio, buscando separar as responsabilidades relacionadas às diferentes funcionalidades do sistema. A estrutura do backend contém módulos específicos para autenticação, usuários, aprendentes, avaliações, aplicações, relatórios e dashboard. Além desses módulos, foram definidos diretórios específicos para configurações, middlewares e utilitários, conforme apresentado na estrutura do projeto.
+A aplicação foi organizada em módulos de negócio, buscando separar as responsabilidades relacionadas às diferentes funcionalidades do sistema. A estrutura do backend contém módulos específicos para autenticação, usuários, aprendentes, avaliações, aplicações, relatórios, dashboard e auditoria. Além desses módulos, foram definidos diretórios específicos para configurações, middlewares, utilitários e para o mecanismo de auditoria, conforme apresentado na estrutura do projeto.
 
 Essa organização permite concentrar em cada módulo as operações relacionadas a um determinado domínio da aplicação. O módulo de autenticação, por exemplo, concentra as funcionalidades relacionadas ao acesso ao sistema, enquanto os módulos de aprendentes, avaliações e aplicações estão relacionados diretamente ao processo de avaliação psicopedagógica. O módulo de relatórios é responsável pelas operações relacionadas às devolutivas produzidas a partir das aplicações, e o módulo de dashboard disponibiliza informações destinadas à visualização geral dos dados do sistema.
 
-\section{Acesso aos dados}
+\section{Rotas da API}
 
-A comunicação entre o frontend e o backend é realizada por meio de uma API REST, disponibilizada pelo Express.js. Os recursos são organizados em diferentes rotas, de acordo com os módulos funcionais do sistema.
+A comunicação entre o frontend e o backend é realizada por meio de uma API REST, disponibilizada pelo Express.js. Os recursos são organizados em rotas agrupadas por domínio funcional, com controle de acesso aplicado por middleware antes do processamento de cada requisição. A Tabela \ref{tab:rotas_api} apresenta os principais endpoints disponibilizados.
 
-Entre os principais recursos disponibilizados estão as operações de autenticação, gerenciamento de usuários, gerenciamento de aprendentes, gerenciamento de avaliações, aplicações, relatórios e dashboard. O endpoint de autenticação disponibiliza a operação \textit{POST /api/auth/login}, enquanto os demais módulos possuem seus respectivos prefixos de rota.
-
-O gerenciamento de usuários é disponibilizado por meio das operações \textit{GET}, \textit{POST}, \textit{PUT} e \textit{DELETE} em \textit{/api/users}. De maneira semelhante, o módulo de aprendentes disponibiliza operações de consulta, cadastro, alteração e exclusão por meio de \textit{/api/aprendentes}, enquanto as avaliações são gerenciadas por meio de \textit{/api/avaliacoes}. Para aplicações, são disponibilizadas operações de consulta e criação em \textit{/api/aplicacoes}, e os relatórios possuem operações correspondentes em \textit{/api/relatorios}. O sistema também disponibiliza o endpoint \textit{GET /api/dashboard} para acesso às informações utilizadas no painel da aplicação.
+\begin{table}[H]
+\centering
+GET  & /api/dashboard & Autenticado & Dados do painel geral \\
+GET  & /api/auditoria & Autenticado & Consulta do registro de auditoria \\
+\hline
+\end{tabular}
+\caption{Principais rotas da API REST}
+\label{tab:rotas_api}
+\end{table}
 
 A utilização de uma API com recursos separados por domínio permite que o frontend consuma as funcionalidades do sistema de maneira padronizada, mantendo a lógica de processamento e acesso aos dados concentrada no backend.
 
