@@ -1,0 +1,194 @@
+\chapter[Resultados e discussões]{Resultados e discussões} \label{capitulo15}
+
+Este capítulo apresenta os resultados obtidos durante o desenvolvimento do sistema web de apoio à avaliação psicopedagógica na educação infantil. São descritas as funcionalidades implementadas, o fluxo de utilização da plataforma, os testes realizados e as limitações identificadas ao longo do desenvolvimento.
+
+\section{Sistema desenvolvido}
+
+O sistema desenvolvido consiste em uma aplicação web destinada a apoiar a organização e o acompanhamento das atividades de avaliação psicopedagógica. A plataforma permite que profissionais realizem o cadastro de aprendentes, gerenciem instrumentos avaliativos, registrem aplicações e respostas e elaborem relatórios com observações e conclusões profissionais.
+
+A aplicação foi desenvolvida com arquitetura cliente-servidor, utilizando React 18 e Vite 5 no frontend, Node.js e Express.js no backend e MySQL 8 como sistema gerenciador de banco de dados. A comunicação entre as camadas ocorre por meio de uma API REST, com utilização do Prisma como ferramenta de mapeamento objeto-relacional (ORM). Também foram utilizadas bibliotecas como Material UI, React Router, TanStack Query e Zod, para construção da interface, gerenciamento de rotas, requisições e validação de dados.
+
+A estrutura do projeto foi organizada em módulos, contemplando autenticação, gerenciamento de usuários, aprendentes, avaliações, aplicações, relatórios, painel inicial e auditoria. Essa organização permite separar as responsabilidades de cada funcionalidade e facilita a manutenção e a evolução do sistema.
+
+O banco de dados foi estruturado para armazenar as informações dos usuários, aprendentes, instrumentos avaliativos, questões, aplicações, respostas, relatórios e registros de auditoria, além das estruturas relacionadas à autenticação. Ao todo, a implementação contempla 12 tabelas relacionadas entre si por meio de chaves primárias e estrangeiras.
+
+Quanto ao controle de acesso, foram implementados dois perfis: administrador (ADMIN) e psicopedagogo (PSICOPEDAGOGO). O administrador possui permissões para gerenciar usuários e acessar os recursos administrativos, enquanto o psicopedagogo pode utilizar as funcionalidades de avaliação e consultar os registros sob sua responsabilidade. O controle de propriedade dos dados também é aplicado no backend, restringindo o acesso do profissional aos seus próprios aprendentes e instrumentos.
+
+\section{Funcionalidades implementadas}
+
+A plataforma contempla as principais etapas do fluxo de avaliação psicopedagógica, desde o cadastro do aprendente até a elaboração do relatório final.
+
+O cadastro de aprendentes permite registrar informações pessoais, dados dos responsáveis, informações escolares e observações. Cada aprendente possui uma página individual com acesso aos seus dados cadastrais, histórico de registros e logs de acesso.
+
+O gerenciamento de instrumentos avaliativos permite cadastrar e organizar instrumentos compostos por questões de diferentes tipos, incluindo texto, texto longo, número, data, seleção única, seleção múltipla, escala e respostas de sim ou não. Também é possível configurar a obrigatoriedade e a ordem das questões.
+
+Foi implementado um mecanismo de versionamento dos instrumentos. Quando um instrumento que já possui aplicações vinculadas tem suas questões alteradas, a versão anterior é arquivada e uma nova versão é criada. Dessa forma, as aplicações anteriores permanecem relacionadas à versão utilizada no momento de sua realização, preservando as respostas registradas.
+
+A aplicação de avaliações é realizada por meio da vinculação entre aprendente, instrumento e profissional responsável. Durante o preenchimento, as respostas podem ser salvas como rascunho, permitindo a continuidade em outro momento. Para finalizar a aplicação, o sistema verifica o preenchimento das questões obrigatórias. Após a finalização, as respostas ficam bloqueadas para edição.
+
+Ao concluir uma aplicação, o profissional pode elaborar um relatório contendo observações e conclusões. O relatório é vinculado à respectiva aplicação e pode ser impresso ou salvo em PDF utilizando a funcionalidade de impressão do navegador. Portanto, a geração do arquivo PDF não é realizada diretamente pelo servidor, mas pelo próprio navegador utilizado pelo profissional.
+
+O painel inicial apresenta indicadores gerais, como quantidade de aprendentes, instrumentos ativos, aplicações realizadas, aplicações pendentes e aplicações recentes.
+
+\section{Atendimento aos requisitos}
+
+O Quadro \ref{qua:atendimento_requisitos_funcionais} apresenta o grau de atendimento de cada requisito funcional especificado no Capítulo \ref{capitulo5}, indicando o capítulo em que a implementação correspondente é descrita e eventuais ressalvas.
+
+\begin{quadro}[H]
+\centering
+\small
+\caption{Atendimento aos requisitos funcionais}
+\begin{tabular}{p{1.2cm} p{7.5cm} p{1.5cm} p{4cm}}
+\hline
+\textbf{Req.} & \textbf{Descrição resumida} & \textbf{Status} & \textbf{Observação} \\
+\hline
+RF01 & Cadastro e autenticação de usuários & Atendido & Cap. \ref{capitulo8}, \ref{capitulo9} \\
+RF02 & Controle de acesso por perfil & Atendido & Cap. \ref{capitulo8}, \ref{capitulo13} \\
+RF03 & Cadastro, edição e consulta de aprendentes & Atendido & Cap. \ref{capitulo8}, \ref{capitulo9} \\
+RF04 & Restrição de visibilidade de aprendentes por responsável & Atendido & Cap. \ref{capitulo8}, \ref{capitulo13} \\
+RF05 & Registro de informações do processo avaliativo & Atendido & Cap. \ref{capitulo8}, \ref{capitulo11} \\
+RF06 & Cadastro e gerenciamento de instrumentos avaliativos & Atendido & Cap. \ref{capitulo8}, \ref{capitulo10} \\
+RF07 & Restrição de visibilidade de instrumentos por autor & Atendido & Cap. \ref{capitulo8}, \ref{capitulo13} \\
+RF08 & Gerenciamento de versões dos instrumentos & Atendido & Cap. \ref{capitulo10} \\
+RF09 & Registro de adaptações nos instrumentos & Parcialmente atendido & Adaptações registradas via versionamento automático; ausência de campo para justificativa textual (Cap. \ref{capitulo10}) \\
+RF10 & Vinculação de instrumento a aprendente & Atendido & Cap. \ref{capitulo11} \\
+RF11 & Registro de resultados e observações das aplicações & Atendido & Cap. \ref{capitulo11} \\
+RF12 & Consulta ao histórico de avaliações do aprendente & Parcialmente atendido & Histórico de registros textuais disponível; aplicações e relatórios não integrados à página individual do aprendente (Cap. \ref{capitulo11}) \\
+RF13 & Elaboração e armazenamento de relatórios & Atendido & Cap. \ref{capitulo12} \\
+RF14 & Geração de relatórios em PDF & Atendido & Implementado via função de impressão do navegador, sem geração server-side (Cap. \ref{capitulo12}) \\
+RF15 & Autoria e temporalidade nos registros & Atendido & Cap. \ref{capitulo7}, \ref{capitulo8} \\
+\hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:atendimento_requisitos_funcionais}
+\end{quadro}
+
+O Quadro \ref{qua:atendimento_requisitos_nao_funcionais} apresenta o atendimento aos requisitos não funcionais.
+
+\begin{quadro}[H]
+\centering
+\small
+\caption{Atendimento aos requisitos não funcionais}
+\begin{tabular}{p{1.2cm} p{7.5cm} p{1.5cm} p{4cm}}
+\hline
+\textbf{Req.} & \textbf{Descrição resumida} & \textbf{Status} & \textbf{Observação} \\
+\hline
+RNF01 & Autenticação de usuários & Atendido & JWT com tokens de acesso e renovação (Cap. \ref{capitulo8}, \ref{capitulo13}) \\
+RNF02 & Autorização por perfil e titularidade & Atendido & Cap. \ref{capitulo8}, \ref{capitulo13} \\
+RNF03 & Armazenamento seguro dos dados dos aprendentes & Atendido & Cap. \ref{capitulo13} \\
+RNF04 & Registro de auditoria das operações & Atendido & Cap. \ref{capitulo8}, \ref{capitulo13}; limitações descritas no Cap. \ref{capitulo13} \\
+RNF05 & Preservação do histórico de versões dos instrumentos & Atendido & Cap. \ref{capitulo10} \\
+RNF06 & Usabilidade (média $\geq$ 4,0 em avaliação com usuários) & Atendido & Média geral de 4,43/5,0 no questionário com 5 profissionais (Seção \ref{sec:avaliacao_usuarios}) \\
+RNF07 & Arquitetura em três camadas com módulos independentes por domínio & Atendido & 7 módulos de backend independentes; frontend separado em camadas de API, contexto, componentes e páginas (Cap. \ref{capitulo6}, \ref{capitulo8}, \ref{capitulo9}) \\
+RNF08 & Integridade e consistência dos dados & Atendido & Validação com Zod, chaves estrangeiras e restrições no banco (Cap. \ref{capitulo7}, \ref{capitulo8}) \\
+RNF09 & Tratamento adequado de erros & Atendido & Middleware centralizado de erros no backend (Cap. \ref{capitulo8}) \\
+RNF10 & Cobertura de testes do backend $\geq$ 70\% & Atendido & Cobertura de 81,01\% no backend (Seção \ref{sec:testes}) \\
+\hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:atendimento_requisitos_nao_funcionais}
+\end{quadro}
+
+Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois foram parcialmente atendidos. O RF09 (registro de adaptações) é atendido estruturalmente via versionamento automático, mas sem campo para justificativa textual. O RF12 (histórico do aprendente) é atendido para registros textuais, mas aplicações e relatórios não estão integrados à página individual do aprendente. Ambas as limitações estão descritas na seção \ref{sec:limitacoes} deste capítulo. Os dez requisitos não funcionais foram integralmente atendidos, com as ressalvas já documentadas no Capítulo \ref{capitulo13} quanto às limitações do registro de auditoria.
+
+\section{Fluxo de utilização}
+
+O fluxo principal de utilização da plataforma foi organizado para acompanhar as etapas de registro e documentação da avaliação psicopedagógica.
+
+Inicialmente, o profissional realiza o login com suas credenciais, previamente cadastradas pelo administrador. Após a autenticação, é direcionado ao painel inicial, a partir do qual pode acessar os módulos disponíveis conforme suas permissões.
+
+O profissional pode cadastrar um novo aprendente ou consultar um registro existente. Em seguida, pode acessar o gerenciamento de instrumentos para selecionar um instrumento já cadastrado ou criar um novo, configurando suas questões e respectivas propriedades.
+
+Para iniciar uma avaliação, o profissional seleciona o aprendente e o instrumento que será utilizado. O sistema registra a aplicação e permite o preenchimento das respostas, com possibilidade de salvamento como rascunho. Após o preenchimento das questões obrigatórias, a aplicação pode ser finalizada.
+
+Por fim, o profissional é direcionado à elaboração do relatório, no qual registra suas observações e conclusões. O documento pode ser consultado posteriormente e impresso ou salvo em PDF pelo navegador.
+
+Esse fluxo permite concentrar em uma única plataforma as informações relacionadas às etapas de registro e documentação da avaliação, mantendo a associação entre aprendente, instrumento, aplicação, respostas e relatório.
+
+\section{Testes e execução do sistema}\label{sec:testes}
+
+A verificação técnica do sistema foi realizada por meio de testes automatizados no backend e no frontend, utilizando Vitest. No backend, também foi utilizada a biblioteca Supertest para realizar testes das rotas da API. No frontend, foram empregados React Testing Library e jsdom para verificar o comportamento dos componentes e das funcionalidades da interface.
+
+Conforme o levantamento dos testes realizado durante a análise do código, foram identificados 18 arquivos de teste, sendo nove relacionados ao backend e nove ao frontend. Ao todo, foram executados 127 testes automatizados, dos quais 76 pertenciam ao backend e 51 ao frontend. Todos foram concluídos com sucesso, sem falhas.
+
+A cobertura de código identificada foi de 81,01\% para o backend e 50,44\% para o frontend, considerando a cobertura de linhas e instruções. Esses resultados demonstram que parte significativa das funcionalidades do backend possui testes automatizados, enquanto o frontend ainda apresenta áreas que podem receber maior cobertura.
+
+Além dos testes automatizados, foi realizada a execução prática da plataforma em ambiente Docker, com os serviços necessários para seu funcionamento. Durante essa execução, foi possível utilizar o sistema e verificar seu funcionamento geral, sem ocorrência de problemas que impedissem sua utilização.
+
+\label{sec:avaliacao_usuarios}Para complementar a avaliação técnica, foi aplicado um questionário com profissionais da área de psicopedagogia, com o objetivo de conhecer suas percepções sobre a facilidade de utilização, a organização das informações e a contribuição da plataforma para as atividades de avaliação psicopedagógica.
+
+O questionário foi respondido por cinco participantes, entre os dias 9 e 13 de novembro de 2026. Foram utilizadas sete questões fechadas, avaliadas em uma escala de 1 a 5, em que 1 representava discordância total e 5, concordância total. Também foi disponibilizada uma questão aberta para sugestões de melhorias.
+
+Os resultados das questões fechadas estão apresentados no Quadro \ref{qua:medias_avaliacoes_participantes}.
+
+\begin{quadro}[H]
+\centering
+\small
+\caption{Médias das avaliações dos participantes}
+\begin{tabular}{p{13cm} p{2cm}}
+\hline
+\textbf{Aspecto avaliado} & \textbf{Média} \\
+\hline
+Facilidade de compreensão e utilização da interface & 4,6 \\
+Organização das informações e navegação & 4,6 \\
+Cadastro e consulta dos dados dos aprendentes & 4,8 \\
+Gerenciamento dos instrumentos avaliativos & 4,2 \\
+Registro das aplicações e respostas & 4,4 \\
+Geração dos relatórios & 3,8 \\
+Contribuição geral da plataforma & 4,6 \\
+Média geral & 4,43 \\
+\hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:medias_avaliacoes_participantes}
+\end{quadro}
+
+A média geral das respostas foi de 4,43 pontos, indicando uma percepção predominantemente positiva das participantes em relação à plataforma. Das 35 avaliações registradas nas questões fechadas, 33 receberam notas 4 ou 5, correspondendo a 94,3\% das respostas. As duas avaliações restantes receberam nota 3, não havendo respostas com notas 1 ou 2.
+
+O aspecto mais bem avaliado foi o cadastro e a consulta dos dados dos aprendentes, com média de 4,8. A facilidade de utilização, a organização das informações e a contribuição geral da plataforma também apresentaram médias de 4,6.
+
+Por outro lado, a geração dos relatórios obteve a menor média, de 3,8. Embora o resultado ainda seja superior ao ponto intermediário da escala, ele indica uma oportunidade de aprimoramento dessa funcionalidade.
+
+\section{Discussão dos resultados}
+
+Os resultados obtidos demonstram que os principais módulos previstos para a plataforma foram implementados, contemplando o cadastro de aprendentes, o gerenciamento de instrumentos, o registro de aplicações, o armazenamento de respostas e a elaboração de relatórios.
+
+A avaliação realizada com as profissionais complementou os testes técnicos, permitindo observar a percepção das participantes sobre a utilização da plataforma. As médias obtidas foram positivas nos diferentes aspectos avaliados, especialmente no cadastro e na consulta dos aprendentes, na organização das informações e na facilidade de utilização.
+
+A menor média atribuída à geração dos relatórios está relacionada às sugestões apresentadas na questão aberta. Entre as contribuições, foram mencionadas a possibilidade de organizar o relatório em seções predefinidas, incluindo campos para hipótese diagnóstica e encaminhamentos, e a inclusão de recursos que facilitem o preenchimento das informações profissionais.
+
+Também foram sugeridas funcionalidades para ampliar a documentação dos aprendentes, como a possibilidade de anexar laudos, pareceres escolares e registros de avaliações que utilizam protocolos específicos. Outras sugestões envolveram a inclusão de campos para planejamento das intervenções e registro dos objetivos de cada sessão, além de uma linha do tempo para acompanhamento do histórico e do progresso do aprendente.
+
+Essas contribuições apontam que, além do registro das aplicações e dos relatórios, existe interesse em recursos que apoiem a organização de informações complementares e o acompanhamento longitudinal do processo avaliativo.
+
+A implementação do versionamento dos instrumentos representa outro recurso importante para a rastreabilidade das avaliações, pois permite preservar a versão utilizada em aplicações anteriores. Entretanto, o mecanismo ainda apresenta limitações: alterações realizadas antes de existir uma aplicação vinculada podem sobrescrever as questões existentes, e não há recursos completos para registrar justificativas de alterações ou comparar versões.
+
+Outro aspecto relevante é o controle de acesso aos dados dos aprendentes. A restrição de acesso por profissional contribui para a separação dos registros e para a proteção das informações armazenadas. O sistema também conta com autenticação baseada em JWT, validação de dados e registros de auditoria para determinadas operações de acesso e alteração.
+
+A funcionalidade de auditoria permite acompanhar eventos relacionados à utilização do sistema e às modificações realizadas nos registros. Sua implementação foi incorporada ao código versionado do projeto. Apesar disso, a abrangência e a integridade dos registros ainda podem ser aprimoradas, de modo a ampliar a rastreabilidade das operações.
+
+Em relação à consulta histórica, a plataforma disponibiliza registros textuais associados ao histórico do aprendente. Contudo, as aplicações e os relatórios ainda não são apresentados de forma integrada na página individual do aprendente, e as listagens correspondentes não possuem filtros específicos por aprendente. Essa limitação também se relaciona à sugestão das participantes de disponibilizar uma linha do tempo ou histórico visual.
+
+Os relatórios permitem documentar observações e conclusões elaboradas pelo profissional, mantendo a interpretação dos resultados sob sua responsabilidade. Essa característica está alinhada à proposta do sistema, que busca apoiar a organização das informações sem realizar diagnósticos ou interpretações automáticas.
+
+É necessário considerar que a avaliação contou com cinco participantes, constituindo uma amostra reduzida. Portanto, os resultados representam as percepções das profissionais que responderam ao questionário e não permitem generalizações para todo o público de psicopedagogos. Ainda assim, as respostas forneceram indicações relevantes sobre a experiência de utilização e possíveis melhorias.
+
+De modo geral, os resultados técnicos e a avaliação das participantes indicam que a plataforma apresenta funcionalidades capazes de apoiar a organização e a documentação das atividades de avaliação psicopedagógica. As sugestões recebidas também permitiram identificar aspectos que podem ser desenvolvidos em versões futuras.
+
+\section{Limitações e trabalhos futuros}\label{sec:limitacoes}
+
+Embora as funcionalidades principais tenham sido implementadas e a avaliação inicial tenha apresentado resultados positivos, foram identificadas limitações que podem orientar a continuidade do projeto.
+
+Entre as possibilidades de evolução, destacam-se:
+
+\begin{itemize}
+    \item Aprimoramento do histórico do aprendente: integrar as aplicações e os relatórios à página individual do aprendente, além de implementar filtros e uma linha do tempo que facilitem a consulta dos registros.
+    \item Evolução do versionamento dos instrumentos: incluir um campo para que o profissional registre a justificativa textual de cada adaptação, permitir a comparação direta entre versões e ampliar o controle sobre as alterações realizadas.
+    \item Aprimoramento da auditoria: ampliar a cobertura dos eventos registrados e fortalecer os mecanismos de integridade e consulta dos logs.
+    \item Aprimoramento da segurança: implementar medidas adicionais de proteção dos dados, incluindo configurações de comunicação segura e políticas de retenção e exclusão.
+    \item Evolução dos relatórios: implementar seções predefinidas, como hipótese diagnóstica e encaminhamentos, além de ampliar as possibilidades de formatação e organização dos documentos.
+    \item Anexos e documentação complementar: permitir o armazenamento de arquivos relacionados ao aprendente, como laudos, pareceres escolares e registros de avaliações realizadas com protocolos específicos.
+    \item Planejamento das intervenções: disponibilizar campos para registrar os objetivos de cada sessão e o planejamento das intervenções propostas pelo profissional.
+\end{itemize}
+
+Dessa forma, o sistema desenvolvido atende ao propósito de oferecer uma ferramenta para apoiar a organização e a documentação das etapas da avaliação psicopedagógica. Os testes técnicos e a avaliação inicial com profissionais forneceram evidências favoráveis ao funcionamento e à utilidade percebida da plataforma. As limitações identificadas e as sugestões recebidas constituem possibilidades de aprimoramento para versões futuras.
