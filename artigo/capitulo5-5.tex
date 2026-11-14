@@ -26,7 +26,7 @@ A construção da interface utiliza o Material UI, que fornece componentes reuti
 
 A utilização desses componentes permite padronizar elementos que aparecem em diferentes partes do sistema. Por exemplo, componentes de tabela podem ser reutilizados na apresentação de registros, enquanto componentes de confirmação podem ser empregados em operações que exigem uma ação explícita do usuário.
 
-A configuração do tema da aplicação é mantida separadamente no diretório \textit{theme}, permitindo centralizar as definições relacionadas à apresentação visual da interface.
+A configuração do tema da aplicação é mantida separadamente no diretório \textit{theme}, permitindo centralizar as definições relacionadas à apresentação visual da interface. Nele, as cores de alerta e de informação foram definidas em tons mais escuros que os padrões do Material UI, para que o texto branco das etiquetas de status atinja o contraste mínimo exigido pelas WCAG, conforme discutido na Seção~\ref{sec:acessibilidade}.
 
 \subsection{Navegação e proteção das rotas}
 
@@ -78,7 +78,7 @@ A divisão da interface em módulos acompanha a organização funcional do siste
 
 O frontend utiliza Vitest e React Testing Library para a realização de testes automatizados. O Vitest executa os testes e gera o relatório de cobertura; a React Testing Library fornece utilitários para renderizar componentes React em ambiente simulado (jsdom) e interagir com eles como um usuário faria, sem depender de um navegador real.
 
-Foram implementados 51 testes distribuídos em 9 arquivos, cobrindo as páginas e componentes de maior complexidade de lógica de apresentação, conforme o Quadro \ref{qua:testes_frontend}.
+Foram implementados 51 testes distribuídos em 9 arquivos, cobrindo as páginas e componentes de maior complexidade de lógica de apresentação, conforme o Quadro~\ref{qua:testes_frontend}.
 
 \begin{quadro}[H]
 \centering
@@ -88,7 +88,7 @@ Foram implementados 51 testes distribuídos em 9 arquivos, cobrindo as páginas 
 \hline
 \textbf{Arquivo de teste} & \textbf{Testes} & \textbf{Escopo} \\
 \hline
-LoginPage.test.jsx & 6 & Formulário de login e validações \\
+LoginPage.test.jsx & 6 & Formulário de login, validações e nome acessível do botão de senha \\
 ProtectedRoute.test.jsx & 5 & Redirecionamento por autenticação e perfil \\
 AvaliacaoFormPage.test.jsx & 8 & Formulário de criação e edição de instrumento \\
 AvaliacaoDetailPage.test.jsx & 5 & Exibição de instrumento e questões \\

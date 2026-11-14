@@ -32,7 +32,7 @@ O painel inicial apresenta indicadores gerais, como quantidade de aprendentes, i
 
 \section{Atendimento aos requisitos}
 
-O Quadro \ref{qua:atendimento_requisitos_funcionais} apresenta o grau de atendimento de cada requisito funcional especificado na Seção \ref{sec:requisitos}, indicando a seção em que a implementação correspondente é descrita e eventuais ressalvas.
+O Quadro~\ref{qua:atendimento_requisitos_funcionais} apresenta o grau de atendimento de cada requisito funcional especificado na Seção~\ref{sec:requisitos}, indicando a seção em que a implementação correspondente é descrita e eventuais ressalvas.
 
 \begin{quadro}[H]
 \centering
@@ -42,28 +42,28 @@ O Quadro \ref{qua:atendimento_requisitos_funcionais} apresenta o grau de atendim
 \hline
 \textbf{Req.} & \textbf{Descrição resumida} & \textbf{Status} & \textbf{Observação} \\
 \hline
-RF01 & Cadastro e autenticação de usuários & Atendido & Seções \ref{sec:backend}, \ref{sec:frontend} \\
-RF02 & Controle de acesso por perfil & Atendido & Seções \ref{sec:backend}, \ref{sec:seguranca} \\
-RF03 & Cadastro, edição e consulta de aprendentes & Atendido & Seções \ref{sec:backend}, \ref{sec:frontend} \\
-RF04 & Restrição de visibilidade de aprendentes por responsável & Atendido & Seções \ref{sec:backend}, \ref{sec:seguranca} \\
-RF05 & Registro de informações do processo avaliativo & Atendido & Seções \ref{sec:backend}, \ref{sec:aplicacoes} \\
-RF06 & Cadastro e gerenciamento de instrumentos avaliativos & Atendido & Seções \ref{sec:backend}, \ref{sec:instrumentos} \\
-RF07 & Restrição de visibilidade de instrumentos por autor & Atendido & Seções \ref{sec:backend}, \ref{sec:seguranca} \\
-RF08 & Gerenciamento de versões dos instrumentos & Atendido & Seção \ref{sec:instrumentos} \\
-RF09 & Registro de adaptações nos instrumentos & Parcialmente atendido & Adaptações registradas via versionamento automático; ausência de campo para justificativa textual (Seção \ref{sec:instrumentos}) \\
-RF10 & Vinculação de instrumento a aprendente & Atendido & Seção \ref{sec:aplicacoes} \\
-RF11 & Registro de resultados e observações das aplicações & Atendido & Seção \ref{sec:aplicacoes} \\
-RF12 & Consulta ao histórico de avaliações do aprendente & Parcialmente atendido & Histórico de registros textuais disponível; aplicações e relatórios não integrados à página individual do aprendente (Seção \ref{sec:aplicacoes}) \\
-RF13 & Elaboração e armazenamento de relatórios & Atendido & Seção \ref{sec:relatorios} \\
-RF14 & Geração de relatórios em PDF & Atendido & Implementado via função de impressão do navegador, sem geração server-side (Seção \ref{sec:relatorios}) \\
-RF15 & Autoria e temporalidade nos registros & Atendido & Seções \ref{sec:modelagem}, \ref{sec:backend} \\
+RF01 & Cadastro e autenticação de usuários & Atendido & Seções~\ref{sec:backend}, \ref{sec:frontend} \\
+RF02 & Controle de acesso por perfil & Atendido & Seções~\ref{sec:backend}, \ref{sec:seguranca} \\
+RF03 & Cadastro, edição e consulta de aprendentes & Atendido & Seções~\ref{sec:backend}, \ref{sec:frontend} \\
+RF04 & Restrição de visibilidade de aprendentes por responsável & Atendido & Seções~\ref{sec:backend}, \ref{sec:seguranca} \\
+RF05 & Registro de informações do processo avaliativo & Atendido & Seções~\ref{sec:backend}, \ref{sec:aplicacoes} \\
+RF06 & Cadastro e gerenciamento de instrumentos avaliativos & Atendido & Seções~\ref{sec:backend}, \ref{sec:instrumentos} \\
+RF07 & Restrição de visibilidade de instrumentos por autor & Atendido & Seções~\ref{sec:backend}, \ref{sec:seguranca} \\
+RF08 & Gerenciamento de versões dos instrumentos & Atendido & Seção~\ref{sec:instrumentos} \\
+RF09 & Registro de adaptações nos instrumentos & Parcialmente atendido & Adaptações registradas via versionamento automático; ausência de campo para justificativa textual (Seção~\ref{sec:instrumentos}) \\
+RF10 & Vinculação de instrumento a aprendente & Atendido & Seção~\ref{sec:aplicacoes} \\
+RF11 & Registro de resultados e observações das aplicações & Atendido & Seção~\ref{sec:aplicacoes} \\
+RF12 & Consulta ao histórico de avaliações do aprendente & Parcialmente atendido & Histórico de registros textuais disponível; aplicações e relatórios não integrados à página individual do aprendente (Seção~\ref{sec:aplicacoes}) \\
+RF13 & Elaboração e armazenamento de relatórios & Atendido & Seção~\ref{sec:relatorios} \\
+RF14 & Geração de relatórios em PDF & Atendido & Implementado via função de impressão do navegador, sem geração server-side (Seção~\ref{sec:relatorios}) \\
+RF15 & Autoria e temporalidade nos registros & Atendido & Seções~\ref{sec:modelagem}, \ref{sec:backend} \\
 \hline
 \end{tabular}
 \fonte{Elaborado pela autora (2026).}
 \label{qua:atendimento_requisitos_funcionais}
 \end{quadro}
 
-O Quadro \ref{qua:atendimento_requisitos_nao_funcionais} apresenta o atendimento aos requisitos não funcionais.
+O Quadro~\ref{qua:atendimento_requisitos_nao_funcionais} apresenta o atendimento aos requisitos não funcionais.
 
 \begin{quadro}[H]
 \centering
@@ -73,29 +73,30 @@ O Quadro \ref{qua:atendimento_requisitos_nao_funcionais} apresenta o atendimento
 \hline
 \textbf{Req.} & \textbf{Descrição resumida} & \textbf{Status} & \textbf{Observação} \\
 \hline
-RNF01 & Autenticação de usuários & Atendido & JWT com tokens de acesso e renovação (Seções \ref{sec:backend}, \ref{sec:seguranca}) \\
-RNF02 & Autorização por perfil e titularidade & Atendido & Seções \ref{sec:backend}, \ref{sec:seguranca} \\
-RNF03 & Armazenamento seguro dos dados dos aprendentes & Atendido & Seção \ref{sec:seguranca} \\
-RNF04 & Registro de auditoria das operações & Atendido & Seções \ref{sec:backend}, \ref{sec:seguranca}; limitações descritas na Seção \ref{sec:seguranca} \\
-RNF05 & Preservação do histórico de versões dos instrumentos & Atendido & Seção \ref{sec:instrumentos} \\
-RNF06 & Usabilidade (média $\geq$ 4,0 em avaliação com usuários) & Atendido & Média geral de 4,43/5,0 no questionário com 5 profissionais (Seção \ref{sec:avaliacao_usuarios}) \\
-RNF07 & Arquitetura em três camadas com módulos independentes por domínio & Atendido & 7 módulos de backend independentes; frontend separado em camadas de API, contexto, componentes e páginas (Seções \ref{sec:arquitetura}, \ref{sec:backend}, \ref{sec:frontend}) \\
-RNF08 & Integridade e consistência dos dados & Atendido & Validação com Zod, chaves estrangeiras e restrições no banco (Seções \ref{sec:modelagem}, \ref{sec:backend}) \\
-RNF09 & Tratamento adequado de erros & Atendido & Middleware centralizado de erros no backend (Seção \ref{sec:backend}) \\
-RNF10 & Cobertura de testes do backend $\geq$ 70\% & Atendido & Cobertura de 80,20\% no backend (Seção \ref{sec:testes}) \\
+RNF01 & Autenticação de usuários & Atendido & JWT com tokens de acesso e renovação (Seções~\ref{sec:backend}, \ref{sec:seguranca}) \\
+RNF02 & Autorização por perfil e titularidade & Atendido & Seções~\ref{sec:backend}, \ref{sec:seguranca} \\
+RNF03 & Armazenamento seguro dos dados dos aprendentes & Parcialmente atendido & Controle de acesso e auditoria implementados; sem criptografia em repouso e sem política de retenção (Seção~\ref{sec:seguranca}) \\
+RNF04 & Registro de auditoria das operações & Atendido & Seções~\ref{sec:backend}, \ref{sec:seguranca}; limitações descritas na Seção~\ref{sec:seguranca} \\
+RNF05 & Preservação do histórico de versões dos instrumentos & Atendido & Seção~\ref{sec:instrumentos} \\
+RNF06 & Usabilidade (média $\geq$ 4,0 em avaliação com usuários) & Atendido & Média geral de 4,43/5,0 no questionário com 5 profissionais (Seção~\ref{sec:avaliacao_usuarios}) \\
+RNF07 & Arquitetura em três camadas com módulos independentes por domínio & Atendido & 7 módulos de backend independentes; frontend separado em camadas de API, contexto, componentes e páginas (Seções~\ref{sec:arquitetura}, \ref{sec:backend}, \ref{sec:frontend}) \\
+RNF08 & Integridade e consistência dos dados & Atendido & Validação com Zod, chaves estrangeiras e restrições no banco (Seções~\ref{sec:modelagem}, \ref{sec:backend}) \\
+RNF09 & Tratamento adequado de erros & Atendido & Middleware centralizado de erros no backend (Seção~\ref{sec:backend}) \\
+RNF10 & Cobertura de testes do backend $\geq$ 70\% & Atendido & Cobertura de 80,20\% no backend (Seção~\ref{sec:testes}) \\
+RNF11 & Ausência de violações WCAG 2.2 (A e AA) detectáveis pelo axe-core & Atendido & Cinco tipos de violação corrigidos; nenhuma violação nas 18 telas após correção (Seção~\ref{sec:acessibilidade}) \\
 \hline
 \end{tabular}
 \fonte{Elaborado pela autora (2026).}
 \label{qua:atendimento_requisitos_nao_funcionais}
 \end{quadro}
 
-Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois foram parcialmente atendidos. O RF09 (registro de adaptações) é atendido estruturalmente via versionamento automático, mas sem campo para justificativa textual. O RF12 (histórico do aprendente) é atendido para registros textuais, mas aplicações e relatórios não estão integrados à página individual do aprendente. Ambas as limitações estão descritas na seção \ref{sec:limitacoes} deste capítulo. Os dez requisitos não funcionais foram integralmente atendidos, com as ressalvas já documentadas na Seção \ref{sec:seguranca} quanto às limitações do registro de auditoria.
+Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois foram parcialmente atendidos. O RF09 (registro de adaptações) é atendido estruturalmente via versionamento automático, mas sem campo para justificativa textual. O RF12 (histórico do aprendente) é atendido para registros textuais, mas aplicações e relatórios não estão integrados à página individual do aprendente. Ambas as limitações estão descritas na seção~\ref{sec:limitacoes} deste capítulo. Dos onze requisitos não funcionais, dez foram atendidos e um, o RNF03 (armazenamento seguro), foi parcialmente atendido, em razão da ausência de criptografia em repouso e de política de retenção dos dados. As ressalvas quanto às limitações do registro de auditoria estão documentadas na Seção~\ref{sec:seguranca}.
 
 \section{Fluxo de utilização}
 
-O fluxo principal de utilização da plataforma foi organizado para acompanhar as etapas de registro e documentação da avaliação psicopedagógica. As Figuras~\ref{fig:tela_dashboard} a \ref{fig:tela_relatorio} ilustram as principais telas do sistema.
+O fluxo principal de utilização da plataforma foi organizado para acompanhar as etapas de registro e documentação da avaliação psicopedagógica. As Figuras~\ref{fig:tela_dashboard} a~\ref{fig:tela_relatorio} ilustram as principais telas do sistema.
 
-Inicialmente, o profissional realiza o login com suas credenciais, previamente cadastradas pelo administrador. Após a autenticação, é direcionado ao painel inicial (Figura~\ref{fig:tela_dashboard}), a partir do qual pode acessar os módulos disponíveis conforme suas permissões.
+Inicialmente, o profissional realiza o login com suas credenciais, obtidas por meio do autocadastro na tela de cadastro, que cria uma conta com o perfil de psicopedagogo, ou do cadastro realizado pelo administrador no gerenciamento de usuários. Após a autenticação, é direcionado ao painel inicial (Figura~\ref{fig:tela_dashboard}), a partir do qual pode acessar os módulos disponíveis conforme suas permissões.
 
 O profissional pode cadastrar um novo aprendente ou consultar um registro existente (Figura~\ref{fig:tela_aprendente}). Em seguida, pode acessar o gerenciamento de instrumentos para selecionar um instrumento já cadastrado ou criar um novo, configurando suas questões e respectivas propriedades.
 
@@ -105,30 +106,34 @@ Por fim, o profissional elabora o relatório, no qual registra suas observaçõe
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.90\textwidth]{tela_dashboard.png}
     \caption{Painel inicial do sistema}
     \label{fig:tela_dashboard}
+    \includegraphics[width=0.90\textwidth]{tela_dashboard.png}
+    \fonte{Elaborado pela autora (2026).}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.90\textwidth]{tela_aprendente.png}
     \caption{Página de detalhe do aprendente}
     \label{fig:tela_aprendente}
+    \includegraphics[width=0.90\textwidth]{tela_aprendente.png}
+    \fonte{Elaborado pela autora (2026).}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.90\textwidth]{tela_aplicacao.png}
     \caption{Preenchimento de respostas durante a aplicação de um instrumento}
     \label{fig:tela_aplicacao}
+    \includegraphics[width=0.90\textwidth]{tela_aplicacao.png}
+    \fonte{Elaborado pela autora (2026).}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.90\textwidth]{tela_relatorio.png}
     \caption{Elaboração do relatório de avaliação psicopedagógica}
     \label{fig:tela_relatorio}
+    \includegraphics[width=0.90\textwidth]{tela_relatorio.png}
+    \fonte{Elaborado pela autora (2026).}
 \end{figure}
 
 Esse fluxo permite concentrar em uma única plataforma as informações relacionadas às etapas de registro e documentação da avaliação, mantendo a associação entre aprendente, instrumento, aplicação, respostas e relatório.
@@ -143,11 +148,44 @@ A cobertura de código identificada foi de 80,20\% para o backend e 48,37\% para
 
 Além dos testes automatizados, foi realizada a execução prática da plataforma em ambiente Docker, com os serviços necessários para seu funcionamento. Durante essa execução, foi possível utilizar o sistema e verificar seu funcionamento geral, sem ocorrência de problemas que impedissem sua utilização.
 
+\subsection{Avaliação automatizada de acessibilidade}\label{sec:acessibilidade}
+
+Para verificar a aderência da interface às diretrizes de acessibilidade discutidas no Capítulo~\ref{capitulo3-0}, foi realizada uma avaliação automatizada com o motor axe-core, versão 4.10.2 \cite{deque_axe_core}, executado por meio da biblioteca Playwright em navegador Chromium. A análise considerou os critérios de sucesso dos níveis A e AA das WCAG 2.0, 2.1 e 2.2 \cite{w3c_wcag22_pt}. Foram avaliadas 18 telas: as três telas públicas (login, cadastro e recuperação de senha) e 15 telas autenticadas, abrangendo o painel inicial, as listagens, os formulários e as páginas de detalhe de aprendentes, instrumentos, aplicações e relatórios, além das telas de usuários, auditoria e alteração de senha. As telas autenticadas foram acessadas com o perfil \textit{ADMIN}, em resolução de 1366$\times$768 pixels, utilizando os dados de demonstração do ambiente Docker local.
+
+A primeira execução identificou cinco tipos de violação, apresentados no Quadro~\ref{qua:violacoes_acessibilidade}, juntamente com a correção aplicada a cada um. Apenas a tela de recuperação de senha não apresentou violações nessa execução.
+
+\begin{quadro}[H]
+\centering
+\small
+\caption{Violações de acessibilidade identificadas pelo axe-core e correções aplicadas}
+\begin{tabular}{p{3.0cm} p{1.6cm} p{1.3cm} p{3.0cm} p{5.0cm}}
+\hline
+\textbf{Problema} & \textbf{Critério WCAG} & \textbf{Impacto} & \textbf{Telas afetadas} & \textbf{Correção aplicada} \\
+\hline
+Botão sem nome acessível & 4.1.2 (A) & Crítico & Login e cadastro & Inclusão de nome acessível no botão de exibir senha (``Mostrar senha'' ou ``Ocultar senha'', conforme o estado) \\
+Campo de formulário sem rótulo & 4.1.2 (A) & Crítico & Preenchimento da aplicação & Associação de cada campo de resposta ao enunciado da questão e, quando houver, ao texto de ajuda \\
+Contraste insuficiente & 1.4.3 (AA) & Sério & Painel inicial, lista e preenchimento de aplicações & Escurecimento das cores de alerta e informação do tema, elevando o contraste das etiquetas de status de 3,11:1 e 3,86:1 para 5,18:1 e 4,80:1 \\
+Lista inválida no menu lateral & 1.3.1 (A) & Sério & 15 telas autenticadas & Título ``Admin'' convertido em subtítulo de lista \\
+Lista inválida no painel & 1.3.1 (A) & Sério & Painel inicial & Remoção dos elementos intermediários entre a lista e seus itens \\
+\hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:violacoes_acessibilidade}
+\end{quadro}
+
+As violações de maior impacto eram as duas classificadas como críticas. A ausência de nome acessível no botão de exibir senha fazia com que leitores de tela anunciassem apenas ``botão'', sem indicar sua função. Já a falta de rótulo nos campos de resposta afetava a tela central do sistema: um usuário de leitor de tela, ao percorrer os campos durante a aplicação de um instrumento, não ouvia o enunciado da questão a que cada campo se referia. A violação de estrutura do menu lateral, embora presente em 15 telas, decorria de um único componente e ocorria apenas para o perfil \textit{ADMIN}, pois o grupo de itens ``Admin'' não é exibido ao psicopedagogo.
+
+Como as causas estavam concentradas em poucos componentes, as correções foram aplicadas ainda durante o desenvolvimento. No caso do contraste, o axe-core apontou apenas a etiqueta ``Rascunho'', presente nos dados de demonstração; o cálculo das demais cores do tema mostrou que a etiqueta ``Em Andamento'' e a ação ``Alteração'' do registro de auditoria, que utilizam a cor de informação, também ficavam abaixo do mínimo, e ambas foram corrigidas. O mesmo padrão de lista inválida do painel foi encontrado no histórico de acompanhamento do aprendente, que não havia sido sinalizado porque esse conteúdo não estava visível durante a execução automatizada, e também foi corrigido. Após as correções, o teste automatizado do botão de exibir senha passou a verificar também seu nome acessível, e os 51 testes do frontend foram executados novamente com sucesso. Uma segunda execução do axe-core, nas mesmas 18 telas e com os mesmos critérios, não identificou violações.
+
+É necessário considerar que ferramentas automatizadas verificam apenas parte dos critérios das WCAG. Aspectos como a navegação completa por teclado, a ordem lógica do foco, a clareza das mensagens de erro e a experiência real com leitores de tela exigem avaliação manual e, idealmente, testes com pessoas com deficiência, que não foram realizados neste trabalho. Além disso, o axe-core sinalizou 181 elementos cujo contraste não pôde ser determinado automaticamente, por estarem sobre fundos compostos, e que também demandariam verificação manual. Assim, a ausência de violações na segunda execução não significa que a interface esteja em conformidade com as WCAG 2.2, mas apenas que não foram detectados problemas pelos testes automatizados.
+
+\subsection{Avaliação com usuários}
+
 \label{sec:avaliacao_usuarios}Para complementar a avaliação técnica, foi aplicado um questionário com profissionais da área de psicopedagogia, com o objetivo de conhecer suas percepções sobre a facilidade de utilização, a organização das informações e a contribuição da plataforma para as atividades de avaliação psicopedagógica.
 
 O questionário foi respondido por cinco participantes, entre os dias 9 e 13 de novembro de 2026. Foram utilizadas sete questões fechadas, avaliadas em uma escala de 1 a 5, em que 1 representava discordância total e 5, concordância total. Também foi disponibilizada uma questão aberta para sugestões de melhorias.
 
-Os resultados das questões fechadas estão apresentados no Quadro \ref{qua:medias_avaliacoes_participantes}.
+Os resultados das questões fechadas estão apresentados no Quadro~\ref{qua:medias_avaliacoes_participantes}.
 
 \begin{quadro}[H]
 \centering
@@ -201,9 +239,11 @@ Os relatórios permitem documentar observações e conclusões elaboradas pelo p
 
 É necessário considerar que a avaliação contou com cinco participantes, constituindo uma amostra reduzida. Portanto, os resultados representam as percepções das profissionais que responderam ao questionário e não permitem generalizações para todo o público de psicopedagogos. Ainda assim, as respostas forneceram indicações relevantes sobre a experiência de utilização e possíveis melhorias.
 
-Em relação aos estudos apresentados no Capítulo~\ref{capitulo2}, o sistema desenvolvido compartilha com \citeonline{abreu2025_sistemas_web_gestao} e \citeonline{pedroso2025_integraedu} a ênfase na centralização de dados e no controle de acesso por perfil como requisitos essenciais de sistemas web voltados à educação. Assim como o IntegraEDU \cite{pedroso2025_integraedu}, o sistema adota perfis diferenciados e restringe a visibilidade dos registros ao usuário responsável. Em relação a \citeonline{carneiro2023_taep4}, que documenta a TAEP4.0, ambos convergem na necessidade de registro estruturado e exportação de relatórios; a diferença está no foco: enquanto a TAEP4.0 apoia a prática docente em sala de aula, este sistema é orientado ao processo clínico-pedagógico da avaliação psicopedagógica. Quanto ao aplicativo de \citeonline{silva2024_app_tdah}, a semelhança está na adoção de formulários personalizáveis e na validação com usuários especialistas; o presente trabalho expande esse escopo ao contemplar múltiplos instrumentos, versionamento e registro longitudinal.
+Em relação aos estudos apresentados no Capítulo~\ref{capitulo2}, o sistema desenvolvido compartilha com \citeonline{abreu2025_sistemas_web_gestao} e \citeonline{pedroso2025_integraedu} a ênfase na centralização de dados e no controle de acesso por perfil como requisitos essenciais de sistemas web voltados à educação. Assim como o IntegraEDU \cite{pedroso2025_integraedu}, o sistema adota perfis diferenciados e restringe a visibilidade dos registros ao usuário responsável. Em relação a \citeonline{carneiro2023_taep4}, que documentam a TAEP4.0, ambos convergem na necessidade de registro estruturado e exportação de relatórios; a diferença está no foco: enquanto a TAEP4.0 apoia a prática docente em sala de aula, este sistema é orientado ao processo clínico-pedagógico da avaliação psicopedagógica. Quanto ao aplicativo de \citeonline{silva2024_app_tdah}, a semelhança está na adoção de formulários personalizáveis e na validação com usuários especialistas; o presente trabalho expande esse escopo ao contemplar múltiplos instrumentos, versionamento e registro longitudinal.
 
-A lacuna identificada na síntese do cap. 2 — ausência de ferramentas específicas para avaliação psicopedagógica na Educação Infantil — é o ponto central que distingue este trabalho dos demais: nenhum dos estudos analisados combina instrumentos configuráveis, versionamento automático com rastreabilidade, registro de auditoria de dados de saúde infantil e geração de relatório clínico vinculado à aplicação. Os resultados da avaliação com as profissionais, em especial a média de 4,43/5,0 e as sugestões de evolução, indicam que o sistema representa uma contribuição concreta nessa direção, ainda que em estágio de protótipo.
+Entre os trabalhos mais próximos, o sistema de \citeonline{valgas2021_prontuario_neuropsicologico} também foi desenvolvido segundo a \textit{Design Science Research} e obteve avaliação de usabilidade positiva, resultado convergente com a média de 4,43/5,0 obtida neste trabalho. Aquele estudo, contudo, identificou a pontuação de testes como uma das tarefas mais custosas para os profissionais, e o sistema aqui desenvolvido não realiza pontuação automática das respostas, limitando-se ao seu registro; essa é uma diferença relevante, que poderia ser incorporada em versões futuras para os instrumentos cujas regras de pontuação possam ser definidas no cadastro. Em relação às ferramentas de triagem do desenvolvimento infantil, como o TEDI \cite{moreira2022_tedi} e o ASQ-3 aplicado pela \textit{web} \cite{schonhaut2023_asq_web}, o sistema não oferece instrumentos validados prontos, mas permite que o profissional cadastre e adapte os instrumentos que utiliza, preservando o histórico de versões. Por fim, a combinação entre respostas estruturadas e relatórios em texto livre responde à tensão apontada por \citeonline{kariotis2022_ehr_saude_mental} entre a padronização do registro e a natureza narrativa das informações clínicas.
+
+Em relação às soluções comerciais levantadas na Seção~\ref{sec:solucoes_mercado}, o sistema não cobre as rotinas administrativas do consultório, como agenda e financeiro, mas se diferencia no tratamento do instrumento avaliativo. Esse é o ponto central que distingue este trabalho: nenhum dos estudos analisados no Capítulo~\ref{capitulo2} nem das soluções comerciais levantadas divulga a combinação de instrumentos configuráveis, versionamento automático com rastreabilidade, registro de auditoria de dados de saúde infantil e geração de relatório clínico vinculado à aplicação. Os resultados da avaliação com as profissionais, em especial a média de 4,43/5,0 e as sugestões de evolução, indicam que o sistema representa uma contribuição concreta nessa direção, ainda que em estágio de protótipo.
 
 De modo geral, os resultados técnicos e a avaliação das participantes indicam que a plataforma apresenta funcionalidades capazes de apoiar a organização e a documentação das atividades de avaliação psicopedagógica. As sugestões recebidas também permitiram identificar aspectos que podem ser desenvolvidos em versões futuras.
 

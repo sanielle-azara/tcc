@@ -1,6 +1,6 @@
 \chapter[Materiais e Métodos]{Materiais e Métodos}\label{capitulo4}
 
-Este capítulo descreve os materiais e os procedimentos metodológicos adotados na pesquisa, situada no campo da psicopedagogia articulada à engenharia de software. O estudo caracteriza-se como pesquisa aplicada \cite{Gil_2002, Prodanov_Freitas_2013}, pois buscou propor uma solução tecnológica para um problema concreto identificado na prática psicopedagógica: a ausência de sistemas web específicos e estruturados para registro, organização e análise de atendimentos clínicos. 
+Este capítulo descreve os materiais e os procedimentos metodológicos adotados na pesquisa, situada no campo da psicopedagogia articulada à engenharia de software. O estudo caracteriza-se como pesquisa aplicada \cite{Gil_2002, Prodanov_Freitas_2013}, pois buscou propor uma solução tecnológica para um problema concreto identificado na prática psicopedagógica: a falta de sistemas web que permitam ao psicopedagogo cadastrar e adaptar seus próprios instrumentos avaliativos preservando a rastreabilidade das aplicações já realizadas, lacuna verificada no levantamento de soluções existentes apresentado na Seção~\ref{sec:solucoes_mercado}.
 
 Do ponto de vista dos procedimentos, o trabalho se enquadra na abordagem da \textit{Design Science Research} \cite{Hevner_2004, Dresch_Lacerda_Antunes_2015}, voltada ao projeto, construção e avaliação de artefatos de tecnologia da informação como resposta a problemas identificados em contextos organizacionais ou profissionais. Essa abordagem é adequada ao estudo porque o objetivo central não é apenas descrever ou explicar um fenômeno, mas desenvolver e avaliar um artefato (o sistema web) que atenda às necessidades do processo de avaliação psicopedagógica.
 
@@ -68,9 +68,9 @@ A entrevista semiestruturada foi realizada previamente ao desenvolvimento do sis
 
 A síntese das respostas indicou que a profissional utiliza planilhas e documentos de texto para organizar os registros dos aprendentes, sem integração entre as informações de diferentes atendimentos. Relatou dificuldade em localizar registros anteriores e em manter o histórico longitudinal dos aprendentes de forma organizada. Em relação aos instrumentos, destacou que costuma adaptar protocolos existentes conforme as características de cada criança, e que não possui forma sistematizada de registrar essas adaptações nem de retomar versões anteriores. Quanto aos relatórios, apontou a necessidade de um documento que reúna os dados da avaliação e permita o registro das conclusões profissionais, sem impor uma estrutura rígida que desconsidere o caráter interpretativo do processo. Também mencionou a importância de que o sistema respeite o sigilo das informações, restringindo o acesso dos dados de cada criança ao profissional responsável pelo atendimento.
 
-Essas informações orientaram diretamente a definição dos requisitos funcionais RF03, RF04, RF06, RF07, RF08, RF09, RF12 e RF13, bem como os requisitos não funcionais RNF02, RNF03 e RNF05, descritos na Seção \ref{sec:requisitos}.
+Essas informações orientaram diretamente a definição dos requisitos funcionais RF03, RF04, RF06, RF07, RF08, RF09, RF12 e RF13, bem como os requisitos não funcionais RNF02, RNF03 e RNF05, descritos na Seção~\ref{sec:requisitos}.
 
-Complementarmente, após a implementação do sistema, foi aplicado um questionário com profissionais de psicopedagogia para avaliar a adequação da plataforma às atividades do processo avaliativo. Essa etapa é descrita na Seção \ref{sec:testes}.
+Complementarmente, após a implementação do sistema, foi aplicado um questionário com profissionais de psicopedagogia para avaliar a adequação da plataforma às atividades do processo avaliativo. Essa etapa é descrita na Seção~\ref{sec:testes}.
 
 \section{Análise de Dados}
 
@@ -87,7 +87,7 @@ Essas categorias foram relacionadas com princípios de engenharia de software e 
 
 \section{Desenvolvimento do Sistema}
 
-No que diz respeito ao desenvolvimento do sistema, adotou-se como referência um modelo incremental e iterativo, em que os artefatos de análise e de projeto foram progressivamente refinados à medida que novos elementos foram incorporados. As etapas contempladas incluíram a definição de requisitos, a modelagem do banco de dados, a implementação das camadas de backend e frontend, a realização de testes automatizados e a avaliação do sistema com profissionais da área.
+No que diz respeito ao desenvolvimento do sistema, adotou-se como referência um modelo incremental e iterativo, em que os artefatos de análise e de projeto foram progressivamente refinados à medida que novos elementos foram incorporados. As etapas contempladas incluíram a definição de requisitos, a modelagem do banco de dados, a implementação das camadas de backend e frontend, a realização de testes automatizados, a avaliação automatizada de acessibilidade e a avaliação do sistema com profissionais da área.
 
 As etapas metodológicas de desenvolvimento adotadas foram:
 
@@ -112,6 +112,7 @@ As etapas metodológicas de desenvolvimento adotadas foram:
     \begin{enumerate}
         \item realização de testes automatizados para verificar o comportamento das funcionalidades implementadas;
         \item realização de testes exploratórios e funcionais durante o desenvolvimento, verificando o funcionamento integrado das camadas;
+        \item avaliação automatizada de acessibilidade das telas principais com a ferramenta axe-core, considerando os critérios dos níveis A e AA das WCAG 2.2, com correção das violações identificadas e nova verificação;
         \item avaliação do sistema com profissionais de psicopedagogia, por meio de questionário estruturado aplicado após a utilização da plataforma.
     \end{enumerate}
 \end{enumerate}
@@ -126,13 +127,13 @@ Considerando que o sistema envolve dados potencialmente sensíveis relativos a a
     \item adoção de princípios da Lei Geral de Proteção de Dados, como necessidade, minimização de dados, finalidade e transparência;
     \item anonimização dos registros utilizados em ambiente de demonstração, sem uso de dados reais de crianças ou prontuários clínicos;
     \item armazenamento seguro em banco de dados protegido, com mecanismos de autenticação, autorização por perfis de acesso e registro de auditoria;
-    \item apresentação de Termo de Consentimento Livre e Esclarecido (TCLE) à profissional participante da entrevista de levantamento de requisitos, assegurando ciência sobre os objetivos da pesquisa, voluntariedade e confidencialidade das informações fornecidas (Apêndice \ref{apendice:tcle});
+    \item apresentação de Termo de Consentimento Livre e Esclarecido (TCLE) à profissional participante da entrevista de levantamento de requisitos, assegurando ciência sobre os objetivos da pesquisa, voluntariedade e confidencialidade das informações fornecidas (Apêndice~\ref{apendice:tcle});
     \item aplicação do questionário de avaliação do sistema de forma anônima, sem coleta de nome, instituição ou qualquer dado que permitisse identificar os respondentes.
 \end{itemize}
 
 A pesquisa não envolveu coleta direta de dados de crianças nem análise de prontuários reais. A entrevista de levantamento de requisitos e o questionário de avaliação foram realizados exclusivamente com psicopedagogos adultos, e os dados coletados limitaram-se às suas percepções profissionais e opiniões sobre o sistema.
 
-Em relação ao enquadramento ético, o questionário de avaliação, por ser anônimo e tratar apenas de opiniões sobre um produto de software, enquadra-se na hipótese de dispensa de registro em Comitê de Ética em Pesquisa prevista no art. 1º, parágrafo único, inciso I, da Resolução CNS n.º 510/2016, que exclui do âmbito de sua regulação as pesquisas de opinião realizadas com participantes não identificados. O instrumento utilizado consta no Apêndice \ref{apendice:questionario}.
+Em relação ao enquadramento ético, o questionário de avaliação, por ser anônimo e tratar apenas de opiniões sobre um produto de software, enquadra-se na hipótese de dispensa de registro em Comitê de Ética em Pesquisa prevista no art. 1º, parágrafo único, inciso I, da Resolução CNS n.º 510/2016, que exclui do âmbito de sua regulação as pesquisas de opinião realizadas com participantes não identificados. O instrumento utilizado consta no Apêndice~\ref{apendice:questionario}.
 
 \section{Limitações do Método}
 

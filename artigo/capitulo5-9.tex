@@ -20,13 +20,15 @@ No frontend, o controle de acesso é complementado pelo uso do \textit{AuthConte
 
 A comunicação entre frontend e backend é realizada por meio da API REST, sendo as operações protegidas verificadas pelo backend. Essa separação permite que o controle de segurança não dependa exclusivamente das restrições apresentadas na interface, mantendo a validação das permissões no lado servidor.
 
+As senhas dos usuários não são armazenadas em texto plano. No cadastro, na redefinição e na alteração de senha, o backend gera um \textit{hash} com o algoritmo bcrypt, utilizando fator de custo 12, e somente esse \textit{hash} é gravado no campo \textit{passwordHash} da entidade \textit{users}. Na autenticação, a senha informada é comparada ao \textit{hash} armazenado, sem que a senha original precise ser recuperada.
+
 O gerenciamento das credenciais também conta com estruturas específicas para tokens de atualização e recuperação de senha. A entidade \textit{refresh\_tokens} armazena os tokens associados aos usuários, juntamente com seus prazos de validade e informações de revogação. Já a entidade \textit{password\_resets} permite registrar tokens destinados ao processo de recuperação de senha, incluindo prazo de validade e indicação de utilização.
 
 Outro mecanismo utilizado na implementação é a validação dos dados recebidos pela API. O backend utiliza Zod para validação das entradas, permitindo verificar se os dados enviados às operações atendem às estruturas esperadas antes de serem processados. Esse mecanismo complementa as medidas de autenticação e autorização ao contribuir para o controle das informações recebidas pela aplicação.
 
 Para a rastreabilidade, os campos de controle temporal (\textit{createdAt} e \textit{updatedAt}) e os vínculos de autoria do modelo (\textit{responsavelId}, \textit{autorId} e \textit{aplicadorId}) não são suficientes quando se trata de dados de saúde de crianças. Eles indicam quem criou cada registro e quando ele foi alterado pela última vez, mas não registram quem fez cada alteração, quais eram os valores anteriores nem quem consultou as informações. Este último ponto é justamente o que a Lei Geral de Proteção de Dados e o sigilo profissional mais exigem. Além disso, o perfil \textit{ADMIN} tem acesso irrestrito a todos os dados clínicos, e esse acesso não deixaria rastro.
 
-Por esses motivos, o sistema mantém um registro de auditoria na entidade \textit{audit\_logs}, preenchido automaticamente por uma extensão do Prisma Client, conforme descrito na Seção \ref{sec:backend}. O registro atende aos quatro pontos acima:
+Por esses motivos, o sistema mantém um registro de auditoria na entidade \textit{audit\_logs}, preenchido automaticamente por uma extensão do Prisma Client, conforme descrito na Seção~\ref{sec:backend}. O registro atende aos quatro pontos acima:
 
 \begin{itemize}
     \item cada criação, alteração e exclusão identifica o usuário que a realizou, o seu perfil, o IP de origem e o momento da operação;
@@ -57,7 +59,7 @@ O sistema armazena dois tipos de dados com proteção legal reforçada pela Lei 
 
 Do ponto de vista da minimização de dados, os campos opcionais da entidade \textit{aprendentes} — contato secundário, e-mail, escola, série e turno — permitem que o profissional registre apenas as informações necessárias ao atendimento. Os campos obrigatórios (nome, data de nascimento, sexo, responsável e contato principal) foram definidos com base nas informações mínimas identificadas como necessárias ao processo avaliativo. Ainda assim, a decisão sobre quais campos preencher é do profissional, e o sistema não impede o registro de informações além do estritamente necessário.
 
-As seguintes medidas foram implementadas em relação à proteção dos dados: controle de acesso por perfil e titularidade, registro de auditoria das operações e acessos, e exclusão lógica dos registros. Contudo, o sistema apresenta limitações relevantes para uso com dados reais que precisam ser reconhecidas:
+As seguintes medidas foram implementadas em relação à proteção dos dados: controle de acesso por perfil e titularidade, armazenamento de senhas por \textit{hash}, registro de auditoria das operações e acessos, e exclusão lógica dos registros. Contudo, o sistema apresenta limitações relevantes para uso com dados reais que precisam ser reconhecidas:
 
 \begin{itemize}
     \item \textbf{Consentimento do responsável legal}: o sistema não possui mecanismo para registrar o consentimento do responsável da criança para o tratamento de seus dados, exigido pelo art. 14 da LGPD. Essa responsabilidade recai sobre o profissional que utiliza o sistema, devendo ser gerenciada por procedimentos externos à plataforma;
@@ -69,4 +71,4 @@ As seguintes medidas foram implementadas em relação à proteção dos dados: c
 
 Essas limitações são inerentes ao estágio de protótipo do sistema e não inviabilizam sua avaliação funcional. Para uso em produção com dados reais de crianças, seria necessário endereçar cada um desses pontos, além de elaborar um Relatório de Impacto à Proteção de Dados Pessoais (RIPD) conforme previsto no art. 38 da LGPD.
 
-Assim, a segurança implementada combina autenticação por JWT, controle de acesso por perfis, restrição de visibilidade por titularidade, proteção das rotas, gerenciamento de sessão, validação das informações recebidas pela API e registro de auditoria. Esses mecanismos estabelecem uma camada de proteção adequada ao estágio de protótipo do sistema, mas não substituem as medidas organizacionais e técnicas exigidas para o tratamento de dados pessoais sensíveis de crianças em ambiente de produção.
+Assim, a segurança implementada combina autenticação por JWT, armazenamento de senhas com bcrypt, controle de acesso por perfis, restrição de visibilidade por titularidade, proteção das rotas, gerenciamento de sessão, validação das informações recebidas pela API e registro de auditoria. Esses mecanismos estabelecem uma camada de proteção adequada ao estágio de protótipo do sistema, mas não substituem as medidas organizacionais e técnicas exigidas para o tratamento de dados pessoais sensíveis de crianças em ambiente de produção.

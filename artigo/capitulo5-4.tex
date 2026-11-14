@@ -8,7 +8,7 @@ Essa organização permite concentrar em cada módulo as operações relacionada
 
 \subsection{Rotas da API}
 
-A comunicação entre o frontend e o backend é realizada por meio de uma API REST, disponibilizada pelo Express.js. Os recursos são organizados em rotas agrupadas por domínio funcional, com controle de acesso aplicado por middleware antes do processamento de cada requisição. A Tabela \ref{qua:rotas_api} apresenta os principais endpoints disponibilizados.
+A comunicação entre o frontend e o backend é realizada por meio de uma API REST, disponibilizada pelo Express.js. Os recursos são organizados em rotas agrupadas por domínio funcional, com controle de acesso aplicado por middleware antes do processamento de cada requisição. A Tabela~\ref{qua:rotas_api} apresenta os principais endpoints disponibilizados.
 
 \begin{quadro}[H]
 \centering
@@ -74,7 +74,7 @@ A validação das informações de entrada é realizada com o Zod. Essa abordage
 
 \subsection{Autenticação e controle de acesso}
 
-A autenticação foi implementada utilizando JWT, com tokens de acesso (\textit{access token}) e de renovação (\textit{refresh token}). O access token tem validade de 15 minutos; o refresh token, de 7 dias. Ambos os valores são configuráveis por variável de ambiente.
+A autenticação foi implementada utilizando JWT \cite{rfc7519_jwt}, com tokens de acesso (\textit{access token}) e de renovação (\textit{refresh token}), conforme o esquema descrito na Seção~\ref{sec:fund_seguranca}. Os tokens são assinados com o algoritmo HMAC SHA-256, padrão da biblioteca \textit{jsonwebtoken}, utilizando chaves secretas distintas para cada tipo de token. O access token tem validade de 15 minutos; o refresh token, de 7 dias. Ambos os valores são configuráveis por variável de ambiente.
 
 No frontend, os tokens são armazenados no \textit{localStorage} do navegador. Essa escolha simplifica a implementação, mas expõe os tokens a ataques de \textit{cross-site scripting} (XSS); a alternativa mais segura seria o uso de cookies \textit{httpOnly}, que não são acessíveis por JavaScript. Essa é uma limitação do protótipo para uso em produção.
 
@@ -84,7 +84,7 @@ O processo de recuperação de senha utiliza um token gerado com \texttt{crypto.
 
 Para proteção contra ataques de força bruta e abuso da API, o backend aplica limitação de taxa (\textit{rate limiting}) globalmente por meio da biblioteca \textit{express-rate-limit}: no máximo 100 requisições por endereço IP em uma janela de 15 minutos. Ao atingir o limite, a API retorna HTTP 429 com mensagem de erro. Os valores são configuráveis por variável de ambiente.
 
-O backend contempla os perfis \textit{ADMIN} e \textit{PSICOPEDAGOGO}, com controle de acesso por perfil aplicado via middleware \textit{authorize} nas rotas que exigem permissão específica. Além disso, o sistema implementa restrição de visibilidade baseada em titularidade: aprendentes e avaliações são vinculados ao usuário que os criou, e aplicações e relatórios seguem a titularidade do aprendente a que pertencem. As operações de leitura e escrita alcançam somente os registros pertencentes ao usuário autenticado, exceto para o perfil \textit{ADMIN}, que possui acesso irrestrito.
+O backend contempla os perfis \textit{ADMIN} e \textit{PSICOPEDAGOGO}, com controle de acesso por perfil aplicado via middleware \textit{authorize} nas rotas que exigem permissão específica, na forma de um controle de acesso baseado em papéis \cite{sandhu1996_rbac}. Como esse modelo não expressa restrições que dependem do registro acessado, o sistema o complementa com uma restrição baseada em um atributo do recurso, a titularidade, à maneira do controle de acesso baseado em atributos \cite{hu2014_abac}: aprendentes e avaliações são vinculados ao usuário que os criou, e aplicações e relatórios seguem a titularidade do aprendente a que pertencem. As operações de leitura e escrita alcançam somente os registros pertencentes ao usuário autenticado, exceto para o perfil \textit{ADMIN}, que possui acesso irrestrito.
 
 \subsection{Gerenciamento de aprendentes e avaliações}
 
@@ -94,7 +94,7 @@ A visibilidade dos aprendentes é controlada pelo campo \textit{responsavelId}, 
 
 O módulo de avaliações é responsável pelo gerenciamento dos instrumentos utilizados pelo sistema. A estrutura adotada permite representar avaliações compostas por diferentes questões e tipos de resposta. O versionamento desses instrumentos é mantido na camada de persistência, conforme apresentado na modelagem do banco de dados, permitindo relacionar diferentes versões de uma mesma avaliação.
 
-De maneira análoga ao módulo de aprendentes, a visibilidade das avaliações é controlada pelo campo \textit{autorId}, atribuído automaticamente ao usuário que criou o instrumento. As consultas de listagem e de detalhe aplicam o mesmo filtro de restrição por responsável, garantindo que cada profissional acesse somente os instrumentos que criou. Ao criar uma nova versão de uma avaliação, o campo \textit{autorId} recebe o usuário que realizou a alteração. Como o psicopedagogo só edita os próprios instrumentos, a titularidade se mantém entre as versões; quando a edição é feita pelo administrador, a nova versão passa a pertencer a ele, limitação discutida na Seção \ref{sec:instrumentos}.
+De maneira análoga ao módulo de aprendentes, a visibilidade das avaliações é controlada pelo campo \textit{autorId}, atribuído automaticamente ao usuário que criou o instrumento. As consultas de listagem e de detalhe aplicam o mesmo filtro de restrição por responsável, garantindo que cada profissional acesse somente os instrumentos que criou. Ao criar uma nova versão de uma avaliação, o campo \textit{autorId} recebe o usuário que realizou a alteração. Como o psicopedagogo só edita os próprios instrumentos, a titularidade se mantém entre as versões; quando a edição é feita pelo administrador, a nova versão passa a pertencer a ele, limitação discutida na Seção~\ref{sec:instrumentos}.
 
 As aplicações são tratadas separadamente pelo módulo \textit{aplicacoes}, permitindo associar uma avaliação a um aprendente e registrar o andamento desse processo. Essa separação entre avaliação e aplicação possibilita que um mesmo instrumento seja utilizado em diferentes processos avaliativos, mantendo cada aplicação como um registro independente.
 
@@ -148,7 +148,7 @@ Também foram definidos procedimentos para geração do cliente do Prisma, execu
 
 \subsection{Auditoria}
 
-A rastreabilidade das operações é garantida por um registro de auditoria, armazenado na entidade \textit{audit\_logs}. As razões que motivaram esse registro, relacionadas às lacunas dos campos de controle do modelo de dados, são discutidas na Seção \ref{sec:seguranca}; esta seção descreve sua implementação.
+A rastreabilidade das operações é garantida por um registro de auditoria, armazenado na entidade \textit{audit\_logs}. As razões que motivaram esse registro, relacionadas às lacunas dos campos de controle do modelo de dados, são discutidas na Seção~\ref{sec:seguranca}; esta seção descreve sua implementação.
 
 O preenchimento é feito por uma extensão do Prisma Client, mecanismo que substitui os antigos \textit{middlewares} do Prisma: todas as operações executadas pela aplicação sobre o banco de dados passam por essa extensão antes de serem concluídas. Para que a extensão saiba qual usuário originou cada operação, o backend mantém um contexto por requisição, implementado com o \textit{AsyncLocalStorage} do Node.js. O contexto é criado no início do processamento de cada requisição, com o endereço IP de origem, e recebe o identificador e o perfil do usuário quando o middleware de autenticação valida o token de acesso. Dessa forma, os serviços de negócio não precisam repassar essas informações à camada de persistência.
 
@@ -158,6 +158,6 @@ Nas entidades com dados clínicos de crianças (aprendentes, histórico de acomp
 
 A consulta ao registro é feita pelo endpoint \textit{GET /api/auditoria}, com filtros por aprendente, usuário, entidade, ação e período. O perfil \textit{ADMIN} consulta todo o registro. O perfil \textit{PSICOPEDAGOGO} consulta apenas o registro de acessos dos aprendentes sob sua responsabilidade, o que inclui os acessos feitos pelo administrador aos dados dessas crianças.
 
-As limitações desse registro de auditoria são discutidas na Seção \ref{sec:seguranca}.
+As limitações desse registro de auditoria são discutidas na Seção~\ref{sec:seguranca}.
 
 Dessa forma, o desenvolvimento do backend estabeleceu a camada responsável pela disponibilização da API REST, autenticação, validação das requisições, aplicação das operações relacionadas aos módulos do sistema, registro de auditoria, comunicação com o banco de dados e disponibilização dos dados utilizados pelo frontend. A organização modular adotada também fornece uma estrutura para a manutenção e evolução das funcionalidades relacionadas ao processo de avaliação psicopedagógica.
