@@ -1,15 +1,49 @@
 \chapter[Conclusão]{Conclusão} \label{capitulo16}
 
-O presente trabalho teve como objetivo desenvolver um sistema web de apoio à avaliação psicopedagógica na educação infantil, buscando oferecer uma ferramenta para auxiliar os profissionais na organização das informações dos aprendentes, no gerenciamento de instrumentos avaliativos, no registro das aplicações e na elaboração de relatórios. A proposta partiu da necessidade de centralizar essas informações e facilitar sua consulta e acompanhamento ao longo do processo avaliativo.
+O presente trabalho teve como objetivo desenvolver um sistema web de apoio à avaliação psicopedagógica na educação infantil, buscando oferecer uma ferramenta para auxiliar os profissionais na organização das informações dos aprendentes, no gerenciamento de instrumentos avaliativos, no registro das aplicações e na elaboração de relatórios. Esta conclusão retoma cada objetivo específico, sintetiza as limitações identificadas e aponta os trabalhos futuros.
 
-O desenvolvimento da plataforma resultou em uma aplicação web com funcionalidades de autenticação e controle de acesso, cadastro de aprendentes, gerenciamento e versionamento de instrumentos, registro de aplicações e respostas e elaboração de relatórios. A estrutura implementada permite relacionar as informações das diferentes etapas da avaliação, mantendo os registros organizados em um ambiente único. Também foram desenvolvidos mecanismos de controle de acesso por perfil e propriedade dos dados, validação das informações e auditoria de operações, contribuindo para a segurança e a rastreabilidade dos registros.
+\section{Atendimento aos objetivos específicos}
 
-Em relação aos objetivos específicos, foi possível estruturar a arquitetura da aplicação, modelar o banco de dados e implementar os módulos previstos para apoiar as atividades de avaliação psicopedagógica. O sistema também contempla recursos para preservar versões de instrumentos já utilizados em aplicações, permitindo manter a referência ao instrumento correspondente no momento da avaliação. Além disso, a elaboração de relatórios permanece sob responsabilidade do profissional, sem a realização de diagnósticos ou interpretações automáticas pelo sistema, respeitando o caráter profissional e contextualizado da avaliação psicopedagógica.
+O primeiro objetivo — identificar instrumentos e métodos empregados na avaliação psicopedagógica infantil — foi atendido por meio da revisão bibliográfica apresentada nos Capítulos \ref{capitulo2} e \ref{capitulo3}, que levantou dimensões cognitivas, emocionais e pedagógicas relevantes e orientou a definição dos requisitos do sistema.
 
-A verificação técnica foi realizada por meio de testes automatizados, que totalizaram 127 casos executados com sucesso, além da execução prática da plataforma em ambiente Docker, sem problemas que impedissem sua utilização. Complementarmente, foi aplicado um questionário com cinco profissionais da área, cujas respostas apresentaram média geral de 4,43 em uma escala de 1 a 5. Os resultados indicaram uma percepção predominantemente positiva, especialmente quanto ao cadastro e à consulta dos aprendentes, à facilidade de utilização e à organização das informações. As sugestões apresentadas pelas participantes também permitiram identificar oportunidades de aprimoramento, principalmente relacionadas à elaboração dos relatórios, ao armazenamento de documentos complementares e ao acompanhamento longitudinal dos aprendentes.
+O segundo objetivo — projetar a arquitetura do sistema — foi atendido. A aplicação adota arquitetura em três camadas (apresentação, aplicação e persistência), com backend organizado em sete módulos independentes por domínio funcional (autenticação, aprendentes, avaliações, aplicações, relatórios, auditoria e dashboard), frontend separado em camadas de API, contexto, componentes e páginas, e banco de dados relacional MySQL, conforme descrito nos Capítulos \ref{capitulo6} a \ref{capitulo9}.
 
-Apesar dos resultados alcançados, o desenvolvimento e a avaliação também evidenciaram limitações. Entre elas estão a integração ainda incompleta do histórico de aplicações e relatórios na página individual do aprendente, as possibilidades de aprimoramento do versionamento dos instrumentos e da auditoria, e a necessidade de ampliar os mecanismos de segurança e proteção dos dados. Além disso, a avaliação com profissionais contou com um número reduzido de participantes, de modo que seus resultados representam uma percepção inicial sobre a plataforma e não permitem generalizações para todo o público de psicopedagogos.
+O terceiro objetivo — construir uma base de dados segura em conformidade com a LGPD — foi parcialmente atendido. Foram implementados controle de acesso por perfil e titularidade, hash bcrypt com fator de custo 12 para senhas, exclusão lógica e registro de auditoria das operações e consultas a dados clínicos. Contudo, o sistema não implementa criptografia em repouso dos campos sensíveis, não define política de retenção e descarte dos dados, não possui mecanismo de exclusão definitiva e não registra a base legal utilizada para o tratamento dos dados de cada aprendente, conforme discutido no Capítulo \ref{capitulo13}. O sistema foi desenvolvido como protótipo e não está preparado para uso em produção com dados reais sem o endereçamento dessas limitações.
 
-Como trabalhos futuros, destacam-se a implementação de uma linha do tempo para acompanhamento do histórico dos aprendentes, a inclusão de recursos para anexar documentos e registros complementares, o aprimoramento da estrutura dos relatórios e a disponibilização de funcionalidades para planejamento das intervenções. Também poderão ser ampliados os mecanismos de rastreabilidade, segurança e consulta das informações, bem como realizadas novas avaliações de usabilidade com um número maior de profissionais.
+O quarto objetivo — desenvolver uma interface orientada à usabilidade — foi atendido. A média geral de 4,43/5,0 no questionário com cinco profissionais, com 94,3\% das respostas nas notas 4 ou 5, indica adequação percebida ao contexto clínico-pedagógico. O aspecto com menor média foi a geração de relatórios (3,8), que concentrou as sugestões de melhoria.
 
-Conclui-se que o objetivo geral do trabalho foi alcançado, uma vez que foi desenvolvido um sistema web funcional que reúne recursos para apoiar a organização e a documentação das etapas da avaliação psicopedagógica na educação infantil. Embora ainda existam possibilidades de evolução, a plataforma apresenta uma base tecnológica e funcional para auxiliar os profissionais na centralização dos registros e na consulta das informações dos aprendentes, contribuindo para a organização do processo avaliativo e para a documentação de seu acompanhamento.
+O quinto objetivo — realizar testes com especialistas — foi atendido. Foram aplicados 127 testes automatizados (76 no backend, 51 no frontend), todos com sucesso, com cobertura de 80,20\% de linhas no backend. O questionário foi respondido por cinco profissionais entre 9 e 13 de novembro de 2026. A amostra reduzida é uma limitação reconhecida: os resultados não permitem generalizações para todo o público de psicopedagogos.
+
+O sexto objetivo — analisar o impacto potencial sobre as práticas avaliativas — foi atendido na discussão do Capítulo \ref{capitulo15}, onde os resultados são comparados com os estudos relacionados e discutidas as contribuições e limitações do sistema frente ao estado da arte.
+
+\section{Limitações}
+
+Além das limitações já mencionadas em relação ao objetivo três, o sistema apresenta as seguintes restrições que precisam ser consideradas:
+
+\begin{itemize}
+    \item \textbf{Auditoria de acessos}: o registro de auditoria implementado tem limitações de integridade — é gravado em conexão separada à operação, sem encadeamento criptográfico, e pode ser modificado por acesso direto ao banco. Não há política de retenção para os próprios registros de auditoria.
+    \item \textbf{Criptografia em repouso}: os dados armazenados no banco não são criptografados em nível de campo. Campos sensíveis — textos de histórico, respostas e relatórios — ficam em texto plano, protegidos apenas pelos controles de acesso à infraestrutura.
+    \item \textbf{Ausência de interoperabilidade}: o sistema não exporta nem importa dados em formatos padronizados (como HL7 FHIR ou CSV estruturado), dificultando a integração com outros sistemas de saúde ou educação.
+    \item \textbf{Ambiente local}: o sistema foi validado apenas em ambiente Docker local. Não foi realizado deploy em ambiente de produção nem avaliação de desempenho sob carga real.
+    \item \textbf{Validação com amostra reduzida}: a avaliação contou com cinco participantes, sem aleatorização ou grupo de controle, o que limita a validade externa dos resultados de usabilidade.
+    \item \textbf{RF09 parcialmente atendido}: o versionamento automático preserva as questões usadas em cada aplicação, mas o sistema não disponibiliza campo para que o profissional registre textualmente a justificativa da adaptação.
+    \item \textbf{RF12 parcialmente atendido}: aplicações e relatórios não estão integrados à página individual do aprendente; a consulta longitudinal exige navegação entre módulos separados.
+\end{itemize}
+
+\section{Trabalhos futuros}
+
+Com base nas limitações identificadas e nas sugestões das profissionais participantes, os principais trabalhos futuros incluem:
+
+\begin{itemize}
+    \item Implementar criptografia em repouso dos campos sensíveis e definir política de retenção e descarte dos dados, habilitando o sistema para uso em produção com dados reais de crianças.
+    \item Integrar aplicações e relatórios à página individual do aprendente, com linha do tempo que facilite a consulta longitudinal do histórico avaliativo.
+    \item Adicionar campo de justificativa textual ao versionamento de instrumentos, permitindo que o profissional registre a motivação de cada adaptação.
+    \item Expandir o módulo de relatórios com seções predefinidas (hipótese diagnóstica, encaminhamentos, objetivos de intervenção) e suporte a anexos (laudos, pareceres escolares).
+    \item Implementar exportação de dados em formato estruturado e estudar a viabilidade de interoperabilidade com sistemas de saúde ou plataformas educacionais.
+    \item Realizar nova avaliação de usabilidade com amostra maior e mais diversificada de profissionais, em ambiente de produção.
+    \item Realizar deploy em ambiente de nuvem e avaliar desempenho e disponibilidade sob carga real.
+\end{itemize}
+
+\section{Considerações finais}
+
+Conclui-se que o objetivo geral do trabalho foi alcançado: foi desenvolvido um sistema web funcional que reúne recursos para apoiar a organização e a documentação das etapas da avaliação psicopedagógica na educação infantil. Os testes automatizados e a avaliação com profissionais forneceram evidências favoráveis ao funcionamento e à utilidade percebida da plataforma. As limitações identificadas — especialmente as relacionadas à proteção de dados, à interoperabilidade e ao escopo da validação — delimitam claramente o caráter de protótipo do sistema e orientam a agenda de desenvolvimento para versões futuras.
