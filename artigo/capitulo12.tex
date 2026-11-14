@@ -12,6 +12,17 @@ O sistema também mantém a separação entre os dados obtidos por meio dos inst
 
 A funcionalidade de relatórios também está relacionada à necessidade de produzir registros individualizados, identificada durante a definição dos requisitos do sistema. A proposta apresentada no TCC considera que as conclusões psicopedagógicas são contextualizadas e envolvem interpretação profissional, tornando necessário um mecanismo que permita registrar informações qualitativas juntamente aos dados estruturados obtidos durante as avaliações.
 
-A interface do relatório também disponibiliza uma função de impressão, acessível diretamente pela página do relatório. Ao acionar essa opção, o navegador abre o diálogo de impressão do sistema operacional, que permite imprimir o documento ou exportá-lo em formato PDF. O layout da página foi adaptado para impressão por meio de regras CSS específicas, garantindo uma apresentação organizada do conteúdo ao ser impresso ou exportado. Essa abordagem não depende de bibliotecas externas de geração de PDF no servidor, utilizando a capacidade nativa dos navegadores modernos para essa finalidade.
+A interface do relatório também disponibiliza uma função de impressão, acessível diretamente pela página do relatório. Ao acionar essa opção, o navegador abre o diálogo de impressão do sistema operacional, que permite imprimir o documento ou exportá-lo em formato PDF. O layout da página foi adaptado para impressão por meio de uma folha de estilos específica, aplicada apenas no momento da impressão: a página é configurada no formato A4, com margens definidas; os elementos da interface, como o cabeçalho, o menu lateral e os botões, são ocultados; as observações e a conclusão, editadas em campos de texto na tela, são impressas como texto corrido completo; cada pergunta e sua resposta são mantidas na mesma página; e o documento é encerrado com um espaço para a assinatura do profissional responsável. As respostas do tipo sim/não são apresentadas por extenso. Essa abordagem não depende de bibliotecas externas de geração de PDF no servidor, utilizando a capacidade nativa dos navegadores modernos para essa finalidade.
+
+Do ponto de vista da rastreabilidade, o documento impresso inclui explicitamente, na seção ``Dados da Avaliação'', o nome do instrumento, sua categoria e sua versão (por exemplo, ``v2''). Como cada aplicação armazena uma referência direta à versão do instrumento utilizada — e não ao instrumento em sua versão mais recente —, o relatório sempre reflete a versão com a qual o atendimento foi efetivamente realizado. Isso garante que, mesmo após adaptações subsequentes ao instrumento, o documento gerado continue identificando corretamente o protocolo vigente no momento da avaliação.
+
+A Figura~\ref{fig:relatorio_versao} apresenta o bloco ``Dados da Avaliação'' do relatório impresso, destacando os campos de nome, categoria e versão do instrumento utilizado no atendimento.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.60\textwidth]{relatorio_versao.png}
+    \caption{Bloco ``Dados da Avaliação'' no relatório impresso, com identificação da versão do instrumento}
+    \label{fig:relatorio_versao}
+\end{figure}
 
 Dessa forma, o módulo de relatórios complementa o fluxo de avaliação implementado no sistema, estabelecendo uma sequência entre a aplicação do instrumento, o registro das respostas e a elaboração da devolutiva profissional. A estrutura desenvolvida permite centralizar essas informações e manter sua associação ao histórico do aprendente, contribuindo para a organização e a continuidade dos registros avaliativos.
