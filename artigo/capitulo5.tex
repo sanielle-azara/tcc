@@ -1,4 +1,4 @@
-\chapter[Levantamento e especificação dos requisitos]{Levantamento e especificação dos requisitos}\label{capitulo5}
+\section{Levantamento e especificação dos requisitos}\label{sec:requisitos}
 
 O levantamento e a especificação dos requisitos constituíram uma etapa fundamental para orientar o desenvolvimento do sistema web de apoio à avaliação psicopedagógica na Educação Infantil. A definição dos requisitos teve como objetivo identificar as funcionalidades necessárias para apoiar a organização das informações dos aprendentes, o gerenciamento dos instrumentos avaliativos, o registro das etapas do processo de avaliação e a elaboração das devolutivas pelos profissionais.
 
@@ -6,7 +6,7 @@ Os requisitos foram definidos a partir dos objetivos estabelecidos para o sistem
 
 A especificação foi dividida em requisitos funcionais e não funcionais. Os requisitos funcionais descrevem os serviços e comportamentos que o sistema deve oferecer aos usuários, enquanto os requisitos não funcionais estabelecem características e restrições relacionadas à qualidade, segurança, desempenho e utilização do sistema.
 
-\section{Requisitos funcionais}
+\subsection{Requisitos funcionais}
 
 Os requisitos funcionais foram definidos considerando as principais etapas do processo de avaliação psicopedagógica contempladas pelo sistema. Entre elas estão o gerenciamento dos aprendentes, o registro de informações, o gerenciamento dos instrumentos avaliativos, a aplicação das avaliações, o acompanhamento dos registros e a elaboração de relatórios.
 
@@ -16,7 +16,7 @@ A visibilidade dos aprendentes cadastrados deve ser restrita ao psicopedagogo re
 
 Também deve ser possível registrar informações relacionadas ao processo de avaliação, incluindo dados provenientes de entrevistas, anamnese, observações e aplicação de instrumentos. Dessa forma, os registros de um aprendente podem ser mantidos de maneira estruturada, permitindo o acompanhamento das informações ao longo do processo avaliativo.
 
-Outro aspecto relevante é a rastreabilidade. Os registros do sistema devem conter informações suficientes para identificar quem os criou, quando foram criados e quando foram modificados. Os campos de controle presentes nas entidades — \textit{createdAt}, \textit{updatedAt} e, em parte delas, \textit{deletedAt} — e as referências ao usuário responsável por cada registro, como \textit{responsavelId} em aprendentes, \textit{autorId} em avaliações, \textit{aplicadorId} em aplicações e \textit{autorId} em relatórios, indicam quem criou cada dado e quando ele foi alterado pela última vez. Como esses campos não são suficientes para dados de saúde de crianças (Capítulo \ref{capitulo13}), o sistema deve manter também um registro de auditoria das operações, incluindo as consultas aos dados clínicos e os acessos realizados pelo administrador.
+Outro aspecto relevante é a rastreabilidade. Os registros do sistema devem conter informações suficientes para identificar quem os criou, quando foram criados e quando foram modificados. Os campos de controle presentes nas entidades (\textit{createdAt}, \textit{updatedAt} e, em parte delas, \textit{deletedAt}) e as referências ao usuário responsável por cada registro, como \textit{responsavelId} em aprendentes, \textit{autorId} em avaliações, \textit{aplicadorId} em aplicações e \textit{autorId} em relatórios, indicam quem criou cada dado e quando ele foi alterado pela última vez. Como esses campos não são suficientes para dados de saúde de crianças (Capítulo \ref{capitulo13}), o sistema deve manter também um registro de auditoria das operações, incluindo as consultas aos dados clínicos e os acessos realizados pelo administrador.
 
 Durante a aplicação de um instrumento, o profissional deve poder vinculá-lo a um determinado aprendente e registrar as informações obtidas no atendimento. As adaptações realizadas em um instrumento são registradas por meio de versionamento automático: quando as questões de um instrumento já aplicado são alteradas, o sistema arquiva a versão anterior e cria uma nova, mantendo cada aplicação associada à versão utilizada no momento do atendimento. O sistema não oferece campo para que o profissional descreva textualmente a justificativa da adaptação, o que constitui uma limitação reconhecida da implementação. 
 
@@ -24,11 +24,12 @@ O sistema deve permitir ainda a consulta ao histórico de avaliações e registr
 
 Por fim, deve ser possível elaborar devolutivas e relatórios a partir dos registros realizados no sistema, permitindo sua organização em um documento e sua posterior geração em formato PDF. O sistema atua, portanto, como instrumento de apoio à organização das informações, sem substituir a análise e a interpretação realizadas pelo profissional.
 
-Com base nessas definições, os principais requisitos funcionais contemplados no desenvolvimento são apresentados na Tabela \ref{tab:requisitos_funcionais}.
+Com base nessas definições, os principais requisitos funcionais contemplados no desenvolvimento são apresentados no Quadro \ref{qua:requisitos_funcionais}.
 
-\begin{table}[H]
+\begin{quadro}[H]
 \centering
 \small
+\caption{Requisitos funcionais}
 \begin{tabular}{p{2cm} p{13cm}}
 \hline
 \textbf{Código} & \textbf{Requisito funcional} \\
@@ -41,7 +42,7 @@ RF05 & Permitir o registro de informações relacionadas ao processo de avaliaç
 RF06 & Permitir o cadastro e gerenciamento dos instrumentos avaliativos. \\
 RF07 & Restringir a visualização dos instrumentos avaliativos ao psicopedagogo que os criou, com exceção do perfil administrador. \\
 RF08 & Permitir o gerenciamento de diferentes versões dos instrumentos. \\
-RF09 & Registrar adaptações realizadas nos instrumentos por meio de versionamento automático, preservando a versão anterior e associando-a às aplicações já realizadas; o sistema não disponibiliza campo para descrição textual da justificativa da alteração. \\
+RF09 & Registrar adaptações realizadas nos instrumentos por meio de versionamento automático, preservando a versão anterior e associando-a às aplicações já realizadas. \\
 RF10 & Permitir vincular um instrumento a um aprendente durante um atendimento. \\
 RF11 & Permitir registrar os resultados e observações obtidos durante a aplicação dos instrumentos. \\
 RF12 & Permitir consultar o histórico de avaliações e registros de um aprendente. \\
@@ -50,11 +51,11 @@ RF14 & Permitir gerar relatórios em formato PDF. \\
 RF15 & Manter nos registros as informações de autoria e temporalidade necessárias para identificar quem criou cada dado e quando foi criado ou modificado. \\
 \hline
 \end{tabular}
-\caption{Requisitos funcionais}
-\label{tab:requisitos_funcionais}
-\end{table}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:requisitos_funcionais}
+\end{quadro}
 
-\section{Requisitos não funcionais}
+\subsection{Requisitos não funcionais}
 
 Os requisitos não funcionais foram definidos a partir das características de qualidade necessárias para a utilização do sistema em um contexto que envolve o armazenamento e o processamento de informações relacionadas a crianças. Nesse sentido, aspectos como segurança, privacidade, controle de acesso, rastreabilidade, usabilidade e organização dos dados foram considerados durante a definição da solução.
 
@@ -62,17 +63,18 @@ A segurança constitui um requisito essencial, uma vez que o sistema armazena in
 
 A privacidade dos dados também deve ser considerada durante o desenvolvimento, de modo que as informações armazenadas sejam tratadas de acordo com os princípios de proteção de dados aplicáveis ao sistema. Além disso, os registros devem permanecer organizados e íntegros, evitando alterações não identificadas ou perda do histórico das informações.
 
-Outro aspecto relevante é a rastreabilidade. Os registros de aprendentes e de instrumentos de avaliação devem conter informações de autoria e temporalidade — como o identificador do profissional responsável e os campos de data de criação e de última atualização — de modo que seja possível identificar quem criou ou modificou cada dado e quando isso ocorreu. Além disso, operações sobre o banco de dados são registradas automaticamente em uma tabela de auditoria, permitindo rastrear ações realizadas, usuários envolvidos e os dados afetados.
+Outro aspecto relevante é a rastreabilidade. Os registros de aprendentes e de instrumentos de avaliação devem conter informações de autoria e temporalidade, como o identificador do profissional responsável e os campos de data de criação e de última atualização, de modo que seja possível identificar quem criou ou modificou cada dado e quando isso ocorreu. Além disso, operações sobre o banco de dados são registradas automaticamente em uma tabela de auditoria, permitindo rastrear ações realizadas, usuários envolvidos e os dados afetados.
 
 A usabilidade também foi considerada como requisito do sistema. Para que seja verificável, o atendimento a esse requisito é avaliado por meio de questionário aplicado a profissionais após a utilização da plataforma, adotando-se como critério uma média igual ou superior a 4,0 em escala de 1 a 5 nos aspectos de facilidade de uso, organização das informações e contribuição geral.
 
-Além disso, a aplicação deve apresentar arquitetura em três camadas separadas — apresentação, aplicação e persistência —, com o backend organizado em módulos independentes por domínio funcional. Essa separação permite que alterações em um módulo não exijam modificações nos demais e facilita a manutenção incremental do sistema. Como critério complementar de manutenibilidade, o backend deve atingir cobertura de testes automatizados de no mínimo 70\% das linhas de código, permitindo a detecção de regressões durante a evolução da aplicação.
+Além disso, a aplicação deve apresentar arquitetura em três camadas separadas, apresentação, aplicação e persistência, com o backend organizado em módulos independentes por domínio funcional. Essa separação permite que alterações em um módulo não exijam modificações nos demais e facilita a manutenção incremental do sistema. Como critério complementar de manutenibilidade, o backend deve atingir cobertura de testes automatizados de no mínimo 70\% das linhas de código, permitindo a detecção de regressões durante a evolução da aplicação.
 
-Os principais requisitos não funcionais definidos são apresentados na Tabela \ref{tab:requisitos_nao_funcionais}.
+Os principais requisitos não funcionais definidos são apresentados no Quadro \ref{qua:requisitos_nao_funcionais}.
 
-\begin{table}[H]
+\begin{quadro}[H]
 \centering
 \small
+\caption{Requisitos não funcionais}
 \begin{tabular}{p{2cm} p{13cm}}
 \hline
 \textbf{Código} & \textbf{Requisito não funcional} \\
@@ -89,6 +91,6 @@ RNF09 & O sistema deve possuir tratamento adequado de erros, evitando a exposiç
 RNF10 & O sistema deve possuir cobertura de testes automatizados de no mínimo 70\% das linhas de código do backend, de modo a permitir a detecção de regressões durante a evolução do sistema. \\
 \hline
 \end{tabular}
-\caption{Requisitos não funcionais}
-\label{tab:requisitos_nao_funcionais}
-\end{table}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:requisitos_nao_funcionais}
+\end{quadro}

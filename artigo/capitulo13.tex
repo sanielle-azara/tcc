@@ -1,4 +1,4 @@
-\chapter[Segurança e controle de acesso]{Segurança e controle de acesso} \label{capitulo13}
+\section{Segurança e controle de acesso}
 
 A segurança foi considerada como um requisito transversal do sistema, especialmente em razão da natureza das informações armazenadas durante o processo de avaliação psicopedagógica. A aplicação possui diferentes perfis de usuário e mecanismos de autenticação e autorização, buscando restringir o acesso às funcionalidades de acordo com as responsabilidades atribuídas a cada usuário.
 
@@ -6,9 +6,13 @@ A autenticação da aplicação foi implementada por meio de JSON Web Tokens (JW
 
 Além da autenticação, o sistema possui controle de acesso baseado em perfis. Foram definidos os papéis \textit{ADMIN} e \textit{PSICOPEDAGOGO}, permitindo diferenciar as permissões disponíveis para cada tipo de usuário. O perfil administrador possui acesso às funcionalidades de gerenciamento de usuários e a todos os registros do sistema, enquanto o perfil de psicopedagogo pode realizar operações relacionadas aos aprendentes, avaliações, aplicações e relatórios sob sua responsabilidade.
 
-O controle por perfil é aplicado no backend por meio do middleware \textit{authorize}, presente nas rotas que exigem permissões específicas. Dessa forma, tentativas de acessar o gerenciamento de usuários ou de excluir instrumentos avaliativos, operações exclusivas do perfil \textit{ADMIN}, são bloqueadas com resposta 403 quando realizadas por um usuário com perfil \textit{PSICOPEDAGOGO}, antes de chegar à camada de serviço. A interface complementa esse controle ao condicionar a exibição de determinados elementos ao perfil do usuário, como o menu de gerenciamento de usuários e o botão de exclusão de instrumentos, exibidos somente ao administrador. O controle definitivo, entretanto, é exercido pelo backend, de modo que a restrição na interface funciona como auxílio à experiência do usuário, não como mecanismo de segurança principal.
+O controle por perfil é aplicado no backend por meio do middleware \textit{authorize}, presente nas rotas que exigem permissões específicas. Dessa forma, tentativas de acessar o gerenciamento de usuários ou de excluir instrumentos avaliativos, operações exclusivas do perfil \textit{ADMIN}, são bloqueadas com resposta 403 quando realizadas por um usuário com perfil \textit{PSICOPEDAGOGO}, antes de chegar à camada de serviço. 
 
-Além do controle por perfil, o sistema implementa restrição de visibilidade baseada em titularidade. Aprendentes e avaliações são vinculados ao usuário que os criou por meio dos campos \textit{responsavelId} e \textit{autorId}, respectivamente, e as aplicações e os relatórios seguem a titularidade do aprendente a que pertencem. Nas operações de listagem, consulta, alteração e exclusão, a camada de serviço do backend aplica automaticamente um filtro que restringe os registros ao usuário autenticado, e a criação de uma aplicação exige que o aprendente e o instrumento pertençam ao próprio profissional. Registros de outros profissionais são tratados como inexistentes, sem revelar que existem. O perfil \textit{ADMIN} constitui exceção a essa regra, tendo acesso irrestrito a todos os registros do sistema. Esse mecanismo garante que profissionais distintos não acessem os registros uns dos outros, mesmo possuindo o mesmo perfil de acesso.
+A interface complementa esse controle ao condicionar a exibição de determinados elementos ao perfil do usuário, como o menu de gerenciamento de usuários e o botão de exclusão de instrumentos, exibidos somente ao administrador. O controle definitivo, entretanto, é exercido pelo backend, de modo que a restrição na interface funciona como auxílio à experiência do usuário, não como mecanismo de segurança principal.
+
+Além do controle por perfil, o sistema implementa restrição de visibilidade baseada em titularidade. Aprendentes e avaliações são vinculados ao usuário que os criou por meio dos campos \textit{responsavelId} e \textit{autorId}, respectivamente, e as aplicações e os relatórios seguem a titularidade do aprendente a que pertencem. Nas operações de listagem, consulta, alteração e exclusão, a camada de serviço do backend aplica automaticamente um filtro que restringe os registros ao usuário autenticado, e a criação de uma aplicação exige que o aprendente e o instrumento pertençam ao próprio profissional. 
+
+Registros de outros profissionais são tratados como inexistentes, sem revelar que existem. O perfil \textit{ADMIN} constitui exceção a essa regra, tendo acesso irrestrito a todos os registros do sistema. Esse mecanismo garante que profissionais distintos não acessem os registros uns dos outros, mesmo possuindo o mesmo perfil de acesso.
 
 Essa diferenciação também está representada no banco de dados, na entidade \textit{users}, que possui o campo \textit{role} para identificação do perfil do usuário e o campo \textit{status}, responsável por indicar se a conta está ativa ou inativa. Dessa maneira, o controle de acesso considera tanto a identidade do usuário quanto as permissões associadas ao seu perfil.
 
@@ -23,15 +27,18 @@ Outro mecanismo utilizado na implementação é a validação dos dados recebido
 Para a rastreabilidade, os campos de controle temporal (\textit{createdAt} e \textit{updatedAt}) e os vínculos de autoria do modelo (\textit{responsavelId}, \textit{autorId} e \textit{aplicadorId}) não são suficientes quando se trata de dados de saúde de crianças. Eles indicam quem criou cada registro e quando ele foi alterado pela última vez, mas não registram quem fez cada alteração, quais eram os valores anteriores nem quem consultou as informações. Este último ponto é justamente o que a Lei Geral de Proteção de Dados e o sigilo profissional mais exigem. Além disso, o perfil \textit{ADMIN} tem acesso irrestrito a todos os dados clínicos, e esse acesso não deixaria rastro.
 
 Por esses motivos, o sistema mantém um registro de auditoria na entidade \textit{audit\_logs}, preenchido automaticamente por uma extensão do Prisma Client, conforme descrito no Capítulo \ref{capitulo8}. O registro atende aos quatro pontos acima:
+
 \begin{itemize}
     \item cada criação, alteração e exclusão identifica o usuário que a realizou, o seu perfil, o IP de origem e o momento da operação;
     \item as alterações guardam os valores anteriores e os novos dos campos modificados, e as exclusões guardam o conteúdo excluído;
     \item as consultas e listagens de dados clínicos (aprendentes, histórico de acompanhamento, aplicações e relatórios) são registradas e associadas ao aprendente, permitindo saber quem acessou os dados de cada criança;
     \item os acessos do administrador são registrados como os de qualquer outro usuário, e o psicopedagogo responsável pode consultá-los na aba ``Registro de Acessos'' do aprendente.
 \end{itemize}
+
 Os logins bem-sucedidos e as tentativas recusadas também são registrados, e o hash da senha nunca é gravado no registro.
 
 O registro de auditoria, entretanto, possui limitações que precisam ser consideradas:
+
 \begin{itemize}
     \item o registro é gravado após a operação, em uma conexão separada, e não faz parte da mesma transação. Se a gravação da auditoria falhar, a operação é mantida e a falha aparece apenas no log do servidor. Em operações executadas dentro de uma transação, o registro pode permanecer mesmo que a transação seja desfeita;
     \item não há garantia de imutabilidade. A aplicação não oferece meios de alterar ou excluir o registro, mas quem tem acesso direto ao banco de dados pode modificá-lo, pois não há encadeamento criptográfico dos registros nem armazenamento externo somente de gravação;
@@ -41,9 +48,10 @@ O registro de auditoria, entretanto, possui limitações que precisam ser consid
     \item as leituras feitas internamente pelo sistema, como a verificação de permissão antes de uma alteração, também são registradas como consultas, e as listagens geram um registro por item exibido. Isso aumenta o volume de registros e pode dificultar a análise. Contagens agregadas, como as do dashboard, não são registradas, assim como as tentativas de acesso negadas a registros de outros profissionais;
     \item o endereço IP registrado depende da configuração do proxy reverso. Se a API estiver acessível diretamente, sem passar pelo proxy, o cabeçalho que informa o IP de origem pode ser falsificado.
 \end{itemize}
+
 Essas limitações indicam que o registro implementado constitui um mecanismo básico de rastreabilidade, adequado ao estágio de protótipo do sistema, mas não substitui as medidas organizacionais e técnicas exigidas para o uso com dados reais, como a imutabilidade do registro, a política de retenção e o controle do acesso direto à infraestrutura.
 
-\section{Adequação à LGPD e limitações para uso em produção}
+\subsection{Adequação à LGPD e limitações para uso em produção}
 
 O sistema armazena dois tipos de dados com proteção legal reforçada pela Lei Geral de Proteção de Dados. Os dados dos aprendentes envolvem crianças, categoria sujeita ao art. 14 da LGPD, que exige tratamento no melhor interesse do menor e, em regra, consentimento do responsável legal. As respostas das avaliações e os relatórios podem conter dados de saúde, classificados como dados pessoais sensíveis pelo art. 5º, inciso II, e sujeitos às restrições do art. 11, que limita as bases legais admissíveis para seu tratamento.
 

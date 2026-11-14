@@ -1,8 +1,9 @@
-\chapter[Testes e validação]{Testes e validação} \label{capitulo14}
+\section{Testes e validação}\label{sec:testes}
 
 Os testes do sistema foram planejados com o objetivo de verificar o funcionamento das principais funcionalidades implementadas, a integração entre as camadas da aplicação e a adequação do sistema às necessidades relacionadas ao apoio à avaliação psicopedagógica. A estratégia de validação foi estruturada em duas frentes: testes técnicos realizados durante o desenvolvimento e avaliação de uso com profissionais da área de psicopedagogia.
 
 No backend, foram utilizados Vitest e Supertest para a realização de testes automatizados das funcionalidades da API, com o acesso ao banco de dados simulado. Esses testes contemplaram:
+
 \begin{itemize}
     \item o login e a identificação do usuário autenticado;
     \item o cadastro e a consulta de aprendentes e de instrumentos avaliativos, incluindo a criação de novas versões e a validação das perguntas;
@@ -11,6 +12,7 @@ No backend, foram utilizados Vitest e Supertest para a realização de testes au
     \item o controle de acesso por perfil;
     \item o registro de auditoria.
 \end{itemize}
+
 Não foram contemplados por testes automatizados o cadastro de usuários, a renovação de sessão, o logout e a recuperação de senha. Como o banco de dados é simulado nesses testes, o comportamento junto ao banco real foi verificado separadamente, por roteiros executados contra uma instância descartável do MySQL, cobrindo o fluxo de aplicação de instrumentos com perguntas de seleção e o registro de auditoria.
 
 No frontend, foram utilizados Vitest e React Testing Library, permitindo verificar o comportamento dos componentes e das páginas da aplicação. Foram considerados a tela de login, a proteção das rotas conforme o perfil do usuário, o formulário e a tela de visualização dos instrumentos, o preenchimento, o salvamento e a finalização das aplicações, a criação e a impressão dos relatórios e a consulta ao registro de auditoria. Nesses testes, as chamadas à API também são simuladas.

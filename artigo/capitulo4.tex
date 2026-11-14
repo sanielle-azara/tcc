@@ -1,6 +1,8 @@
 \chapter[Materiais e Métodos]{Materiais e Métodos}\label{capitulo4}
 
-Este capítulo descreve os materiais e os procedimentos metodológicos adotados na pesquisa, situada no campo da psicopedagogia articulada à engenharia de software. O estudo caracteriza-se como pesquisa aplicada \cite{Gil_2002, Prodanov_Freitas_2013}, pois buscou propor uma solução tecnológica para um problema concreto identificado na prática psicopedagógica: a ausência de sistemas web específicos e estruturados para registro, organização e análise de atendimentos clínicos. Do ponto de vista dos procedimentos, o trabalho se enquadra na abordagem da \textit{Design Science Research} \cite{Hevner_2004, Dresch_Lacerda_Antunes_2015}, voltada ao projeto, construção e avaliação de artefatos de tecnologia da informação como resposta a problemas identificados em contextos organizacionais ou profissionais. Essa abordagem é adequada ao estudo porque o objetivo central não é apenas descrever ou explicar um fenômeno, mas desenvolver e avaliar um artefato — o sistema web — que atenda às necessidades do processo de avaliação psicopedagógica.
+Este capítulo descreve os materiais e os procedimentos metodológicos adotados na pesquisa, situada no campo da psicopedagogia articulada à engenharia de software. O estudo caracteriza-se como pesquisa aplicada \cite{Gil_2002, Prodanov_Freitas_2013}, pois buscou propor uma solução tecnológica para um problema concreto identificado na prática psicopedagógica: a ausência de sistemas web específicos e estruturados para registro, organização e análise de atendimentos clínicos. 
+
+Do ponto de vista dos procedimentos, o trabalho se enquadra na abordagem da \textit{Design Science Research} \cite{Hevner_2004, Dresch_Lacerda_Antunes_2015}, voltada ao projeto, construção e avaliação de artefatos de tecnologia da informação como resposta a problemas identificados em contextos organizacionais ou profissionais. Essa abordagem é adequada ao estudo porque o objetivo central não é apenas descrever ou explicar um fenômeno, mas desenvolver e avaliar um artefato (o sistema web) que atenda às necessidades do processo de avaliação psicopedagógica.
 
 \section{Softwares e Tecnologias Utilizadas}
 
@@ -11,7 +13,6 @@ O desenvolvimento do sistema web tomou como base um conjunto de tecnologias ampl
     \item camada de backend desenvolvida em Node.js com o uso do framework Express.js, possibilitando a criação de uma API REST estruturada, com rotas bem definidas e separação entre lógica de negócio e acesso a dados;
     \item banco de dados relacional MySQL, escolhido por sua maturidade, suporte transacional adequado e ampla documentação, aspectos relevantes para o armazenamento de informações sensíveis e para a modelagem de relações entre atendimentos, instrumentos e registros qualitativos;
     \item uso de Git para controle de versão do código-fonte e GitHub como repositório remoto, garantindo rastreabilidade das alterações, histórico de desenvolvimento e possibilidade de colaboração;
-    \item ferramenta Postman para testes de rotas da API, simulação de requisições e inspeção de respostas, apoiando a verificação da consistência entre frontend, backend e banco de dados.
 \end{itemize}
 
 A seleção dessas tecnologias considerou critérios de maturidade, comunidade ativa de desenvolvimento, compatibilidade com boas práticas de engenharia de software e capacidade de atender a requisitos de segurança, registro longitudinal e controle de acesso.
@@ -30,7 +31,9 @@ A definição dos requisitos funcionais e da lógica de organização dos módul
 
 A leitura desses materiais permitiu identificar dimensões do desenvolvimento frequentemente avaliadas, tipos de tarefas e formatos de registro empregados na prática profissional. Com base nessa análise, foram delineadas as estruturas de formulários, as categorias de registro e os tipos de questão contemplados pelo sistema.
 
-É importante destacar que nenhum desses instrumentos foi reproduzido ou distribuído pelo sistema. Parte deles — como o IDADI e o Denver II — são testes psicológicos comercializados, com uso restrito a profissionais habilitados e registrados no Sistema de Avaliação de Testes Psicológicos (SATEPSI) do Conselho Federal de Psicologia. O sistema não armazena nem distribui o conteúdo de nenhum instrumento: o que o profissional cadastra é a estrutura de um protocolo próprio, composta por questões e tipos de resposta definidos por ele. Para demonstração das funcionalidades, foram criados dois instrumentos de exemplo no ambiente de desenvolvimento — uma avaliação de leitura e escrita e uma avaliação psicomotora — elaborados especificamente para fins de teste, sem reproduzir o conteúdo de nenhum dos instrumentos referenciados.
+É importante destacar que nenhum desses instrumentos foi reproduzido ou distribuído pelo sistema. Parte deles, como o IDADI e o Denver II, são testes psicológicos comercializados, com uso restrito a profissionais habilitados e registrados no Sistema de Avaliação de Testes Psicológicos (SATEPSI) do Conselho Federal de Psicologia. O sistema não armazena nem distribui o conteúdo de nenhum instrumento: o que o profissional cadastra é a estrutura de um protocolo próprio, composta por questões e tipos de resposta definidos por ele. 
+
+Para demonstração das funcionalidades, foram criados dois instrumentos de exemplo no ambiente de desenvolvimento, uma avaliação de leitura e escrita e uma avaliação psicomotora, elaborados especificamente para fins de teste, sem reproduzir o conteúdo de nenhum dos instrumentos referenciados.
 
 \section{Público-alvo e Contexto de Uso}
 
@@ -65,9 +68,9 @@ A entrevista semiestruturada foi realizada previamente ao desenvolvimento do sis
 
 A síntese das respostas indicou que a profissional utiliza planilhas e documentos de texto para organizar os registros dos aprendentes, sem integração entre as informações de diferentes atendimentos. Relatou dificuldade em localizar registros anteriores e em manter o histórico longitudinal dos aprendentes de forma organizada. Em relação aos instrumentos, destacou que costuma adaptar protocolos existentes conforme as características de cada criança, e que não possui forma sistematizada de registrar essas adaptações nem de retomar versões anteriores. Quanto aos relatórios, apontou a necessidade de um documento que reúna os dados da avaliação e permita o registro das conclusões profissionais, sem impor uma estrutura rígida que desconsidere o caráter interpretativo do processo. Também mencionou a importância de que o sistema respeite o sigilo das informações, restringindo o acesso dos dados de cada criança ao profissional responsável pelo atendimento.
 
-Essas informações orientaram diretamente a definição dos requisitos funcionais RF03, RF04, RF06, RF07, RF08, RF09, RF12 e RF13, bem como os requisitos não funcionais RNF02, RNF03 e RNF05, descritos no Capítulo \ref{capitulo5}.
+Essas informações orientaram diretamente a definição dos requisitos funcionais RF03, RF04, RF06, RF07, RF08, RF09, RF12 e RF13, bem como os requisitos não funcionais RNF02, RNF03 e RNF05, descritos na Seção \ref{sec:requisitos}.
 
-Complementarmente, após a implementação do sistema, foi aplicado um questionário com profissionais de psicopedagogia para avaliar a adequação da plataforma às atividades do processo avaliativo. Essa etapa é descrita no Capítulo \ref{capitulo14}.
+Complementarmente, após a implementação do sistema, foi aplicado um questionário com profissionais de psicopedagogia para avaliar a adequação da plataforma às atividades do processo avaliativo. Essa etapa é descrita na Seção \ref{sec:testes}.
 
 \section{Análise de Dados}
 

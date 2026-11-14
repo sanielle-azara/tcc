@@ -1,4 +1,4 @@
-\chapter[Desenvolvimento do Backend]{Desenvolvimento do Backend} \label{capitulo8}
+\section{Desenvolvimento do Backend}
 
 O backend do sistema foi desenvolvido utilizando Node.js como ambiente de execução e Express.js como framework para construção da API REST. A camada de persistência utiliza o Prisma ORM, com banco de dados MySQL, enquanto a autenticação dos usuários é realizada por meio de JSON Web Tokens (JWT), utilizando tokens de acesso e de renovação. Para a validação dos dados recebidos pela API foi utilizado o Zod, e a documentação dos recursos disponibilizados é realizada por meio do padrão Swagger/OpenAPI.
 
@@ -6,13 +6,14 @@ A aplicação foi organizada em módulos de negócio, buscando separar as respon
 
 Essa organização permite concentrar em cada módulo as operações relacionadas a um determinado domínio da aplicação. O módulo de autenticação, por exemplo, concentra as funcionalidades relacionadas ao acesso ao sistema, enquanto os módulos de aprendentes, avaliações e aplicações estão relacionados diretamente ao processo de avaliação psicopedagógica. O módulo de relatórios é responsável pelas operações relacionadas às devolutivas produzidas a partir das aplicações, e o módulo de dashboard disponibiliza informações destinadas à visualização geral dos dados do sistema.
 
-\section{Rotas da API}
+\subsection{Rotas da API}
 
-A comunicação entre o frontend e o backend é realizada por meio de uma API REST, disponibilizada pelo Express.js. Os recursos são organizados em rotas agrupadas por domínio funcional, com controle de acesso aplicado por middleware antes do processamento de cada requisição. A Tabela \ref{tab:rotas_api} apresenta os principais endpoints disponibilizados.
+A comunicação entre o frontend e o backend é realizada por meio de uma API REST, disponibilizada pelo Express.js. Os recursos são organizados em rotas agrupadas por domínio funcional, com controle de acesso aplicado por middleware antes do processamento de cada requisição. A Tabela \ref{qua:rotas_api} apresenta os principais endpoints disponibilizados.
 
-\begin{table}[H]
+\begin{quadro}[H]
 \centering
 \small
+\caption{Principais rotas da API REST}
 \begin{tabular}{p{1.5cm} p{6cm} p{2.5cm} p{4.5cm}}
 \hline
 \textbf{Método} & \textbf{Rota} & \textbf{Perfil exigido} & \textbf{Descrição} \\
@@ -59,13 +60,11 @@ GET  & /api/dashboard & Autenticado & Dados do painel geral \\
 GET  & /api/auditoria & Autenticado & Consulta do registro de auditoria \\
 \hline
 \end{tabular}
-\caption{Principais rotas da API REST}
-\label{tab:rotas_api}
-\end{table}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:rotas_api}
+\end{quadro}
 
-A utilização de uma API com recursos separados por domínio permite que o frontend consuma as funcionalidades do sistema de maneira padronizada, mantendo a lógica de processamento e acesso aos dados concentrada no backend.
-
-\section{Organização dos módulos e middlewares}
+\subsection{Organização dos módulos e middlewares}
 
 A estrutura interna da aplicação está dividida entre configurações, middlewares, módulos de negócio e utilitários. O diretório \textit{config} concentra configurações relacionadas ao ambiente, ao Prisma e ao Swagger. Já o diretório \textit{middlewares} contém mecanismos relacionados à autenticação, validação e tratamento de erros.
 
@@ -73,7 +72,7 @@ Os middlewares são utilizados como uma camada intermediária no processamento d
 
 A validação das informações de entrada é realizada com o Zod. Essa abordagem permite definir as estruturas esperadas para os dados recebidos pela API e verificar se as informações fornecidas estão de acordo com essas estruturas antes de serem processadas pela aplicação.
 
-\section{Autenticação e controle de acesso}
+\subsection{Autenticação e controle de acesso}
 
 A autenticação foi implementada utilizando JWT, com tokens de acesso (\textit{access token}) e de renovação (\textit{refresh token}). O access token tem validade de 15 minutos; o refresh token, de 7 dias. Ambos os valores são configuráveis por variável de ambiente.
 
@@ -87,7 +86,7 @@ Para proteção contra ataques de força bruta e abuso da API, o backend aplica 
 
 O backend contempla os perfis \textit{ADMIN} e \textit{PSICOPEDAGOGO}, com controle de acesso por perfil aplicado via middleware \textit{authorize} nas rotas que exigem permissão específica. Além disso, o sistema implementa restrição de visibilidade baseada em titularidade: aprendentes e avaliações são vinculados ao usuário que os criou, e aplicações e relatórios seguem a titularidade do aprendente a que pertencem. As operações de leitura e escrita alcançam somente os registros pertencentes ao usuário autenticado, exceto para o perfil \textit{ADMIN}, que possui acesso irrestrito.
 
-\section{Gerenciamento de aprendentes e avaliações}
+\subsection{Gerenciamento de aprendentes e avaliações}
 
 O módulo de aprendentes disponibiliza as operações necessárias para o cadastro e gerenciamento dos indivíduos acompanhados pelo profissional. Os dados são posteriormente utilizados nas aplicações dos instrumentos avaliativos, mantendo a associação entre o aprendente e os registros produzidos durante o processo de avaliação.
 
@@ -99,7 +98,7 @@ De maneira análoga ao módulo de aprendentes, a visibilidade das avaliações �
 
 As aplicações são tratadas separadamente pelo módulo \textit{aplicacoes}, permitindo associar uma avaliação a um aprendente e registrar o andamento desse processo. Essa separação entre avaliação e aplicação possibilita que um mesmo instrumento seja utilizado em diferentes processos avaliativos, mantendo cada aplicação como um registro independente.
 
-\section{Relatórios e dashboard}
+\subsection{Relatórios e dashboard}
 
 O módulo \textit{relatorios} concentra as operações relacionadas aos relatórios produzidos a partir das aplicações realizadas. Esses registros permanecem associados à aplicação correspondente, permitindo relacionar a devolutiva produzida pelo profissional ao processo avaliativo que lhe deu origem.
 
@@ -107,38 +106,39 @@ O backend também possui um módulo específico de \textit{dashboard}, disponibi
 
 Nesse contexto, o backend atua como intermediário entre os dados persistidos e a interface do sistema, sendo responsável pelo processamento das requisições e pela disponibilização das informações necessárias às funcionalidades implementadas.
 
-\section{Documentação e testes}
+\subsection{Documentação e testes}
 
 A API possui documentação baseada em Swagger/OpenAPI, disponibilizada durante a execução do sistema no endereço \textit{/api-docs}. A documentação permite consultar os recursos disponibilizados pela API e auxilia na compreensão e utilização dos endpoints durante o desenvolvimento e os testes.
 
 Para os testes automatizados do backend foram utilizadas as ferramentas Vitest e Supertest. O Vitest é responsável pela execução e pela geração do relatório de cobertura, enquanto o Supertest possibilita a realização de requisições HTTP reais contra a aplicação em memória, sem necessidade de servidor externo. O frontend utiliza Vitest combinado com Testing Library para testes de componentes React.
 
-O backend conta com 76 testes automatizados distribuídos em dois níveis: testes de integração, que exercitam as rotas da API de ponta a ponta, e testes unitários, voltados para as regras de negócio isoladas dos módulos de autenticação e do mecanismo de auditoria. A Tabela~\ref{tab:testes_backend} apresenta a distribuição por arquivo de teste e a cobertura de linhas por módulo obtida com o relatório gerado pelo Vitest com provider V8.
+O backend conta com 76 testes automatizados distribuídos em dois níveis: testes de integração, que exercitam as rotas da API de ponta a ponta, e testes unitários, voltados para as regras de negócio isoladas dos módulos de autenticação e do mecanismo de auditoria. A Tabela~\ref{qua:testes_backend} apresenta a distribuição por arquivo de teste e a cobertura de linhas por módulo obtida com o relatório gerado pelo Vitest com provider V8.
 
-\begin{table}[H]
+\begin{quadro}[H]
 \centering
 \small
+\caption{Distribuição dos testes e cobertura por módulo do backend}
 \begin{tabular}{p{5cm} p{2.2cm} p{2.5cm} p{2.5cm}}
 \hline
 \textbf{Módulo / Arquivo de teste} & \textbf{Nível} & \textbf{Testes} & \textbf{Cobertura (linhas)} \\
 \hline
-auth (rotas) — auth.test.js & Integração & 7 & 68,32\% \\
-aprendentes — aprendentes.test.js & Integração & 6 & 74,85\% \\
-avaliacoes — avaliacoes.test.js & Integração & 10 & 78,57\% \\
-aplicacoes — aplicacoes.test.js & Integração & 14 & 95,83\% \\
-relatorios — relatorios.test.js & Integração & 8 & 95,67\% \\
-auditoria — auditoria.test.js & Integração & 8 & 97,08\% \\
-auth.service — auth.service.test.js & Unitário & 4 & — \\
-Extensão Prisma — audit.extension.test.js & Unitário & 12 & 95,37\% \\
-Utilitários — shared-utils.test.js & Unitário & 7 & 70,14\% \\
+auth (rotas) - auth.test.js & Integração & 7 & 68,32\% \\
+aprendentes - aprendentes.test.js & Integração & 6 & 74,85\% \\
+avaliacoes - avaliacoes.test.js & Integração & 10 & 78,57\% \\
+aplicacoes - aplicacoes.test.js & Integração & 14 & 95,83\% \\
+relatorios - relatorios.test.js & Integração & 8 & 95,67\% \\
+auditoria - auditoria.test.js & Integração & 8 & 97,08\% \\
+auth.service - auth.service.test.js & Unitário & 4 & - \\
+Extensão Prisma - audit.extension.test.js & Unitário & 12 & 95,37\% \\
+Utilitários - shared-utils.test.js & Unitário & 7 & 70,14\% \\
 \hline
 \textbf{Total} & & \textbf{76} & \textbf{80,20\% (linhas)} \\
  & & & \textbf{70,27\% (branches)} \\
 \hline
 \end{tabular}
-\caption{Distribuição dos testes e cobertura por módulo do backend}
-\label{tab:testes_backend}
-\end{table}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:testes_backend}
+\end{quadro}
 
 A cobertura de linhas de 80,20\% e de branches de 70,27\% superam o critério mínimo de 70\% estabelecido em RNF10. Os módulos com menor cobertura são \textit{users} (64,31\%) e \textit{auth.service} (42,50\% de linhas nos testes unitários isolados), reflexo de operações administrativas e de recuperação de senha que não possuem testes de integração completos.
 
@@ -146,7 +146,7 @@ O frontend conta com 51 testes distribuídos em 9 arquivos, cobrindo as páginas
 
 Também foram definidos procedimentos para geração do cliente do Prisma, execução das migrações e população inicial do banco de dados. Essas operações permitem preparar o ambiente de desenvolvimento de forma padronizada e manter a estrutura do banco sincronizada com o modelo utilizado pela aplicação.
 
-\section{Auditoria}
+\subsection{Auditoria}
 
 A rastreabilidade das operações é garantida por um registro de auditoria, armazenado na entidade \textit{audit\_logs}. As razões que motivaram esse registro, relacionadas às lacunas dos campos de controle do modelo de dados, são discutidas no Capítulo \ref{capitulo13}; esta seção descreve sua implementação.
 
@@ -154,7 +154,7 @@ O preenchimento é feito por uma extensão do Prisma Client, mecanismo que subst
 
 Nas operações de criação, alteração e exclusão, a extensão grava a ação realizada, a entidade, o identificador do registro, o usuário, o perfil, o IP e o momento da operação. Nas alterações e exclusões, os valores anteriores são lidos antes da operação, e o registro guarda somente os campos alterados, com seus valores anteriores e novos. As exclusões lógicas, feitas pelo preenchimento do campo \textit{deletedAt}, são registradas como exclusões. O hash da senha nunca é gravado: quando ele muda, o registro indica apenas que o campo foi alterado.
 
-Nas entidades com dados clínicos de crianças — aprendentes, histórico de acompanhamento, aplicações e relatórios —, também as consultas são registradas, inclusive as listagens, com um registro para cada item exibido. Cada registro é associado ao aprendente a que o dado pertence, o que permite responder quem acessou os dados de uma determinada criança. Os logins bem-sucedidos e as tentativas recusadas também são registrados, estas sem a senha informada.
+Nas entidades com dados clínicos de crianças (aprendentes, histórico de acompanhamento, aplicações e relatórios), também as consultas são registradas, inclusive as listagens, com um registro para cada item exibido. Cada registro é associado ao aprendente a que o dado pertence, o que permite responder quem acessou os dados de uma determinada criança. Os logins bem-sucedidos e as tentativas recusadas também são registrados, estas sem a senha informada.
 
 A consulta ao registro é feita pelo endpoint \textit{GET /api/auditoria}, com filtros por aprendente, usuário, entidade, ação e período. O perfil \textit{ADMIN} consulta todo o registro. O perfil \textit{PSICOPEDAGOGO} consulta apenas o registro de acessos dos aprendentes sob sua responsabilidade, o que inclui os acessos feitos pelo administrador aos dados dessas crianças.
 

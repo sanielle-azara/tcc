@@ -1,10 +1,10 @@
-\chapter[Gerenciamento e versionamento dos instrumentos]{Gerenciamento e versionamento dos instrumentos} \label{capitulo10}
+\section{Gerenciamento e versionamento dos instrumentos}
 
-O gerenciamento dos instrumentos avaliativos foi desenvolvido de modo a permitir sua organização, manutenção e utilização em diferentes aplicações de avaliação psicopedagógica. A modelagem de dados subjacente — entidade \textit{avaliacoes}, campo \textit{parentId}, estados e tipos de questão — foi descrita no Capítulo \ref{capitulo7}. Este capítulo descreve o fluxo pelo qual o profissional cria e versiona instrumentos na interface.
+O gerenciamento dos instrumentos avaliativos foi desenvolvido de modo a permitir sua organização, manutenção e utilização em diferentes aplicações de avaliação psicopedagógica. A modelagem de dados subjacente (entidade \textit{avaliacoes}, campo \textit{parentId}, estados e tipos de questão) foi descrita no Capítulo \ref{capitulo7}. Este capítulo descreve o fluxo pelo qual o profissional cria e versiona instrumentos na interface.
 
 O profissional acessa o módulo de avaliações e cria um novo instrumento informando nome, categoria e descrição. Em seguida, adiciona as questões, definindo para cada uma o texto, o tipo de resposta, a obrigatoriedade e a ordem de apresentação. O instrumento é criado com estado \textit{DRAFT} e só fica disponível para aplicação após ser explicitamente ativado (\textit{ACTIVE}).
 
-Enquanto o instrumento ainda não foi utilizado em nenhuma aplicação, todas as edições — incluindo adição, remoção e alteração de questões — são salvas diretamente no mesmo registro, sem geração de nova versão.
+Enquanto o instrumento ainda não foi utilizado em nenhuma aplicação, todas as edições, incluindo adição, remoção e alteração de questões, são salvas diretamente no mesmo registro, sem geração de nova versão.
 
 Quando o profissional tenta editar as questões de um instrumento que já possui ao menos uma aplicação vinculada, a interface exibe um aviso informando que a alteração criará uma nova versão. Ao confirmar, o sistema arquiva o registro atual (estado \textit{ARCHIVED}) e cria automaticamente um novo registro com versão incrementada, herdando os metadados e recebendo as novas questões. O registro anterior permanece intacto e continua associado a todas as aplicações já realizadas com ele.
 
@@ -14,7 +14,7 @@ A tela de visualização do instrumento apresenta a versão de origem (\textit{p
 
 Cada aplicação armazena uma referência direta à versão do instrumento utilizada no atendimento. Dessa forma, alterações posteriores ao instrumento nunca modificam retroativamente o histórico do aprendente: a aplicação sempre aponta para a versão com a qual foi realizada.
 
-O sistema não disponibiliza, contudo, um campo para que o profissional registre textualmente a justificativa de cada adaptação. Essa informação fica registrada apenas de forma estrutural — número de versão, data e usuário no registro de auditoria — o que constitui uma limitação da implementação atual. O registro da motivação da adaptação fica a cargo do profissional por meios externos ao sistema, como anotações no histórico do aprendente.
+O sistema não disponibiliza, contudo, um campo para que o profissional registre textualmente a justificativa de cada adaptação. Essa informação fica registrada apenas de forma estrutural, número de versão, data e usuário no registro de auditoria, o que constitui uma limitação da implementação atual. O registro da motivação da adaptação fica a cargo do profissional por meios externos ao sistema, como anotações no histórico do aprendente.
 
 Uma segunda limitação diz respeito à titularidade: ao criar uma nova versão, o sistema atribui como autor o usuário que realizou a alteração. Se a edição for feita pelo administrador, a nova versão passa a pertencer a ele, e o psicopedagogo que criou o instrumento deixa de visualizá-la.
 
