@@ -93,15 +93,43 @@ Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois foram 
 
 \section{Fluxo de utilização}
 
-O fluxo principal de utilização da plataforma foi organizado para acompanhar as etapas de registro e documentação da avaliação psicopedagógica.
+O fluxo principal de utilização da plataforma foi organizado para acompanhar as etapas de registro e documentação da avaliação psicopedagógica. As Figuras~\ref{fig:tela_dashboard} a \ref{fig:tela_relatorio} ilustram as principais telas do sistema.
 
-Inicialmente, o profissional realiza o login com suas credenciais, previamente cadastradas pelo administrador. Após a autenticação, é direcionado ao painel inicial, a partir do qual pode acessar os módulos disponíveis conforme suas permissões.
+Inicialmente, o profissional realiza o login com suas credenciais, previamente cadastradas pelo administrador. Após a autenticação, é direcionado ao painel inicial (Figura~\ref{fig:tela_dashboard}), a partir do qual pode acessar os módulos disponíveis conforme suas permissões.
 
-O profissional pode cadastrar um novo aprendente ou consultar um registro existente. Em seguida, pode acessar o gerenciamento de instrumentos para selecionar um instrumento já cadastrado ou criar um novo, configurando suas questões e respectivas propriedades.
+O profissional pode cadastrar um novo aprendente ou consultar um registro existente (Figura~\ref{fig:tela_aprendente}). Em seguida, pode acessar o gerenciamento de instrumentos para selecionar um instrumento já cadastrado ou criar um novo, configurando suas questões e respectivas propriedades.
 
-Para iniciar uma avaliação, o profissional seleciona o aprendente e o instrumento que será utilizado. O sistema registra a aplicação e permite o preenchimento das respostas, com possibilidade de salvamento como rascunho. Após o preenchimento das questões obrigatórias, a aplicação pode ser finalizada.
+Para iniciar uma avaliação, o profissional seleciona o aprendente e o instrumento que será utilizado. O sistema registra a aplicação e permite o preenchimento das respostas (Figura~\ref{fig:tela_aplicacao}), com possibilidade de salvamento como rascunho. Após o preenchimento das questões obrigatórias, a aplicação pode ser finalizada.
 
-Por fim, o profissional é direcionado à elaboração do relatório, no qual registra suas observações e conclusões. O documento pode ser consultado posteriormente e impresso ou salvo em PDF pelo navegador.
+Por fim, o profissional elabora o relatório, no qual registra suas observações e conclusões (Figura~\ref{fig:tela_relatorio}). O documento pode ser consultado posteriormente e impresso ou salvo em PDF pelo navegador.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.90\textwidth]{tela_dashboard.png}
+    \caption{Painel inicial do sistema}
+    \label{fig:tela_dashboard}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.90\textwidth]{tela_aprendente.png}
+    \caption{Página de detalhe do aprendente}
+    \label{fig:tela_aprendente}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.90\textwidth]{tela_aplicacao.png}
+    \caption{Preenchimento de respostas durante a aplicação de um instrumento}
+    \label{fig:tela_aplicacao}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.90\textwidth]{tela_relatorio.png}
+    \caption{Elaboração do relatório de avaliação psicopedagógica}
+    \label{fig:tela_relatorio}
+\end{figure}
 
 Esse fluxo permite concentrar em uma única plataforma as informações relacionadas às etapas de registro e documentação da avaliação, mantendo a associação entre aprendente, instrumento, aplicação, respostas e relatório.
 
@@ -172,6 +200,10 @@ Em relação à consulta histórica, a plataforma disponibiliza registros textua
 Os relatórios permitem documentar observações e conclusões elaboradas pelo profissional, mantendo a interpretação dos resultados sob sua responsabilidade. Essa característica está alinhada à proposta do sistema, que busca apoiar a organização das informações sem realizar diagnósticos ou interpretações automáticas.
 
 É necessário considerar que a avaliação contou com cinco participantes, constituindo uma amostra reduzida. Portanto, os resultados representam as percepções das profissionais que responderam ao questionário e não permitem generalizações para todo o público de psicopedagogos. Ainda assim, as respostas forneceram indicações relevantes sobre a experiência de utilização e possíveis melhorias.
+
+Em relação aos estudos apresentados no Capítulo~\ref{capitulo2}, o sistema desenvolvido compartilha com \citeonline{abreu2025_sistemas_web_gestao} e \citeonline{pedroso2025_integraedu} a ênfase na centralização de dados e no controle de acesso por perfil como requisitos essenciais de sistemas web voltados à educação. Assim como o IntegraEDU \cite{pedroso2025_integraedu}, o sistema adota perfis diferenciados e restringe a visibilidade dos registros ao usuário responsável. Em relação a \citeonline{carneiro2023_taep4}, que documenta a TAEP4.0, ambos convergem na necessidade de registro estruturado e exportação de relatórios; a diferença está no foco: enquanto a TAEP4.0 apoia a prática docente em sala de aula, este sistema é orientado ao processo clínico-pedagógico da avaliação psicopedagógica. Quanto ao aplicativo de \citeonline{silva2024_app_tdah}, a semelhança está na adoção de formulários personalizáveis e na validação com usuários especialistas; o presente trabalho expande esse escopo ao contemplar múltiplos instrumentos, versionamento e registro longitudinal.
+
+A lacuna identificada na síntese do cap. 2 — ausência de ferramentas específicas para avaliação psicopedagógica na Educação Infantil — é o ponto central que distingue este trabalho dos demais: nenhum dos estudos analisados combina instrumentos configuráveis, versionamento automático com rastreabilidade, registro de auditoria de dados de saúde infantil e geração de relatório clínico vinculado à aplicação. Os resultados da avaliação com as profissionais, em especial a média de 4,43/5,0 e as sugestões de evolução, indicam que o sistema representa uma contribuição concreta nessa direção, ainda que em estágio de protótipo.
 
 De modo geral, os resultados técnicos e a avaliação das participantes indicam que a plataforma apresenta funcionalidades capazes de apoiar a organização e a documentação das atividades de avaliação psicopedagógica. As sugestões recebidas também permitiram identificar aspectos que podem ser desenvolvidos em versões futuras.
 
