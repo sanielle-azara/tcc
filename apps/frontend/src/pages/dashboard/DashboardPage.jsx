@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Box, Grid, Card, CardContent, Typography, CircularProgress, Alert, List, ListItem, ListItemText, Divider } from '@mui/material';
+import { Box, Grid, Card, CardContent, Typography, CircularProgress, Alert, List, ListItem, ListItemText } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
@@ -60,16 +60,13 @@ const DashboardPage = () => {
               ) : (
                 <List disablePadding>
                   {data.ultimasAplicacoes.map((ap, i) => (
-                    <Box key={ap.id}>
-                      <ListItem disablePadding sx={{ py: 1 }}>
-                        <ListItemText
-                          primary={ap.aprendente?.name}
-                          secondary={`${ap.avaliacao?.name} • ${ap.aplicador?.name} • ${formatDateTime(ap.createdAt)}`}
-                        />
-                        <StatusChip status={ap.status} />
-                      </ListItem>
-                      {i < data.ultimasAplicacoes.length - 1 && <Divider />}
-                    </Box>
+                    <ListItem key={ap.id} disablePadding divider={i < data.ultimasAplicacoes.length - 1} sx={{ py: 1 }}>
+                      <ListItemText
+                        primary={ap.aprendente?.name}
+                        secondary={`${ap.avaliacao?.name} • ${ap.aplicador?.name} • ${formatDateTime(ap.createdAt)}`}
+                      />
+                      <StatusChip status={ap.status} />
+                    </ListItem>
                   ))}
                 </List>
               )}

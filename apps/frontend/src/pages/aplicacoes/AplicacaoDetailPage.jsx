@@ -14,24 +14,27 @@ import { formatDate } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 import StatusChip from '../../components/common/StatusChip';
 
-const QuestionInput = ({ question, value, onChange }) => {
+// labelId e helpId apontam para o enunciado e a dica da questão, para que leitores
+// de tela anunciem a pergunta ao chegar no campo de resposta (WCAG 1.3.1 e 4.1.2)
+const QuestionInput = ({ question, value, onChange, labelId, helpId }) => {
+  const a11y = { 'aria-labelledby': labelId, 'aria-describedby': helpId };
   switch (question.type) {
     case 'TEXT':
-      return <TextField fullWidth value={value || ''} onChange={(e) => onChange(e.target.value)} />;
+      return <TextField fullWidth inputProps={a11y} value={value || ''} onChange={(e) => onChange(e.target.value)} />;
 
     case 'LONG_TEXT':
-      return <TextField fullWidth multiline rows={4} value={value || ''} onChange={(e) => onChange(e.target.value)} />;
+      return <TextField fullWidth multiline rows={4} inputProps={a11y} value={value || ''} onChange={(e) => onChange(e.target.value)} />;
 
     case 'NUMERIC':
-      return <TextField type="number" value={value || ''} onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)} sx={{ width: 200 }} />;
+      return <TextField type="number" inputProps={a11y} value={value || ''} onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)} sx={{ width: 200 }} />;
 
     case 'DATE':
-      return <TextField type="date" InputLabelProps={{ shrink: true }} value={value || ''} onChange={(e) => onChange(e.target.value)} />;
+      return <TextField type="date" inputProps={a11y} InputLabelProps={{ shrink: true }} value={value || ''} onChange={(e) => onChange(e.target.value)} />;
 
     case 'YES_NO':
       return (
         <FormControl>
-          <RadioGroup row value={value === true ? 'true' : value === false ? 'false' : ''} onChange={(e) => onChange(e.target.value === 'true')}>
+          <RadioGroup row {...a11y} value={value === true ? 'true' : value === false ? 'false' : ''} onChange={(e) => onChange(e.target.value === 'true')}>
             <FormControlLabel value="true" control={<Radio />} label="Sim" />
             <FormControlLabel value="false" control={<Radio />} label="Não" />
           </RadioGroup>
@@ -42,7 +45,7 @@ const QuestionInput = ({ question, value, onChange }) => {
       const opts = question.options ? (Array.isArray(question.options) ? question.options : JSON.parse(question.options)) : [];
       return (
         <FormControl>
-          <RadioGroup value={value || ''} onChange={(e) => onChange(e.target.value)}>
+          <RadioGroup {...a11y} value={value || ''} onChange={(e) => onChange(e.target.value)}>
             {opts.map((opt) => <FormControlLabel key={opt} value={opt} control={<Radio />} label={opt} />)}
           </RadioGroup>
         </FormControl>
@@ -53,7 +56,7 @@ const QuestionInput = ({ question, value, onChange }) => {
       const opts = question.options ? (Array.isArray(question.options) ? question.options : JSON.parse(question.options)) : [];
       const selected = value || [];
       return (
-        <Box>
+        <Box role="group" {...a11y}>
           {opts.map((opt) => (
             <FormControlLabel
               key={opt}
@@ -82,6 +85,7 @@ const QuestionInput = ({ question, value, onChange }) => {
             max={question.scaleMax ?? 5}
             marks
             valueLabelDisplay="auto"
+            {...a11y}
             onChange={(_, v) => onChange(v)}
           />
           <Box display="flex" justifyContent="space-between">
@@ -172,13 +176,15 @@ const AplicacaoDetailPage = () => {
               <Typography variant="body2" color="text.secondary">#{idx + 1}</Typography>
               {q.required && <Chip label="Obrigatória" size="small" color="error" variant="outlined" />}
             </Box>
-            <Typography variant="body1" fontWeight={500} mb={1}>
+            <Typography id={`questao-${q.id}`} variant="body1" fontWeight={500} mb={1}>
               {q.text}
             </Typography>
-            {q.helpText && <Typography variant="caption" color="text.secondary" display="block" mb={1}>{q.helpText}</Typography>}
+            {q.helpText && <Typography id={`questao-${q.id}-dica`} variant="caption" color="text.secondary" display="block" mb={1}>{q.helpText}</Typography>}
             {!isCompleted ? (
               <QuestionInput
                 question={q}
+                labelId={`questao-${q.id}`}
+                helpId={q.helpText ? `questao-${q.id}-dica` : undefined}
                 value={answers[q.id]}
                 onChange={(val) => setAnswers((prev) => ({ ...prev, [q.id]: val }))}
               />

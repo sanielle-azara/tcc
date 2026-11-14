@@ -33,7 +33,7 @@ describe('LoginPage', () => {
   it('renderiza os campos de email e senha', () => {
     renderLogin();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/senha/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^senha/i)).toBeInTheDocument();
   });
 
   it('exibe erros de validação ao submeter com campos vazios', async () => {
@@ -50,7 +50,7 @@ describe('LoginPage', () => {
     const user = userEvent.setup();
 
     await user.type(screen.getByLabelText(/email/i), 'prof@test.com');
-    await user.type(screen.getByLabelText(/senha/i), 'Senha@123');
+    await user.type(screen.getByLabelText(/^senha/i), 'Senha@123');
     await user.click(screen.getByRole('button', { name: /entrar/i }));
 
     await waitFor(() => {
@@ -64,7 +64,7 @@ describe('LoginPage', () => {
     const user = userEvent.setup();
 
     await user.type(screen.getByLabelText(/email/i), 'prof@test.com');
-    await user.type(screen.getByLabelText(/senha/i), 'Senha@123');
+    await user.type(screen.getByLabelText(/^senha/i), 'Senha@123');
     await user.click(screen.getByRole('button', { name: /entrar/i }));
 
     await waitFor(() => {
@@ -80,7 +80,7 @@ describe('LoginPage', () => {
     const user = userEvent.setup();
 
     await user.type(screen.getByLabelText(/email/i), 'errado@test.com');
-    await user.type(screen.getByLabelText(/senha/i), 'SenhaErrada@1');
+    await user.type(screen.getByLabelText(/^senha/i), 'SenhaErrada@1');
     await user.click(screen.getByRole('button', { name: /entrar/i }));
 
     await waitFor(() => {
@@ -90,12 +90,13 @@ describe('LoginPage', () => {
 
   it('alterna visibilidade da senha ao clicar no ícone', async () => {
     renderLogin();
-    const senhaInput = screen.getByLabelText(/senha/i);
+    const senhaInput = screen.getByLabelText(/^senha/i);
     expect(senhaInput).toHaveAttribute('type', 'password');
 
-    const toggleBtn = screen.getByRole('button', { name: '' });
+    const toggleBtn = screen.getByRole('button', { name: 'Mostrar senha' });
     await userEvent.setup().click(toggleBtn);
 
     expect(senhaInput).toHaveAttribute('type', 'text');
+    expect(toggleBtn).toHaveAccessibleName('Ocultar senha');
   });
 });

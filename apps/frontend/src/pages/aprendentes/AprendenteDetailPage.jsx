@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box, Card, CardContent, Grid, Typography, Chip, Button, CircularProgress,
-  Alert, Divider, TextField, List, ListItem, ListItemText, Tab, Tabs,
+  Alert, TextField, List, ListItem, ListItemText, Tab, Tabs,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -147,16 +147,13 @@ const AprendenteDetailPage = () => {
               ) : (
                 <List disablePadding>
                   {a.historico.map((h, i) => (
-                    <Box key={h.id}>
-                      <ListItem disablePadding sx={{ py: 1.5 }}>
-                        <ListItemText
-                          primary={h.descricao}
-                          secondary={formatDate(h.data)}
-                          primaryTypographyProps={{ style: { whiteSpace: 'pre-wrap' } }}
-                        />
-                      </ListItem>
-                      {i < a.historico.length - 1 && <Divider />}
-                    </Box>
+                    <ListItem key={h.id} disablePadding divider={i < a.historico.length - 1} sx={{ py: 1.5 }}>
+                      <ListItemText
+                        primary={h.descricao}
+                        secondary={formatDate(h.data)}
+                        primaryTypographyProps={{ style: { whiteSpace: 'pre-wrap' } }}
+                      />
+                    </ListItem>
                   ))}
                 </List>
               )}

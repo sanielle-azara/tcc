@@ -14,6 +14,14 @@ const theme = createTheme(
         light: '#4db6ac',
         dark: '#00897b',
       },
+      // Tons mais escuros que o padrão do MUI para que o texto branco das etiquetas
+      // atinja o contraste mínimo de 4,5:1 da WCAG (critério 1.4.3)
+      warning: {
+        main: '#c2410c',
+      },
+      info: {
+        main: '#0277bd',
+      },
       background: {
         default: '#f5f5f5',
       },

@@ -86,7 +86,11 @@ const RegisterPage = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                      aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    >
                       {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                     </IconButton>
                   </InputAdornment>
@@ -104,7 +108,11 @@ const RegisterPage = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowConfirm(!showConfirm)} edge="end">
+                    <IconButton
+                      onClick={() => setShowConfirm(!showConfirm)}
+                      edge="end"
+                      aria-label={showConfirm ? 'Ocultar confirmação de senha' : 'Mostrar confirmação de senha'}
+                    >
                       {showConfirm ? <VisibilityOffIcon /> : <VisibilityIcon />}
                     </IconButton>
                   </InputAdornment>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar, Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem,
-  ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography, Avatar,
+  ListItemButton, ListItemIcon, ListItemText, ListSubheader, Toolbar, Typography, Avatar,
   Menu, MenuItem, Tooltip,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -78,7 +78,8 @@ const AppLayout = () => {
       {isAdmin && (
         <>
           <Divider />
-          <List subheader={<Typography variant="caption" sx={{ px: 2, color: 'text.secondary' }}>Admin</Typography>}>
+          {/* ListSubheader é renderizado como <li>, mantendo a lista válida (WCAG 1.3.1) */}
+          <List subheader={<ListSubheader sx={{ lineHeight: 2, typography: 'caption', color: 'text.secondary' }}>Admin</ListSubheader>}>
             {adminItems.map((item) => (
               <ListItem key={item.path} disablePadding>
                 <ListItemButton
