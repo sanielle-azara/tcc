@@ -48,6 +48,7 @@ const AvaliacoesListPage = () => {
     { id: 'version', label: 'Versão', render: (row) => `v${row.version}` },
     { id: '_count', label: 'Perguntas', align: 'center', render: (row) => row._count?.questions || 0 },
     { id: 'status', label: 'Status', render: (row) => <StatusChip status={row.status} /> },
+    ...(isAdmin ? [{ id: 'autor', label: 'Autor', render: (row) => row.autor?.name || '—' }] : []),
     { id: 'createdAt', label: 'Criada em', render: (row) => formatDate(row.createdAt) },
     {
       id: 'actions', label: 'Ações', align: 'center', width: 120,

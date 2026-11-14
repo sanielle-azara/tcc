@@ -29,6 +29,7 @@ const list = async (query, userId, userRole) => {
       select: {
         id: true, name: true, description: true, category: true,
         version: true, status: true, createdAt: true,
+        autor: { select: { id: true, name: true } },
         _count: { select: { questions: true, aplicacoes: true } },
       },
     }),

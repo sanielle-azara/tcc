@@ -28,6 +28,7 @@ const list = async (query, userId, userRole) => {
       select: {
         id: true, name: true, birthDate: true, sexo: true,
         responsavelNome: true, contatoPrincipal: true, escolaNome: true, escolaSerie: true, createdAt: true,
+        responsavel: { select: { id: true, name: true } },
       },
     }),
     prisma.aprendente.count({ where }),

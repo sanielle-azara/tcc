@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { aprendentesApi } from '../../api/aprendentes';
+import { useAuth } from '../../contexts/AuthContext';
 import { formatDate, calculateAge } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 import DataTable from '../../components/common/DataTable';
@@ -20,6 +21,8 @@ const AprendentesListPage = () => {
   const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
   const { data, isLoading } = useQuery({
     queryKey: ['aprendentes', page, rowsPerPage, search],
@@ -45,6 +48,7 @@ const AprendentesListPage = () => {
     { id: 'responsavelNome', label: 'Responsável' },
     { id: 'escolaNome', label: 'Escola' },
     { id: 'escolaSerie', label: 'Série' },
+    ...(isAdmin ? [{ id: 'responsavel', label: 'Psicopedagogo', render: (row) => row.responsavel?.name || '—' }] : []),
     {
       id: 'actions', label: 'Ações', align: 'center', width: 120,
       render: (row) => (
