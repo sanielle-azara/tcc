@@ -12,7 +12,7 @@ A persistência dos dados é realizada por meio de um banco de dados relacional 
 
 De forma geral, o fluxo de comunicação da aplicação inicia-se na interface web, quando o profissional realiza uma operação no sistema. A solicitação é encaminhada à API, que realiza o processamento correspondente e, quando necessário, consulta ou altera os dados armazenados no banco de dados. Após o processamento, a API retorna uma resposta ao frontend, que atualiza a interface de acordo com o resultado da operação.
 
-Essa separação também contribui para a implementação dos mecanismos de segurança do sistema. A autenticação e a autorização são processadas no backend, permitindo que o acesso às operações da API seja controlado independentemente da interface apresentada ao usuário. Da mesma forma, os mecanismos relacionados ao registro de ações e à rastreabilidade das alterações podem ser tratados na camada de aplicação, mantendo essas responsabilidades separadas da apresentação.
+Essa separação também contribui para a implementação dos mecanismos de segurança do sistema. A autenticação e a autorização são processadas no backend, permitindo que o acesso às operações da API seja controlado independentemente da interface apresentada ao usuário. Da mesma forma, o registro de auditoria é tratado no backend, na fronteira entre a camada de aplicação e a de persistência: as operações sobre o banco de dados passam por uma extensão do Prisma que registra quem a realizou, quando e sobre qual dado, sem depender da interface nem de cada regra de negócio.
 
 A arquitetura adotada pode ser representada de forma simplificada pela Figura \ref{fig:arquitetura_geral_do_sistema}, na qual são apresentadas as relações entre o frontend, a API e o banco de dados.
 
