@@ -2,7 +2,7 @@
 
 O frontend do sistema foi desenvolvido utilizando React 18 e Vite 5, constituindo a interface web do Sistema de Apoio à Avaliação Psicopedagógica. A aplicação foi estruturada como uma Single Page Application (SPA), sendo responsável pela interação com os usuários e pelo consumo dos recursos disponibilizados pela API REST. Para a construção da interface visual foi utilizado o Material UI (MUI) versão 5, enquanto o gerenciamento da navegação foi realizado com o React Router versão 6.
 
-A aplicação foi organizada de forma modular, separando componentes reutilizáveis, páginas, contexto de autenticação, funções de comunicação com a API, hooks, configuração visual e funções auxiliares. Essa estrutura busca facilitar a manutenção do código e a organização das funcionalidades de acordo com os diferentes módulos do sistema.
+A aplicação foi organizada de forma modular, separando componentes reutilizáveis, páginas, contexto de autenticação, funções de comunicação com a API, hooks e configuração visual. Essa estrutura busca facilitar a manutenção do código e a organização das funcionalidades de acordo com os diferentes módulos do sistema.
 
 \section{Estrutura da interface}
 
@@ -12,13 +12,13 @@ A estrutura do frontend está organizada a partir de diferentes diretórios:
     \item o diretório \textit{api} concentra as funções responsáveis pelas chamadas à API; 
     \item \textit{components} reúne componentes reutilizáveis da interface, incluindo componentes comuns e componentes relacionados ao layout; 
     \item \textit{contexts} contém o \textit{AuthContext}, utilizado no gerenciamento do contexto de autenticação; 
-    \item hooks reúne hooks auxiliares, como \textit{useNotification}; 
+    \item \textit{hooks} reúne hooks auxiliares, como o \textit{useNotification}, criado para padronizar as mensagens de retorno, mas ainda não adotado pelas páginas, que controlam suas notificações diretamente;
     \item e \textit{pages} organiza as páginas de acordo com os módulos funcionais do sistema.
 \end{itemize}
 
-As páginas estão separadas nos módulos de autenticação, dashboard, aprendentes, avaliações, aplicações, relatórios e usuários. Essa organização acompanha a divisão funcional do sistema e permite que cada conjunto de telas mantenha seus recursos relacionados em uma estrutura própria.
+As páginas estão separadas nos módulos de autenticação, dashboard, aprendentes, avaliações, aplicações, relatórios, usuários e auditoria. Essa organização acompanha a divisão funcional do sistema e permite que cada conjunto de telas mantenha seus recursos relacionados em uma estrutura própria.
 
-Também foram definidos diretórios específicos para o tema visual da aplicação e para funções auxiliares do frontend. A pasta \textit{theme} concentra a configuração do Material UI, enquanto \textit{utils} reúne funções auxiliares utilizadas pela interface.
+A pasta \textit{theme} concentra a configuração visual do Material UI, e o arquivo \textit{print.css} define os estilos de impressão utilizados pelo relatório. As funções auxiliares de uso geral, como formatação de datas, cálculo de idade e paginação, ficam no pacote compartilhado \textit{shared-utils}, utilizado também pelo backend, enquanto as funções específicas de uma tela ficam junto às suas páginas, como as conversões do formulário de instrumentos.
 
 \section{Componentes e padronização visual}
 
@@ -56,26 +56,54 @@ No caso dos instrumentos avaliativos, a estrutura do backend permite diferentes 
 
 A autenticação do usuário está integrada à estrutura do frontend por meio do \textit{AuthContext} e dos componentes responsáveis pela proteção das rotas. Após o processo de autenticação, a interface disponibiliza as funcionalidades correspondentes ao perfil do usuário.
 
-Foram definidos três perfis de acesso no sistema. O perfil \textit{ADMIN} possui acesso total às funcionalidades, incluindo o gerenciamento de usuários e a visualização de todos os aprendentes e avaliações cadastrados no sistema. O perfil \textit{PSICOPEDAGOGO} possui permissões para criar e editar aprendentes, avaliações, aplicações e relatórios, visualizando somente os registros vinculados ao seu próprio usuário. Já o perfil \textit{VIEWER} possui permissão somente para visualização, sendo bloqueado nas rotas de criação e edição pelo middleware de autorização do backend.
+Foram definidos dois perfis de acesso no sistema. O perfil \textit{ADMIN} possui acesso total às funcionalidades, incluindo o gerenciamento de usuários e a visualização de todos os registros cadastrados no sistema. O perfil \textit{PSICOPEDAGOGO} possui permissões para criar e editar aprendentes, avaliações, aplicações e relatórios, visualizando somente os registros vinculados ao seu próprio usuário.
 
-O controle efetivo das permissões por perfil é aplicado no backend, por meio do middleware \textit{authorize}, que restringe o acesso às operações de escrita para os perfis sem permissão. A interface, por sua vez, utiliza o perfil do usuário autenticado para condicionar a exibição de elementos interativos — como o botão de salvar relatório — reduzindo a exposição de ações que o usuário não pode executar. 
+O controle efetivo das permissões por perfil é aplicado no backend, por meio do middleware \textit{authorize}, que restringe ao perfil \textit{ADMIN} as operações exclusivas do administrador, como o gerenciamento de usuários e a exclusão de instrumentos avaliativos. A interface, por sua vez, utiliza o perfil do usuário autenticado para condicionar a exibição de elementos interativos — como o menu de usuários, cuja rota também é protegida pelo componente \textit{ProtectedRoute}, e o botão de exclusão de instrumentos — reduzindo a exposição de ações que o usuário não pode executar.
 
 A filtragem dos registros por titularidade também é aplicada integralmente na camada de serviço do backend, de forma que a interface recebe apenas os dados que o usuário autenticado tem permissão de visualizar.
 
 \section{Módulos de avaliação psicopedagógica}
 
-As páginas do frontend estão organizadas em módulos correspondentes às principais funcionalidades do sistema: aprendentes, avaliações, aplicações, relatórios, usuários e dashboard, além do módulo de autenticação.
+As páginas do frontend estão organizadas em módulos correspondentes às principais funcionalidades do sistema: aprendentes, avaliações, aplicações, relatórios, usuários, auditoria e dashboard, além do módulo de autenticação.
 
 O módulo de aprendentes disponibiliza a interface para o gerenciamento dos indivíduos acompanhados pelo profissional. O módulo de avaliações está relacionado ao gerenciamento dos instrumentos avaliativos, enquanto o módulo de aplicações permite utilizar esses instrumentos no acompanhamento dos aprendentes.
 
 Os relatórios possuem um módulo próprio, permitindo consultar e gerenciar as devolutivas associadas às aplicações. O dashboard, por sua vez, concentra a apresentação das informações gerais disponibilizadas pelo backend.
 
+O registro de auditoria é apresentado em dois pontos da interface. A página de auditoria, acessível somente ao perfil \textit{ADMIN}, lista todas as operações registradas, com filtros por entidade, ação e aprendente, e permite visualizar os valores anteriores e novos de cada alteração. Na página de detalhe do aprendente, a aba ``Registro de Acessos'' mostra ao psicopedagogo responsável quem consultou, criou, alterou ou excluiu dados daquela criança, inclusive o administrador do sistema. Ambas utilizam o mesmo componente de tabela, \textit{AuditLogTable}.
+
 A divisão da interface em módulos acompanha a organização funcional do sistema e permite manter relacionadas as páginas e componentes pertencentes a cada área.
 
 \section{Testes do frontend}
 
-O frontend utiliza Vitest e React Testing Library para a realização de testes. Essas ferramentas permitem verificar o comportamento dos componentes e das funcionalidades da interface durante o desenvolvimento.
+O frontend utiliza Vitest e React Testing Library para a realização de testes automatizados. O Vitest executa os testes e gera o relatório de cobertura; a React Testing Library fornece utilitários para renderizar componentes React em ambiente simulado (jsdom) e interagir com eles como um usuário faria, sem depender de um navegador real.
 
-O projeto também disponibiliza comandos específicos para instalação das dependências, execução do ambiente de desenvolvimento, geração da versão de produção e execução dos testes. O ambiente de desenvolvimento pode ser iniciado por meio do comando \textit{npm run dev}, enquanto a construção da aplicação para produção é realizada com \textit{npm run build}.
+Foram implementados 51 testes distribuídos em 9 arquivos, cobrindo as páginas e componentes de maior complexidade de lógica de apresentação, conforme a Tabela~\ref{tab:testes_frontend}.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{6cm} p{3cm} p{4.5cm}}
+\hline
+\textbf{Arquivo de teste} & \textbf{Testes} & \textbf{Escopo} \\
+\hline
+LoginPage.test.jsx & 6 & Formulário de login e validações \\
+ProtectedRoute.test.jsx & 5 & Redirecionamento por autenticação e perfil \\
+AvaliacaoFormPage.test.jsx & 8 & Formulário de criação e edição de instrumento \\
+AvaliacaoDetailPage.test.jsx & 5 & Exibição de instrumento e questões \\
+AplicacaoDetailPage.test.jsx & 9 & Preenchimento e finalização de aplicação \\
+Auditoria.test.jsx & 5 & Listagem e filtros do registro de auditoria \\
+RelatorioDetailPage.test.jsx & 6 & Exibição e edição de relatório \\
+StatusChip.test.jsx & 4 & Componente de status com variações visuais \\
+print.test.jsx & 3 & Função utilitária de impressão/PDF \\
+\hline
+\textbf{Total} & \textbf{51} & \\
+\hline
+\end{tabular}
+\caption{Distribuição dos testes automatizados do frontend}
+\label{tab:testes_frontend}
+\end{table}
+
+A cobertura de linhas do frontend atingiu 50,44\%, valor inferior ao do backend em razão da natureza da camada de apresentação: componentes visuais, estilos e integrações com bibliotecas de UI têm menor aderência a testes automatizados do que serviços de negócio. Os testes implementados cobrem os fluxos de maior risco — autenticação, controle de acesso, preenchimento de avaliações e geração de relatórios.
 
 Dessa forma, o desenvolvimento do frontend estabeleceu a camada de interação do sistema, integrando autenticação, navegação, formulários, gerenciamento dos dados provenientes da API e apresentação das funcionalidades relacionadas aos aprendentes, avaliações, aplicações, relatórios e demais módulos. A organização adotada separa os componentes visuais, as páginas e os mecanismos de comunicação com o backend, contribuindo para a manutenção e evolução da aplicação.
