@@ -16,9 +16,9 @@ A visibilidade dos aprendentes cadastrados deve ser restrita ao psicopedagogo re
 
 Também deve ser possível registrar informações relacionadas ao processo de avaliação, incluindo dados provenientes de entrevistas, anamnese, observações e aplicação de instrumentos. Dessa forma, os registros de um aprendente podem ser mantidos de maneira estruturada, permitindo o acompanhamento das informações ao longo do processo avaliativo.
 
-Outro aspecto relevante é a rastreabilidade. Os registros do sistema devem conter informações suficientes para identificar quem os criou, quando foram criados e quando foram modificados. Essa rastreabilidade é implementada por meio dos campos de controle presentes nas entidades — \textit{createdAt}, \textit{updatedAt} e \textit{deletedAt} — e das referências ao usuário responsável por cada registro, como \textit{responsavelId} em aprendentes, \textit{autorId} em avaliações, \textit{aplicadorId} em aplicações e \textit{autorId} em relatórios. Essa abordagem permite reconstituir a autoria e o histórico das operações a partir da estrutura de dados, sem necessidade de um mecanismo de log de auditoria separado.
+Outro aspecto relevante é a rastreabilidade. Os registros do sistema devem conter informações suficientes para identificar quem os criou, quando foram criados e quando foram modificados. Os campos de controle presentes nas entidades — \textit{createdAt}, \textit{updatedAt} e, em parte delas, \textit{deletedAt} — e as referências ao usuário responsável por cada registro, como \textit{responsavelId} em aprendentes, \textit{autorId} em avaliações, \textit{aplicadorId} em aplicações e \textit{autorId} em relatórios, indicam quem criou cada dado e quando ele foi alterado pela última vez. Esses campos, porém, não são suficientes para dados de saúde de crianças: não registram quem fez cada alteração, quais eram os valores anteriores nem quem consultou as informações, que é justamente o que a Lei Geral de Proteção de Dados e o sigilo profissional mais exigem. Por isso, o sistema deve manter também um registro de auditoria das operações, incluindo as consultas aos dados clínicos e os acessos realizados pelo administrador.
 
-Durante a aplicação de um instrumento, o profissional deve poder vinculá-lo a um determinado aprendente e registrar as informações obtidas no atendimento. As adaptações realizadas durante sua utilização devem ser identificáveis, de modo que o registro preserve informações suficientes para compreender em qual versão e em quais condições o instrumento foi aplicado. 
+Durante a aplicação de um instrumento, o profissional deve poder vinculá-lo a um determinado aprendente e registrar as informações obtidas no atendimento. As adaptações realizadas em um instrumento são registradas por meio de versionamento automático: quando as questões de um instrumento já aplicado são alteradas, o sistema arquiva a versão anterior e cria uma nova, mantendo cada aplicação associada à versão utilizada no momento do atendimento. O sistema não oferece campo para que o profissional descreva textualmente a justificativa da adaptação, o que constitui uma limitação reconhecida da implementação. 
 
 O sistema deve permitir ainda a consulta ao histórico de avaliações e registros associados ao aprendente, possibilitando que o profissional acompanhe as informações produzidas em diferentes momentos do processo avaliativo. A organização longitudinal desses registros busca facilitar a consulta e a comparação das informações produzidas ao longo do acompanhamento.
 
@@ -41,7 +41,7 @@ RF05 & Permitir o registro de informações relacionadas ao processo de avaliaç
 RF06 & Permitir o cadastro e gerenciamento dos instrumentos avaliativos. \\
 RF07 & Restringir a visualização dos instrumentos avaliativos ao psicopedagogo que os criou, com exceção do perfil administrador. \\
 RF08 & Permitir o gerenciamento de diferentes versões dos instrumentos. \\
-RF09 & Permitir o registro de adaptações realizadas nos instrumentos. \\
+RF09 & Registrar adaptações realizadas nos instrumentos por meio de versionamento automático, preservando a versão anterior e associando-a às aplicações já realizadas; o sistema não disponibiliza campo para descrição textual da justificativa da alteração. \\
 RF10 & Permitir vincular um instrumento a um aprendente durante um atendimento. \\
 RF11 & Permitir registrar os resultados e observações obtidos durante a aplicação dos instrumentos. \\
 RF12 & Permitir consultar o histórico de avaliações e registros de um aprendente. \\
@@ -62,11 +62,11 @@ A segurança constitui um requisito essencial, uma vez que o sistema armazena in
 
 A privacidade dos dados também deve ser considerada durante o desenvolvimento, de modo que as informações armazenadas sejam tratadas de acordo com os princípios de proteção de dados aplicáveis ao sistema. Além disso, os registros devem permanecer organizados e íntegros, evitando alterações não identificadas ou perda do histórico das informações.
 
-Outro aspecto relevante é a rastreabilidade. As operações realizadas pelos usuários devem ser registradas por meio de mecanismos de auditoria, permitindo identificar ações realizadas, usuários envolvidos e momentos em que determinadas alterações ocorreram. Esse mecanismo contribui para a preservação do histórico e para o acompanhamento das alterações realizadas nos registros.
+Outro aspecto relevante é a rastreabilidade. Os registros de aprendentes e de instrumentos de avaliação devem conter informações de autoria e temporalidade — como o identificador do profissional responsável e os campos de data de criação e de última atualização — de modo que seja possível identificar quem criou ou modificou cada dado e quando isso ocorreu. Além disso, operações sobre o banco de dados são registradas automaticamente em uma tabela de auditoria, permitindo rastrear ações realizadas, usuários envolvidos e os dados afetados.
 
-A usabilidade também foi considerada como requisito do sistema, uma vez que as funcionalidades devem ser apresentadas de maneira organizada e compreensível para os profissionais que utilizarão a aplicação. A interface deve facilitar a localização das informações e a execução das principais atividades relacionadas ao processo de avaliação.
+A usabilidade também foi considerada como requisito do sistema. Para que seja verificável, o atendimento a esse requisito é avaliado por meio de questionário aplicado a profissionais após a utilização da plataforma, adotando-se como critério uma média igual ou superior a 4,0 em escala de 1 a 5 nos aspectos de facilidade de uso, organização das informações e contribuição geral.
 
-Além disso, a aplicação deve apresentar uma arquitetura organizada e modular, possibilitando a separação entre a interface, as regras de negócio e a camada de persistência dos dados. Essa organização contribui para a manutenção e evolução do sistema ao longo do desenvolvimento.
+Além disso, a aplicação deve apresentar arquitetura em três camadas separadas — apresentação, aplicação e persistência —, com o backend organizado em módulos independentes por domínio funcional. Essa separação permite que alterações em um módulo não exijam modificações nos demais e facilita a manutenção incremental do sistema. Como critério complementar de manutenibilidade, o backend deve atingir cobertura de testes automatizados de no mínimo 70\% das linhas de código, permitindo a detecção de regressões durante a evolução da aplicação.
 
 Os principais requisitos não funcionais definidos são apresentados na Tabela \ref{tab:requisitos_nao_funcionais}.
 
@@ -80,13 +80,13 @@ Os principais requisitos não funcionais definidos são apresentados na Tabela \
 RNF01 & O sistema deve utilizar autenticação para controlar o acesso aos usuários. \\
 RNF02 & O sistema deve utilizar mecanismos de autorização para restringir o acesso às funcionalidades e informações, inclusive limitando a visualização de aprendentes e avaliações ao usuário responsável por cada registro. \\
 RNF03 & Os dados dos aprendentes devem ser armazenados de forma segura, considerando os princípios de proteção de dados da LGPD. \\
-RNF04 & Os registros do sistema devem conter informações de autoria e temporalidade que permitam reconstituir quem criou ou alterou cada dado e quando. \\
+RNF04 & O sistema deve manter um registro de auditoria que permita reconstituir quem criou, alterou, excluiu ou consultou cada dado, quando e com quais valores anteriores, inclusive nos acessos realizados pelo administrador. \\
 RNF05 & O sistema deve preservar o histórico das versões e alterações realizadas nos instrumentos avaliativos. \\
-RNF06 & A interface deve apresentar organização e usabilidade adequadas às atividades realizadas pelos profissionais. \\
-RNF07 & A aplicação deve apresentar uma arquitetura modular, facilitando sua manutenção e evolução. \\
+RNF06 & A interface deve apresentar organização e usabilidade adequadas às atividades dos profissionais, verificada por meio de avaliação com usuários: média igual ou superior a 4,0 em escala de 1 a 5 nos aspectos de facilidade de uso, organização das informações e contribuição geral da plataforma. \\
+RNF07 & A aplicação deve apresentar arquitetura em três camadas separadas (apresentação, aplicação e persistência), com o backend organizado em módulos independentes por domínio funcional (autenticação, aprendentes, avaliações, aplicações, relatórios, auditoria e dashboard), de modo que alterações em um módulo não exijam modificações nos demais. \\
 RNF08 & Os dados devem possuir mecanismos de integridade e consistência durante seu armazenamento e manipulação. \\
 RNF09 & O sistema deve possuir tratamento adequado de erros, evitando a exposição de informações internas da aplicação. \\
-RNF10 & O sistema deve permitir a manutenção e evolução dos seus módulos sem comprometer as funcionalidades existentes. \\
+RNF10 & O sistema deve possuir cobertura de testes automatizados de no mínimo 70\% das linhas de código do backend, de modo a permitir a detecção de regressões durante a evolução do sistema. \\
 \hline
 \end{tabular}
 \caption{Requisitos não funcionais}
