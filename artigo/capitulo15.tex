@@ -32,7 +32,7 @@ O painel inicial apresenta indicadores gerais, como quantidade de aprendentes, i
 
 \section{Atendimento aos requisitos}
 
-O Quadro \ref{qua:atendimento_requisitos_funcionais} apresenta o grau de atendimento de cada requisito funcional especificado na Seção \ref{sec:requisitos}, indicando o capítulo em que a implementação correspondente é descrita e eventuais ressalvas.
+O Quadro \ref{qua:atendimento_requisitos_funcionais} apresenta o grau de atendimento de cada requisito funcional especificado na Seção \ref{sec:requisitos}, indicando a seção em que a implementação correspondente é descrita e eventuais ressalvas.
 
 \begin{quadro}[H]
 \centering
@@ -42,21 +42,21 @@ O Quadro \ref{qua:atendimento_requisitos_funcionais} apresenta o grau de atendim
 \hline
 \textbf{Req.} & \textbf{Descrição resumida} & \textbf{Status} & \textbf{Observação} \\
 \hline
-RF01 & Cadastro e autenticação de usuários & Atendido & Cap. \ref{capitulo8}, \ref{capitulo9} \\
-RF02 & Controle de acesso por perfil & Atendido & Cap. \ref{capitulo8}, \ref{capitulo13} \\
-RF03 & Cadastro, edição e consulta de aprendentes & Atendido & Cap. \ref{capitulo8}, \ref{capitulo9} \\
-RF04 & Restrição de visibilidade de aprendentes por responsável & Atendido & Cap. \ref{capitulo8}, \ref{capitulo13} \\
-RF05 & Registro de informações do processo avaliativo & Atendido & Cap. \ref{capitulo8}, \ref{capitulo11} \\
-RF06 & Cadastro e gerenciamento de instrumentos avaliativos & Atendido & Cap. \ref{capitulo8}, \ref{capitulo10} \\
-RF07 & Restrição de visibilidade de instrumentos por autor & Atendido & Cap. \ref{capitulo8}, \ref{capitulo13} \\
-RF08 & Gerenciamento de versões dos instrumentos & Atendido & Cap. \ref{capitulo10} \\
-RF09 & Registro de adaptações nos instrumentos & Parcialmente atendido & Adaptações registradas via versionamento automático; ausência de campo para justificativa textual (Cap. \ref{capitulo10}) \\
-RF10 & Vinculação de instrumento a aprendente & Atendido & Cap. \ref{capitulo11} \\
-RF11 & Registro de resultados e observações das aplicações & Atendido & Cap. \ref{capitulo11} \\
-RF12 & Consulta ao histórico de avaliações do aprendente & Parcialmente atendido & Histórico de registros textuais disponível; aplicações e relatórios não integrados à página individual do aprendente (Cap. \ref{capitulo11}) \\
-RF13 & Elaboração e armazenamento de relatórios & Atendido & Cap. \ref{capitulo12} \\
-RF14 & Geração de relatórios em PDF & Atendido & Implementado via função de impressão do navegador, sem geração server-side (Cap. \ref{capitulo12}) \\
-RF15 & Autoria e temporalidade nos registros & Atendido & Cap. \ref{capitulo7}, \ref{capitulo8} \\
+RF01 & Cadastro e autenticação de usuários & Atendido & Seções \ref{sec:backend}, \ref{sec:frontend} \\
+RF02 & Controle de acesso por perfil & Atendido & Seções \ref{sec:backend}, \ref{sec:seguranca} \\
+RF03 & Cadastro, edição e consulta de aprendentes & Atendido & Seções \ref{sec:backend}, \ref{sec:frontend} \\
+RF04 & Restrição de visibilidade de aprendentes por responsável & Atendido & Seções \ref{sec:backend}, \ref{sec:seguranca} \\
+RF05 & Registro de informações do processo avaliativo & Atendido & Seções \ref{sec:backend}, \ref{sec:aplicacoes} \\
+RF06 & Cadastro e gerenciamento de instrumentos avaliativos & Atendido & Seções \ref{sec:backend}, \ref{sec:instrumentos} \\
+RF07 & Restrição de visibilidade de instrumentos por autor & Atendido & Seções \ref{sec:backend}, \ref{sec:seguranca} \\
+RF08 & Gerenciamento de versões dos instrumentos & Atendido & Seção \ref{sec:instrumentos} \\
+RF09 & Registro de adaptações nos instrumentos & Parcialmente atendido & Adaptações registradas via versionamento automático; ausência de campo para justificativa textual (Seção \ref{sec:instrumentos}) \\
+RF10 & Vinculação de instrumento a aprendente & Atendido & Seção \ref{sec:aplicacoes} \\
+RF11 & Registro de resultados e observações das aplicações & Atendido & Seção \ref{sec:aplicacoes} \\
+RF12 & Consulta ao histórico de avaliações do aprendente & Parcialmente atendido & Histórico de registros textuais disponível; aplicações e relatórios não integrados à página individual do aprendente (Seção \ref{sec:aplicacoes}) \\
+RF13 & Elaboração e armazenamento de relatórios & Atendido & Seção \ref{sec:relatorios} \\
+RF14 & Geração de relatórios em PDF & Atendido & Implementado via função de impressão do navegador, sem geração server-side (Seção \ref{sec:relatorios}) \\
+RF15 & Autoria e temporalidade nos registros & Atendido & Seções \ref{sec:modelagem}, \ref{sec:backend} \\
 \hline
 \end{tabular}
 \fonte{Elaborado pela autora (2026).}
@@ -73,15 +73,15 @@ O Quadro \ref{qua:atendimento_requisitos_nao_funcionais} apresenta o atendimento
 \hline
 \textbf{Req.} & \textbf{Descrição resumida} & \textbf{Status} & \textbf{Observação} \\
 \hline
-RNF01 & Autenticação de usuários & Atendido & JWT com tokens de acesso e renovação (Cap. \ref{capitulo8}, \ref{capitulo13}) \\
-RNF02 & Autorização por perfil e titularidade & Atendido & Cap. \ref{capitulo8}, \ref{capitulo13} \\
-RNF03 & Armazenamento seguro dos dados dos aprendentes & Atendido & Cap. \ref{capitulo13} \\
-RNF04 & Registro de auditoria das operações & Atendido & Cap. \ref{capitulo8}, \ref{capitulo13}; limitações descritas no Cap. \ref{capitulo13} \\
-RNF05 & Preservação do histórico de versões dos instrumentos & Atendido & Cap. \ref{capitulo10} \\
+RNF01 & Autenticação de usuários & Atendido & JWT com tokens de acesso e renovação (Seções \ref{sec:backend}, \ref{sec:seguranca}) \\
+RNF02 & Autorização por perfil e titularidade & Atendido & Seções \ref{sec:backend}, \ref{sec:seguranca} \\
+RNF03 & Armazenamento seguro dos dados dos aprendentes & Atendido & Seção \ref{sec:seguranca} \\
+RNF04 & Registro de auditoria das operações & Atendido & Seções \ref{sec:backend}, \ref{sec:seguranca}; limitações descritas na Seção \ref{sec:seguranca} \\
+RNF05 & Preservação do histórico de versões dos instrumentos & Atendido & Seção \ref{sec:instrumentos} \\
 RNF06 & Usabilidade (média $\geq$ 4,0 em avaliação com usuários) & Atendido & Média geral de 4,43/5,0 no questionário com 5 profissionais (Seção \ref{sec:avaliacao_usuarios}) \\
-RNF07 & Arquitetura em três camadas com módulos independentes por domínio & Atendido & 7 módulos de backend independentes; frontend separado em camadas de API, contexto, componentes e páginas (Cap. \ref{capitulo6}, \ref{capitulo8}, \ref{capitulo9}) \\
-RNF08 & Integridade e consistência dos dados & Atendido & Validação com Zod, chaves estrangeiras e restrições no banco (Cap. \ref{capitulo7}, \ref{capitulo8}) \\
-RNF09 & Tratamento adequado de erros & Atendido & Middleware centralizado de erros no backend (Cap. \ref{capitulo8}) \\
+RNF07 & Arquitetura em três camadas com módulos independentes por domínio & Atendido & 7 módulos de backend independentes; frontend separado em camadas de API, contexto, componentes e páginas (Seções \ref{sec:arquitetura}, \ref{sec:backend}, \ref{sec:frontend}) \\
+RNF08 & Integridade e consistência dos dados & Atendido & Validação com Zod, chaves estrangeiras e restrições no banco (Seções \ref{sec:modelagem}, \ref{sec:backend}) \\
+RNF09 & Tratamento adequado de erros & Atendido & Middleware centralizado de erros no backend (Seção \ref{sec:backend}) \\
 RNF10 & Cobertura de testes do backend $\geq$ 70\% & Atendido & Cobertura de 81,01\% no backend (Seção \ref{sec:testes}) \\
 \hline
 \end{tabular}
@@ -89,7 +89,7 @@ RNF10 & Cobertura de testes do backend $\geq$ 70\% & Atendido & Cobertura de 81,
 \label{qua:atendimento_requisitos_nao_funcionais}
 \end{quadro}
 
-Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois foram parcialmente atendidos. O RF09 (registro de adaptações) é atendido estruturalmente via versionamento automático, mas sem campo para justificativa textual. O RF12 (histórico do aprendente) é atendido para registros textuais, mas aplicações e relatórios não estão integrados à página individual do aprendente. Ambas as limitações estão descritas na seção \ref{sec:limitacoes} deste capítulo. Os dez requisitos não funcionais foram integralmente atendidos, com as ressalvas já documentadas no Capítulo \ref{capitulo13} quanto às limitações do registro de auditoria.
+Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois foram parcialmente atendidos. O RF09 (registro de adaptações) é atendido estruturalmente via versionamento automático, mas sem campo para justificativa textual. O RF12 (histórico do aprendente) é atendido para registros textuais, mas aplicações e relatórios não estão integrados à página individual do aprendente. Ambas as limitações estão descritas na seção \ref{sec:limitacoes} deste capítulo. Os dez requisitos não funcionais foram integralmente atendidos, com as ressalvas já documentadas na Seção \ref{sec:seguranca} quanto às limitações do registro de auditoria.
 
 \section{Fluxo de utilização}
 

@@ -1,4 +1,4 @@
-\section{Segurança e controle de acesso}
+\section{Segurança e controle de acesso}\label{sec:seguranca}
 
 A segurança foi considerada como um requisito transversal do sistema, especialmente em razão da natureza das informações armazenadas durante o processo de avaliação psicopedagógica. A aplicação possui diferentes perfis de usuário e mecanismos de autenticação e autorização, buscando restringir o acesso às funcionalidades de acordo com as responsabilidades atribuídas a cada usuário.
 
@@ -26,7 +26,7 @@ Outro mecanismo utilizado na implementação é a validação dos dados recebido
 
 Para a rastreabilidade, os campos de controle temporal (\textit{createdAt} e \textit{updatedAt}) e os vínculos de autoria do modelo (\textit{responsavelId}, \textit{autorId} e \textit{aplicadorId}) não são suficientes quando se trata de dados de saúde de crianças. Eles indicam quem criou cada registro e quando ele foi alterado pela última vez, mas não registram quem fez cada alteração, quais eram os valores anteriores nem quem consultou as informações. Este último ponto é justamente o que a Lei Geral de Proteção de Dados e o sigilo profissional mais exigem. Além disso, o perfil \textit{ADMIN} tem acesso irrestrito a todos os dados clínicos, e esse acesso não deixaria rastro.
 
-Por esses motivos, o sistema mantém um registro de auditoria na entidade \textit{audit\_logs}, preenchido automaticamente por uma extensão do Prisma Client, conforme descrito no Capítulo \ref{capitulo8}. O registro atende aos quatro pontos acima:
+Por esses motivos, o sistema mantém um registro de auditoria na entidade \textit{audit\_logs}, preenchido automaticamente por uma extensão do Prisma Client, conforme descrito na Seção \ref{sec:backend}. O registro atende aos quatro pontos acima:
 
 \begin{itemize}
     \item cada criação, alteração e exclusão identifica o usuário que a realizou, o seu perfil, o IP de origem e o momento da operação;

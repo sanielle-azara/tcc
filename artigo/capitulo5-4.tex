@@ -1,4 +1,4 @@
-\section{Desenvolvimento do Backend}
+\section{Desenvolvimento do Backend}\label{sec:backend}
 
 O backend do sistema foi desenvolvido utilizando Node.js como ambiente de execução e Express.js como framework para construção da API REST. A camada de persistência utiliza o Prisma ORM, com banco de dados MySQL, enquanto a autenticação dos usuários é realizada por meio de JSON Web Tokens (JWT), utilizando tokens de acesso e de renovação. Para a validação dos dados recebidos pela API foi utilizado o Zod, e a documentação dos recursos disponibilizados é realizada por meio do padrão Swagger/OpenAPI.
 
@@ -94,7 +94,7 @@ A visibilidade dos aprendentes é controlada pelo campo \textit{responsavelId}, 
 
 O módulo de avaliações é responsável pelo gerenciamento dos instrumentos utilizados pelo sistema. A estrutura adotada permite representar avaliações compostas por diferentes questões e tipos de resposta. O versionamento desses instrumentos é mantido na camada de persistência, conforme apresentado na modelagem do banco de dados, permitindo relacionar diferentes versões de uma mesma avaliação.
 
-De maneira análoga ao módulo de aprendentes, a visibilidade das avaliações é controlada pelo campo \textit{autorId}, atribuído automaticamente ao usuário que criou o instrumento. As consultas de listagem e de detalhe aplicam o mesmo filtro de restrição por responsável, garantindo que cada profissional acesse somente os instrumentos que criou. Ao criar uma nova versão de uma avaliação, o campo \textit{autorId} recebe o usuário que realizou a alteração. Como o psicopedagogo só edita os próprios instrumentos, a titularidade se mantém entre as versões; quando a edição é feita pelo administrador, a nova versão passa a pertencer a ele, limitação discutida no Capítulo \ref{capitulo10}.
+De maneira análoga ao módulo de aprendentes, a visibilidade das avaliações é controlada pelo campo \textit{autorId}, atribuído automaticamente ao usuário que criou o instrumento. As consultas de listagem e de detalhe aplicam o mesmo filtro de restrição por responsável, garantindo que cada profissional acesse somente os instrumentos que criou. Ao criar uma nova versão de uma avaliação, o campo \textit{autorId} recebe o usuário que realizou a alteração. Como o psicopedagogo só edita os próprios instrumentos, a titularidade se mantém entre as versões; quando a edição é feita pelo administrador, a nova versão passa a pertencer a ele, limitação discutida na Seção \ref{sec:instrumentos}.
 
 As aplicações são tratadas separadamente pelo módulo \textit{aplicacoes}, permitindo associar uma avaliação a um aprendente e registrar o andamento desse processo. Essa separação entre avaliação e aplicação possibilita que um mesmo instrumento seja utilizado em diferentes processos avaliativos, mantendo cada aplicação como um registro independente.
 
@@ -148,7 +148,7 @@ Também foram definidos procedimentos para geração do cliente do Prisma, execu
 
 \subsection{Auditoria}
 
-A rastreabilidade das operações é garantida por um registro de auditoria, armazenado na entidade \textit{audit\_logs}. As razões que motivaram esse registro, relacionadas às lacunas dos campos de controle do modelo de dados, são discutidas no Capítulo \ref{capitulo13}; esta seção descreve sua implementação.
+A rastreabilidade das operações é garantida por um registro de auditoria, armazenado na entidade \textit{audit\_logs}. As razões que motivaram esse registro, relacionadas às lacunas dos campos de controle do modelo de dados, são discutidas na Seção \ref{sec:seguranca}; esta seção descreve sua implementação.
 
 O preenchimento é feito por uma extensão do Prisma Client, mecanismo que substitui os antigos \textit{middlewares} do Prisma: todas as operações executadas pela aplicação sobre o banco de dados passam por essa extensão antes de serem concluídas. Para que a extensão saiba qual usuário originou cada operação, o backend mantém um contexto por requisição, implementado com o \textit{AsyncLocalStorage} do Node.js. O contexto é criado no início do processamento de cada requisição, com o endereço IP de origem, e recebe o identificador e o perfil do usuário quando o middleware de autenticação valida o token de acesso. Dessa forma, os serviços de negócio não precisam repassar essas informações à camada de persistência.
 
@@ -158,6 +158,6 @@ Nas entidades com dados clínicos de crianças (aprendentes, histórico de acomp
 
 A consulta ao registro é feita pelo endpoint \textit{GET /api/auditoria}, com filtros por aprendente, usuário, entidade, ação e período. O perfil \textit{ADMIN} consulta todo o registro. O perfil \textit{PSICOPEDAGOGO} consulta apenas o registro de acessos dos aprendentes sob sua responsabilidade, o que inclui os acessos feitos pelo administrador aos dados dessas crianças.
 
-As limitações desse registro de auditoria são discutidas no Capítulo \ref{capitulo13}.
+As limitações desse registro de auditoria são discutidas na Seção \ref{sec:seguranca}.
 
 Dessa forma, o desenvolvimento do backend estabeleceu a camada responsável pela disponibilização da API REST, autenticação, validação das requisições, aplicação das operações relacionadas aos módulos do sistema, registro de auditoria, comunicação com o banco de dados e disponibilização dos dados utilizados pelo frontend. A organização modular adotada também fornece uma estrutura para a manutenção e evolução das funcionalidades relacionadas ao processo de avaliação psicopedagógica.
