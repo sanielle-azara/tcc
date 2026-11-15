@@ -32,7 +32,51 @@
 \usepackage{multirow}   % Para unir múltiplas linhas em uma célula
 % ---
 \usepackage{float}
-		
+
+% ---
+% Trechos de código-fonte
+% ---
+\usepackage{listings}
+\renewcommand{\lstlistingname}{Código}
+\definecolor{codefundo}{RGB}{246,248,250}
+\definecolor{codeborda}{RGB}{46,93,138}
+\definecolor{codecomentario}{RGB}{106,115,125}
+\definecolor{codestring}{RGB}{3,47,98}
+\definecolor{codepalavra}{RGB}{215,58,73}
+\lstdefinelanguage{JavaScript}{
+  keywords={const, let, var, function, return, if, else, async, await, new, throw, try, catch, true, false, null, undefined, require, module, exports},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  morestring=[b]`,
+  sensitive=true
+}
+\lstset{
+  language=JavaScript,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{codepalavra}\bfseries,
+  commentstyle=\color{codecomentario}\itshape,
+  stringstyle=\color{codestring},
+  backgroundcolor=\color{codefundo},
+  frame=single,
+  rulecolor=\color{codeborda},
+  numbers=left,
+  numberstyle=\tiny\color{codecomentario},
+  numbersep=6pt,
+  xleftmargin=1.5em,
+  framexleftmargin=1.5em,
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=2,
+  captionpos=t,
+  abovecaptionskip=4pt,
+  literate={á}{{\'a}}1 {à}{{\`a}}1 {â}{{\^a}}1 {ã}{{\~a}}1
+           {é}{{\'e}}1 {ê}{{\^e}}1 {í}{{\'i}}1
+           {ó}{{\'o}}1 {ô}{{\^o}}1 {õ}{{\~o}}1 {ú}{{\'u}}1 {ç}{{\c{c}}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Ó}{{\'O}}1 {Ç}{{\c{C}}}1
+}
+
 % ---
 % Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
 % ---

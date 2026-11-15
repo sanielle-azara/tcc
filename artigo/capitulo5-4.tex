@@ -80,17 +80,78 @@ No frontend, os tokens são armazenados no \textit{localStorage} do navegador. E
 
 O refresh token é rotacionado a cada uso: ao ser utilizado, o token anterior é revogado no banco de dados e um novo é emitido. O token é armazenado em texto plano na tabela \textit{refresh\_tokens}; não é guardado como hash, o que constitui outra limitação de segurança reconhecida. No logout, o token é revogado imediatamente. Na redefinição de senha, todos os refresh tokens ativos do usuário são revogados em uma única transação, invalidando sessões abertas em outros dispositivos.
 
+A Figura~\ref{fig:sequencia_login} apresenta, em um diagrama de sequência da UML \cite{omg2017_uml}, as três situações do ciclo de autenticação. No login (passos 1 a 10), a API confere a senha com o \textit{bcrypt}, emite os dois tokens, grava o refresh token e registra o acesso na auditoria. Nas requisições seguintes (passos 11 a 16), o middleware \textit{authenticate} valida o access token enviado no cabeçalho \textit{Authorization}, confere se o usuário continua ativo e disponibiliza seu identificador e perfil aos serviços, que aplicam o filtro de titularidade.
+
+\begin{figure}[H]
+    \centering
+    \caption{Diagrama de sequência da autenticação com access token e refresh token}
+    \label{fig:sequencia_login}
+    \includegraphics[width=0.92\textwidth,height=0.78\textheight,keepaspectratio]{sequencia_login.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+Quando o access token expira (passos 17 a 27), a API responde com HTTP 401 e um interceptador do Axios no frontend solicita automaticamente um novo par de tokens à rota \textit{/api/auth/refresh}, repetindo a requisição original sem que o usuário perceba. Esse interceptador é executado uma única vez por requisição; se a renovação falhar, porque o refresh token foi revogado ou expirou, os tokens são removidos e o usuário é redirecionado para a tela de login (passos 28 e 29).
+
 O processo de recuperação de senha utiliza um token gerado com \texttt{crypto.randomBytes(32)}, com validade de 1 hora. O link de redefinição é enviado por e-mail por meio do Nodemailer, configurado com servidor SMTP definido em variáveis de ambiente. O token de redefinição é marcado como utilizado após o uso, impedindo sua reutilização.
 
 Para proteção contra ataques de força bruta e abuso da API, o backend aplica limitação de taxa (\textit{rate limiting}) globalmente por meio da biblioteca \textit{express-rate-limit}: no máximo 100 requisições por endereço IP em uma janela de 15 minutos. Ao atingir o limite, a API retorna HTTP 429 com mensagem de erro. Os valores são configuráveis por variável de ambiente.
 
 O backend contempla os perfis \textit{ADMIN} e \textit{PSICOPEDAGOGO}, com controle de acesso por perfil aplicado via middleware \textit{authorize} nas rotas que exigem permissão específica, na forma de um controle de acesso baseado em papéis \cite{sandhu1996_rbac}. Como esse modelo não expressa restrições que dependem do registro acessado, o sistema o complementa com uma restrição baseada em um atributo do recurso, a titularidade, à maneira do controle de acesso baseado em atributos \cite{hu2014_abac}: aprendentes e avaliações são vinculados ao usuário que os criou, e aplicações e relatórios seguem a titularidade do aprendente a que pertencem. As operações de leitura e escrita alcançam somente os registros pertencentes ao usuário autenticado, exceto para o perfil \textit{ADMIN}, que possui acesso irrestrito.
 
+O Código~\ref{cod:authorize} apresenta o middleware \textit{authorize} e seu uso nas rotas de usuários. A função recebe a lista de perfis autorizados e devolve um middleware do Express, que é executado depois do \textit{authenticate} e, portanto, já encontra em \textit{req.user} o usuário validado a partir do token. A distinção entre as duas respostas de erro segue a semântica do HTTP: 401 indica que a requisição não está autenticada, e 403, que o usuário está autenticado mas não possui o perfil exigido.
+
+\begin{lstlisting}[caption={Middleware \textit{authorize} e sua aplicação nas rotas de usuários},label={cod:authorize}]
+// apps/backend/src/middlewares/auth.middleware.js
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Não autenticado' });
+    }
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: 'Acesso negado' });
+    }
+    next();
+  };
+};
+
+// apps/backend/src/modules/users/users.routes.js
+router.use(authenticate);
+router.get('/', authorize('ADMIN'), controller.list);
+router.post('/', authorize('ADMIN'), validate(createUserSchema), controller.create);
+router.delete('/:id', authorize('ADMIN'), controller.remove);
+\end{lstlisting}
+\fonte{Elaborado pela autora (2026).}
+
 \subsection{Gerenciamento de aprendentes e avaliações}
 
 O módulo de aprendentes disponibiliza as operações necessárias para o cadastro e gerenciamento dos indivíduos acompanhados pelo profissional. Os dados são posteriormente utilizados nas aplicações dos instrumentos avaliativos, mantendo a associação entre o aprendente e os registros produzidos durante o processo de avaliação.
 
 A visibilidade dos aprendentes é controlada pelo campo \textit{responsavelId}, preenchido automaticamente com o identificador do usuário autenticado no momento do cadastro. Nas operações de listagem e consulta individual, o módulo aplica um filtro que restringe os resultados ao usuário responsável. O perfil \textit{ADMIN} constitui exceção a essa regra, tendo acesso irrestrito a todos os registros. Essa lógica é implementada na camada de serviço, antes da consulta ao banco de dados, sem expor ao cliente a distinção entre registros próprios e de outros usuários.
+
+O Código~\ref{cod:titularidade} mostra como essa regra é implementada. Cada serviço define uma função \textit{ownerFilter}, que devolve um objeto vazio para o perfil \textit{ADMIN} e, para os demais perfis, uma condição que é combinada à cláusula \textit{where} das consultas do Prisma. No caso dos relatórios, a condição percorre as relações até o aprendente, de modo que a titularidade é herdada do responsável pela criança, e não de quem redigiu o relatório. Como o filtro faz parte da própria consulta, um registro de outro profissional não é encontrado e a API responde com HTTP 404, sem revelar que o registro existe.
+
+\begin{lstlisting}[caption={Filtro de titularidade aplicado nas consultas de aprendentes e relatórios},label={cod:titularidade}]
+// apps/backend/src/modules/aprendentes/aprendentes.service.js
+const ownerFilter = (userId, userRole) =>
+  userRole === 'ADMIN' ? {} : { responsavelId: userId };
+
+const findById = async (id, userId, userRole) => {
+  const where = { id, deletedAt: null, ...ownerFilter(userId, userRole) };
+  const item = await prisma.aprendente.findFirst({ where /* , include: ... */ });
+  if (!item) throw Object.assign(new Error('Aprendente não encontrado'), { status: 404 });
+  return item;
+};
+
+// apps/backend/src/modules/relatorios/relatorios.service.js
+// A titularidade do relatório segue a do aprendente da aplicação
+const ownerFilter = (userId, userRole) =>
+  userRole === 'ADMIN' ? {}
+    : { aplicacao: { aprendente: { responsavelId: userId } } };
+
+// No controlador, o usuário vem do token validado pelo middleware
+const item = await service.findById(req.params.id, req.user.id, req.user.role);
+\end{lstlisting}
+\fonte{Elaborado pela autora (2026).}
 
 O módulo de avaliações é responsável pelo gerenciamento dos instrumentos utilizados pelo sistema. A estrutura adotada permite representar avaliações compostas por diferentes questões e tipos de resposta. O versionamento desses instrumentos é mantido na camada de persistência, conforme apresentado na modelagem do banco de dados, permitindo relacionar diferentes versões de uma mesma avaliação.
 

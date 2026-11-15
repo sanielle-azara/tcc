@@ -74,6 +74,80 @@ O registro de auditoria é apresentado em dois pontos da interface. A página de
 
 A divisão da interface em módulos acompanha a organização funcional do sistema e permite manter relacionadas as páginas e componentes pertencentes a cada área.
 
+\subsection{Principais telas do sistema}\label{sec:telas}
+
+Esta subseção apresenta as telas que compõem o fluxo principal de uso do sistema, do acesso à emissão do relatório. As capturas foram obtidas com a aplicação em execução no ambiente Docker descrito na Seção~\ref{sec:arquitetura}, autenticada com o perfil \textit{PSICOPEDAGOGO}. Todos os dados exibidos são fictícios, provenientes da carga inicial do banco de dados de desenvolvimento, e não correspondem a pessoas reais.
+
+A Figura~\ref{fig:tela_login} mostra a tela de login, única área pública do sistema junto às telas de cadastro e de recuperação de senha. O botão ao lado do campo de senha permite exibir o texto digitado e possui nome acessível para leitores de tela.
+
+\begin{figure}[H]
+    \centering
+    \caption{Tela de login}
+    \label{fig:tela_login}
+    \includegraphics[width=0.70\textwidth]{tela_login.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+Após a autenticação, o usuário é direcionado ao dashboard (Figura~\ref{fig:tela_dashboard}). A estrutura da tela se repete nas demais páginas autenticadas: a barra superior e o menu lateral são fornecidos pelo componente \textit{AppLayout}, e o menu exibe somente os módulos permitidos ao perfil, de modo que os itens de usuários e de auditoria não aparecem para o psicopedagogo. Os indicadores mostram os totais de aprendentes, de avaliações ativas e de aplicações, além das aplicações mais recentes com o respectivo status. Esses números são calculados pela rota \textit{GET /api/dashboard} já com o filtro de titularidade, isto é, consideram apenas os registros do profissional autenticado.
+
+\begin{figure}[H]
+    \centering
+    \caption{Dashboard do perfil psicopedagogo}
+    \label{fig:tela_dashboard}
+    \includegraphics[width=\textwidth]{tela_dashboard.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+O cadastro de aprendentes (Figura~\ref{fig:tela_aprendente_form}) organiza os campos em três grupos: dados do aprendente, dados do responsável e dados escolares. Os campos obrigatórios são marcados com asterisco e validados pelo mesmo esquema Zod utilizado no backend, compartilhado entre as duas aplicações pelo pacote \textit{shared-validation}. O mesmo formulário é utilizado para cadastro e edição; na edição, os campos são preenchidos com os dados atuais do registro.
+
+\begin{figure}[H]
+    \centering
+    \caption{Formulário de cadastro e edição de aprendente}
+    \label{fig:tela_aprendente_form}
+    \includegraphics[width=\textwidth]{tela_aprendente_form.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+A página de detalhe do aprendente (Figura~\ref{fig:tela_aprendente_detalhe}) reúne, em abas, os dados cadastrais, o histórico de acompanhamento e o registro de acessos, no qual o psicopedagogo responsável consulta quem visualizou ou alterou os dados daquela criança.
+
+\begin{figure}[H]
+    \centering
+    \caption{Página de detalhe do aprendente, com as abas de dados cadastrais, histórico e registro de acessos}
+    \label{fig:tela_aprendente_detalhe}
+    \includegraphics[width=\textwidth]{tela_aprendente_detalhe.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+O editor de instrumentos (Figura~\ref{fig:tela_instrumento_editor}) permite definir o nome, a categoria, a descrição e o status do instrumento e compor sua lista de perguntas. Para cada pergunta são escolhidos o tipo de resposta e a obrigatoriedade; os campos complementares variam conforme o tipo, como os limites e rótulos de uma escala, mostrados na pergunta 2, ou as opções de uma questão de múltipla escolha. Quando o instrumento já foi aplicado, um aviso no topo da tela informa que a alteração das perguntas criará uma nova versão, mecanismo detalhado na Seção~\ref{sec:instrumentos}.
+
+\begin{figure}[H]
+    \centering
+    \caption{Editor de instrumento avaliativo, com o aviso de criação de nova versão}
+    \label{fig:tela_instrumento_editor}
+    \includegraphics[width=\textwidth]{tela_instrumento_editor.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+A Figura~\ref{fig:tela_aplicacao} mostra a tela de aplicação de um instrumento a um aprendente. Cada pergunta é apresentada com o componente de entrada correspondente ao seu tipo: campo de texto, botões de opção, sim/não ou campo numérico. Os três botões ao final correspondem aos estados da aplicação: as respostas podem ser salvas como rascunho ou como progresso normal e retomadas depois, e a finalização verifica o preenchimento das perguntas obrigatórias e bloqueia a edição das respostas, conforme descrito na Seção~\ref{sec:aplicacoes}.
+
+\begin{figure}[H]
+    \centering
+    \caption{Tela de aplicação de um instrumento, com perguntas de tipos diferentes}
+    \label{fig:tela_aplicacao}
+    \includegraphics[width=\textwidth]{tela_aplicacao.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+Por fim, a Figura~\ref{fig:tela_relatorio_impresso} apresenta o relatório na forma em que é impresso ou exportado em PDF pelo navegador. A folha de estilos de impressão oculta o menu, a barra superior e os botões, e o documento reúne os dados do aprendente, a identificação do instrumento e de sua versão, as respostas registradas, as observações e a conclusão do profissional, seguidas do espaço para assinatura. A organização desse documento é discutida na Seção~\ref{sec:relatorios}.
+
+\begin{figure}[H]
+    \centering
+    \caption{Relatório de avaliação psicopedagógica no formato de impressão}
+    \label{fig:tela_relatorio_impresso}
+    \includegraphics[width=0.85\textwidth,height=0.80\textheight,keepaspectratio]{tela_relatorio_impresso.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
 \subsection{Testes do frontend}
 
 O frontend utiliza Vitest e React Testing Library para a realização de testes automatizados. O Vitest executa os testes e gera o relatório de cobertura; a React Testing Library fornece utilitários para renderizar componentes React em ambiente simulado (jsdom) e interagir com eles como um usuário faria, sem depender de um navegador real.
