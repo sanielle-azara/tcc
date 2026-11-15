@@ -1,0 +1,541 @@
+\chapter[Desenvolvimento]{Desenvolvimento}\label{capitulo5}
+
+Este capítulo descreve o desenvolvimento do sistema, seguindo as etapas apresentadas no Capítulo~\ref{capitulo4}. Inicialmente, são apresentados os requisitos (Seção~\ref{sec:requisitos}), a arquitetura e o modelo de dados (Seção~\ref{sec:arquitetura_dados}). Em seguida, descrevem-se a implementação do \textit{backend} e do \textit{frontend} (Seções~\ref{sec:backend} e~\ref{sec:frontend}) e as funcionalidades centrais do processo avaliativo, que compreendem o versionamento dos instrumentos, a aplicação das avaliações e a geração dos relatórios (Seção~\ref{sec:funcionalidades}). Por fim, discutem-se a segurança e o controle de acesso (Seção~\ref{sec:seguranca}) e apresentam-se os testes realizados (Seção~\ref{sec:testes-validacao}).
+
+
+\section{Levantamento e especificação dos requisitos}\label{sec:requisitos}
+
+Os requisitos foram definidos a partir da revisão bibliográfica e documental, da entrevista com uma psicopedagoga (Seção~\ref{sec:coleta_dados}) e da análise do processo de avaliação psicopedagógica, e foram divididos em funcionais e não funcionais (Seção~\ref{sec:fund_requisitos}).
+
+\subsection{Requisitos funcionais}
+
+Os requisitos funcionais cobrem as etapas do processo avaliativo contempladas pelo sistema: o gerenciamento dos aprendentes, o gerenciamento e a aplicação dos instrumentos, o acompanhamento dos registros e a elaboração de relatórios. Duas decisões merecem destaque. A primeira é a restrição de acesso: cada psicopedagogo vê apenas os aprendentes sob sua responsabilidade e os instrumentos que criou, e o administrador, responsável pelas contas de usuário, não acessa os dados clínicos, que pelo Código de Ética do Psicopedagogo são de acesso restrito ao profissional responsável \cite{abpp2019_codigo_etica}. A segunda é o versionamento automático: quando as questões de um instrumento já aplicado são alteradas, o sistema preserva a versão anterior, e cada aplicação continua associada à versão efetivamente utilizada. O Quadro~\ref{qua:requisitos_funcionais} apresenta os requisitos funcionais.
+
+\begin{quadro}[H]
+\centering
+\footnotesize
+\caption{Requisitos funcionais}
+\begin{tabular}{|p{1.6cm}|p{13cm}|}
+\hline
+\textbf{Código} & \textbf{Requisito funcional} \\
+\hline
+RF01 & Permitir o cadastro e a autenticação de usuários. \\ \hline
+RF02 & Permitir o controle de acesso às funcionalidades do sistema de acordo com o perfil do usuário. \\ \hline
+RF03 & Permitir o cadastro, edição e consulta dos dados dos aprendentes. \\ \hline
+RF04 & Restringir a visualização dos aprendentes e de seus registros clínicos ao psicopedagogo responsável por cada um deles, sem exceção para o perfil administrador, a quem cabe apenas transferir a responsabilidade entre profissionais. \\ \hline
+RF05 & Permitir o registro de informações relacionadas ao processo de avaliação. \\ \hline
+RF06 & Permitir o cadastro e gerenciamento dos instrumentos avaliativos. \\ \hline
+RF07 & Restringir a visualização dos instrumentos avaliativos ao psicopedagogo que os criou; o administrador pode consultá-los e excluí-los, mas não criá-los nem editá-los. \\ \hline
+RF08 & Permitir o gerenciamento de diferentes versões dos instrumentos. \\ \hline
+RF09 & Registrar adaptações realizadas nos instrumentos por meio de versionamento automático, preservando a versão anterior e associando-a às aplicações já realizadas. \\ \hline
+RF10 & Permitir vincular um instrumento a um aprendente durante um atendimento. \\ \hline
+RF11 & Permitir registrar os resultados e observações obtidos durante a aplicação dos instrumentos. \\ \hline
+RF12 & Permitir consultar o histórico de avaliações e registros de um aprendente. \\ \hline
+RF13 & Permitir elaborar e armazenar devolutivas e relatórios. \\ \hline
+RF14 & Permitir gerar relatórios em formato PDF. \\ \hline
+RF15 & Manter nos registros as informações de autoria e temporalidade necessárias para identificar quem criou cada dado e quando foi criado ou modificado. \\ \hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:requisitos_funcionais}
+\end{quadro}
+
+A Figura~\ref{fig:casos_de_uso} apresenta o diagrama de casos de uso da UML \cite{omg2017_uml}. Os dois atores compartilham apenas a autenticação e a recuperação de senha. O Administrador não é uma especialização do Psicopedagogo e não herda seus casos de uso: gerencia usuários, transfere aprendentes entre profissionais, exclui instrumentos e consulta o registro de auditoria sem os valores dos dados clínicos (Seção~\ref{sec:separacao_admin}). O autocadastro, disponível na tela de login, é discutido na mesma seção.
+
+\begin{figure}[H]
+    \centering
+    \caption{Diagrama de casos de uso do sistema}
+    \label{fig:casos_de_uso}
+    \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{casos_de_uso.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+\subsection{Requisitos não funcionais}
+
+Os requisitos não funcionais (Quadro~\ref{qua:requisitos_nao_funcionais}) decorrem do fato de o sistema armazenar informações de crianças e priorizam segurança, privacidade, rastreabilidade e usabilidade. Seguindo a recomendação de expressá-los de forma mensurável (Seção~\ref{sec:fund_requisitos}), três receberam critérios de verificação: a usabilidade, avaliada por questionário com profissionais (RNF06); a acessibilidade, verificada pela ausência de violações das WCAG 2.2 \cite{w3c_wcag22_pt} detectáveis pela ferramenta axe-core \cite{deque_axe_core}, já que a conformidade plena depende de avaliação manual (RNF11); e a manutenibilidade, associada a uma cobertura mínima de testes no \textit{backend} (RNF10).
+
+\begin{quadro}[H]
+\centering
+\footnotesize
+\caption{Requisitos não funcionais}
+\begin{tabular}{|p{1.6cm}|p{13cm}|}
+\hline
+\textbf{Código} & \textbf{Requisito não funcional} \\
+\hline
+RNF01 & O sistema deve utilizar autenticação para controlar o acesso dos usuários. \\ \hline
+RNF02 & O sistema deve utilizar mecanismos de autorização para restringir o acesso às funcionalidades e informações, inclusive limitando a visualização de aprendentes e avaliações ao usuário responsável por cada registro. \\ \hline
+RNF03 & Os dados dos aprendentes devem ser armazenados de forma segura, considerando os princípios de proteção de dados da LGPD. \\ \hline
+RNF04 & O sistema deve manter um registro de auditoria que permita reconstituir quem criou, alterou, excluiu ou consultou cada dado, quando e com quais valores anteriores, inclusive nas operações realizadas pelo administrador. \\ \hline
+RNF05 & O sistema deve preservar o histórico das versões e alterações realizadas nos instrumentos avaliativos. \\ \hline
+RNF06 & A interface deve apresentar organização e usabilidade adequadas às atividades dos profissionais, verificada por meio de avaliação com usuários: média igual ou superior a 4,0 em escala de 1 a 5 nos aspectos de facilidade de uso, organização das informações e contribuição geral da plataforma. \\ \hline
+RNF07 & A aplicação deve apresentar arquitetura em três camadas separadas (apresentação, aplicação e persistência), com o \textit{backend} organizado em módulos independentes por domínio funcional (autenticação, usuários, aprendentes, avaliações, aplicações, relatórios, auditoria e \textit{dashboard}), de modo que alterações em um módulo não exijam modificações nos demais. \\ \hline
+RNF08 & Os dados devem possuir mecanismos de integridade e consistência durante seu armazenamento e manipulação. \\ \hline
+RNF09 & O sistema deve possuir tratamento adequado de erros, evitando a exposição de informações internas da aplicação. \\ \hline
+RNF10 & O sistema deve possuir cobertura de testes automatizados de no mínimo 70\% das linhas de código do \textit{backend}, de modo a permitir a detecção de regressões durante a evolução do sistema. \\ \hline
+RNF11 & A interface não deve apresentar violações dos critérios de sucesso dos níveis A e AA das WCAG 2.2 detectáveis pela ferramenta axe-core nas telas principais do sistema. \\ \hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:requisitos_nao_funcionais}
+\end{quadro}
+
+\section{Arquitetura e modelo de dados}\label{sec:arquitetura_dados}
+
+Esta seção apresenta a organização geral do sistema em camadas e, em seguida, o modelo de dados que sustenta o processo avaliativo.
+
+\subsection{Arquitetura do sistema}\label{sec:arquitetura}
+
+O sistema adota a arquitetura em três camadas discutida na Seção~\ref{sec:fund_arquitetura}: apresentação, aplicação e persistência. Essa organização separa a interface usada pelo profissional, as regras de negócio e o armazenamento dos dados.
+
+A camada de apresentação é o \textit{frontend}, desenvolvido em React como uma aplicação de página única. Ela reúne as telas destinadas ao psicopedagogo (aprendentes, instrumentos, aplicações e relatórios) e as destinadas ao administrador (usuários e registro de auditoria). A comunicação com o servidor ocorre por meio de uma API REST desenvolvida em Node.js com Express. Seguindo o estilo REST \cite{fielding2000_rest}, a API não mantém estado de sessão: cada requisição carrega o \textit{token} de acesso do usuário, e as operações são expressas pelos métodos e códigos de estado do HTTP.
+
+Na camada de aplicação, cada requisição passa pela autenticação, que identifica o usuário a partir do \textit{token}, pela autorização por perfil e pela validação dos dados antes de chegar aos módulos de negócio: autenticação (\textit{auth}), usuários (\textit{users}), aprendentes (\textit{aprendentes}), instrumentos avaliativos (\textit{avaliacoes}), aplicações dos instrumentos (\textit{aplicacoes}), relatórios (\textit{relatorios}), painel geral (\textit{dashboard}) e auditoria (\textit{auditoria}). Como todas as decisões de acesso são tomadas nessa camada, o controle não depende do que a interface exibe ao usuário. O registro de auditoria fica na fronteira entre a aplicação e a persistência: as operações sobre o banco passam por uma extensão do Prisma que registra quem as realizou, quando e sobre qual dado (Seção~\ref{sec:auditoria}).
+
+A camada de persistência utiliza o banco de dados relacional MySQL, que armazena os usuários, os aprendentes e seu histórico, os instrumentos e suas questões, as aplicações e respostas, os relatórios e o registro de auditoria.
+
+Para execução, os serviços (banco de dados, API e \textit{frontend}) são executados em contêineres Docker. O Nginx entrega os arquivos estáticos do \textit{frontend} ao navegador e atua como \textit{proxy} reverso, encaminhando à API as requisições dirigidas a ela. Essa configuração foi utilizada no ambiente local de testes e de avaliação; o sistema não foi implantado em ambiente de produção (Seção~\ref{sec:limitacoes}).
+
+A Figura~\ref{fig:arquitetura_geral_do_sistema} resume a arquitetura e indica também a separação entre os perfis: os módulos em destaque reúnem dados clínicos e são exclusivos do psicopedagogo responsável, enquanto o administrador atua na gestão de usuários e na auditoria, sem acesso a esses dados (Seção~\ref{sec:separacao_admin}).
+
+\begin{figure}[H]
+    \centering
+    \caption{Arquitetura geral do sistema}
+    \label{fig:arquitetura_geral_do_sistema}
+    \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{arquitetura_sistema.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+
+\subsection{Modelo de dados}\label{sec:modelagem}
+
+O banco de dados foi implementado em MySQL segundo o modelo relacional \cite{codd1970_relational}, representado por meio do modelo entidade-relacionamento \cite{chen1976_entity_relationship} e acessado pela aplicação por meio do Prisma (Seção~\ref{sec:fund_banco}). O modelo tem onze entidades, apresentadas em duas partes nas Figuras~\ref{fig:der_parte1} e \ref{fig:der_parte2}. Quanto à nomenclatura, cabe observar que a entidade \textit{avaliacoes} representa os \textbf{instrumentos} avaliativos, e a entidade \textit{aplicacoes}, cada uso de um instrumento com um aprendente; no texto, os termos ``instrumento'' e ``aplicação'' são usados nesses sentidos.
+
+A primeira parte reúne os usuários e a autenticação (\textit{users}, \textit{refresh\_tokens} e \textit{password\_resets}), os aprendentes e seu histórico (\textit{aprendentes} e \textit{historico\_aprendentes}) e o registro de auditoria (\textit{audit\_logs}). A segunda reúne o processo avaliativo: instrumentos (\textit{avaliacoes}), questões (\textit{questions}), aplicações (\textit{aplicacoes}), respostas (\textit{respostas}) e relatórios (\textit{relatorios}). As principais decisões de modelagem são descritas a seguir.
+
+\begin{itemize}
+    \item \textbf{Titularidade}: os campos \textit{responsavelId}, em \textit{aprendentes}, e \textit{autorId}, em \textit{avaliacoes}, vinculam cada registro ao profissional responsável e sustentam a restrição de visibilidade (Seção~\ref{sec:titularidade}). Ambos são indexados, pois as listagens filtram os registros pelo usuário autenticado.
+    \item \textbf{Versionamento}: o campo \textit{parentId} cria uma autorrelação em \textit{avaliacoes}, de modo que cada nova versão de um instrumento aponta para a anterior (Seção~\ref{sec:instrumentos}).
+    \item \textbf{Questões configuráveis}: cada questão tem texto, tipo, obrigatoriedade e posição, com oito tipos de resposta (texto curto e longo, número, data, seleção única e múltipla, escala e sim/não). Assim, novos instrumentos não exigem alterações na estrutura do banco.
+    \item \textbf{Respostas em JSON}: o campo \textit{valor} de \textit{respostas} é do tipo JSON, o que permite guardar formatos diferentes conforme o tipo da questão. Uma restrição de unicidade sobre o par \textit{aplicacaoId} e \textit{questionId} impede duas respostas para a mesma questão em uma aplicação.
+    \item \textbf{Relatório vinculado à aplicação}: cada relatório pertence a uma única aplicação, em uma relação de zero ou um, o que o mantém associado ao instrumento e à versão utilizados.
+    \item \textbf{Auditoria independente}: \textit{audit\_logs} registra o usuário e seu perfil, a ação, a entidade e o registro afetados, o aprendente a que o dado pertence, o IP, o momento e, quando houver, as diferenças entre os valores anteriores e os novos. A entidade não tem chave estrangeira para \textit{users}, para que o registro não dependa de alterações posteriores no cadastro de usuários.
+    \item \textbf{Exclusão lógica}: usuários, aprendentes e instrumentos têm o campo \textit{deletedAt}, de modo que as exclusões não apagam fisicamente os registros.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \caption{Diagrama Entidade-Relacionamento do sistema (parte 1): usuários, aprendentes e auditoria}
+    \label{fig:der_parte1}
+    \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{der_parte1.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+Na Figura~\ref{fig:der_parte2}, as entidades \textit{users} e \textit{aprendentes}, detalhadas na primeira parte, aparecem em linha tracejada, apenas para indicar seus relacionamentos.
+
+\begin{figure}[H]
+    \centering
+    \caption{Diagrama Entidade-Relacionamento do sistema (parte 2): instrumentos, aplicações e relatórios}
+    \label{fig:der_parte2}
+    \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{der_parte2.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+
+\section{Desenvolvimento do \textit{backend}}\label{sec:backend}
+
+O \textit{backend} foi desenvolvido em Node.js com Express, com persistência em MySQL por meio do Prisma, validação de dados com Zod e documentação da API no padrão Swagger/OpenAPI, disponível no endereço \textit{/api-docs}. A aplicação está organizada em módulos de negócio, um por domínio funcional (Seção~\ref{sec:arquitetura}), cada um com suas rotas, controladores e serviços. Antes dos controladores, as requisições passam por \textit{middlewares} de autenticação, de validação dos dados contra os esquemas Zod e de tratamento centralizado de erros, que evita expor detalhes internos da aplicação nas respostas.
+
+\subsection{Rotas da API}
+
+As rotas da API são agrupadas por domínio funcional, e o controle de acesso por perfil é aplicado antes do processamento de cada requisição. O Quadro~\ref{qua:rotas_api} apresenta uma seleção das rotas que ilustram esse controle; a lista completa está na documentação Swagger do sistema.
+
+\begin{quadro}[H]
+\centering
+\footnotesize
+\caption{Seleção de rotas da API REST e perfil exigido}
+\begin{tabular}{|p{1.4cm}|p{5.6cm}|p{2.4cm}|p{4.8cm}|}
+\hline
+\textbf{Método} & \textbf{Rota} & \textbf{Perfil exigido} & \textbf{Descrição} \\ \hline
+POST & /api/auth/login & Público & Autenticação e emissão dos \textit{tokens} \\ \hline
+POST & /api/auth/refresh & Público & Renovação do \textit{token} de acesso \\ \hline
+GET & /api/users & ADMIN & Listagem de usuários \\ \hline
+POST & /api/users/:id/transferir-aprendentes & ADMIN & Transferência dos aprendentes e instrumentos para outro psicopedagogo \\ \hline
+GET & /api/aprendentes/:id & Psicopedagogo & Consulta de aprendente \\ \hline
+POST & /api/avaliacoes & Autenticado\textsuperscript{*} & Cadastro de instrumento \\ \hline
+PUT & /api/avaliacoes/:id & Psicopedagogo & Edição de instrumento (cria nova versão se já aplicado) \\ \hline
+DELETE & /api/avaliacoes/:id & ADMIN & Exclusão de instrumento \\ \hline
+POST & /api/aplicacoes/:id/finalize & Psicopedagogo & Finalização da aplicação \\ \hline
+POST & /api/relatorios & Psicopedagogo & Criação ou atualização de relatório \\ \hline
+GET & /api/dashboard & Autenticado & Painel geral (para o ADMIN, apenas totais) \\ \hline
+GET & /api/auditoria & Autenticado & Registro de auditoria (para o ADMIN, sem valores clínicos) \\ \hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026). \textsuperscript{*}A rota exige apenas autenticação, mas o cadastro é recusado ao ADMIN dentro do módulo de instrumentos, e não pelo \textit{middleware} de perfil.}
+\label{qua:rotas_api}
+\end{quadro}
+
+\subsection{Autenticação e controle de acesso}
+
+A autenticação foi implementada utilizando JWT \cite{rfc7519_jwt}, com tokens de acesso (\textit{access token}) e de renovação (\textit{refresh token}), conforme o esquema descrito na Seção~\ref{sec:fund_seguranca}. Os \textit{tokens} são assinados com o algoritmo HMAC SHA-256, padrão da biblioteca \textit{jsonwebtoken}, utilizando chaves secretas distintas para cada tipo de token. O \textit{access token} tem validade de 15 minutos, e o \textit{refresh token}, de 7 dias. Ambos os valores são configuráveis por variável de ambiente.
+
+No \textit{frontend}, os \textit{tokens} são armazenados no \textit{localStorage} do navegador. Essa escolha simplifica a implementação, mas expõe os tokens a ataques de \textit{cross-site scripting} (XSS); a alternativa mais segura seria o uso de \textit{cookies httpOnly}, que não são acessíveis por JavaScript. Essa é uma limitação do protótipo para uso em produção.
+
+O \textit{refresh token} é rotacionado a cada uso: o anterior é revogado no banco de dados e um novo é emitido. Ele é armazenado em texto plano na tabela \textit{refresh\_tokens}, e não como \textit{hash}, o que é outra limitação reconhecida. No \textit{logout}, o \textit{token} é revogado imediatamente, e na redefinição de senha todos os \textit{refresh tokens} ativos do usuário são revogados em uma única transação, encerrando sessões abertas em outros dispositivos.
+
+A Figura~\ref{fig:sequencia_login} apresenta, em um diagrama de sequência da UML \cite{omg2017_uml}, as três situações do ciclo de autenticação. No \textit{login} (passos 1 a 10), a API confere a senha com o bcrypt, emite os dois \textit{tokens}, grava o \textit{refresh token} e registra o acesso na auditoria. Nas requisições seguintes (passos 11 a 16), o \textit{middleware} \textit{authenticate} valida o \textit{access token} enviado no cabeçalho \textit{Authorization}, confere se o usuário continua ativo e disponibiliza seu identificador e perfil aos serviços, que aplicam o filtro de titularidade.
+
+\begin{figure}[H]
+    \centering
+    \caption{Diagrama de sequência da autenticação com \textit{access token} e \textit{refresh token}}
+    \label{fig:sequencia_login}
+    \includegraphics[width=0.92\textwidth,height=0.78\textheight,keepaspectratio]{sequencia_login.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+Quando o \textit{access token} expira (passos 17 a 27), a API responde com HTTP 401, e um interceptador do Axios no \textit{frontend} solicita automaticamente um novo par de \textit{tokens} à rota \textit{/api/auth/refresh}, repetindo a requisição original sem que o usuário perceba. Esse interceptador é executado uma única vez por requisição; se a renovação falhar, porque o \textit{refresh token} foi revogado ou expirou, os \textit{tokens} são removidos e o usuário é redirecionado para a tela de login (passos 28 e 29).
+
+A recuperação de senha utiliza um \textit{token} gerado com \texttt{crypto.randomBytes(32)}, com validade de 1 hora. O link de redefinição é enviado por e-mail por meio do Nodemailer, configurado com servidor SMTP definido em variáveis de ambiente. Depois de usado, o \textit{token} é marcado como utilizado, o que impede sua reutilização.
+
+Contra ataques de força bruta e abuso da API, o \textit{backend} aplica limitação de taxa (\textit{rate limiting}) globalmente por meio da biblioteca \textit{express-rate-limit}: no máximo 100 requisições por endereço IP em uma janela de 15 minutos. Ao atingir o limite, a API retorna HTTP 429 com mensagem de erro. Os valores são configuráveis por variável de ambiente.
+
+O \textit{backend} contempla os perfis \textit{ADMIN} e \textit{PSICOPEDAGOGO}, com controle de acesso por perfil aplicado pelo \textit{middleware} \textit{authorize} nas rotas que exigem permissão específica, na forma de um controle de acesso baseado em papéis \cite{sandhu1996_rbac}. Como esse modelo não expressa restrições que dependem do registro acessado, o sistema o complementa com uma restrição baseada em um atributo do recurso, a titularidade, à maneira do controle de acesso baseado em atributos \cite{hu2014_abac}: aprendentes e instrumentos são vinculados ao usuário que os criou, e aplicações e relatórios seguem a titularidade do aprendente a que pertencem. As operações de leitura e escrita alcançam somente os registros pertencentes ao usuário autenticado. A combinação dos dois mecanismos é discutida na Seção~\ref{sec:seguranca}.
+
+O Código~\ref{cod:authorize} apresenta o \textit{middleware} \textit{authorize} e seu uso em dois módulos: nas rotas de usuários, restritas ao \textit{ADMIN}, e nas de aprendentes, restritas ao \textit{PSICOPEDAGOGO} em todas as operações, inclusive nas de leitura. A função recebe a lista de perfis autorizados e devolve um \textit{middleware} do Express, que é executado depois do \textit{authenticate} e, portanto, já encontra em \textit{req.user} o usuário validado a partir do \textit{token}. A distinção entre as duas respostas de erro segue a semântica do HTTP: 401 indica que a requisição não está autenticada, e 403, que o usuário está autenticado mas não possui o perfil exigido.
+
+\begin{lstlisting}[caption={Middleware \textit{authorize} e sua aplicação nas rotas de usuários e de aprendentes},label={cod:authorize}]
+// apps/backend/src/middlewares/auth.middleware.js
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Não autenticado' });
+    }
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: 'Acesso negado' });
+    }
+    next();
+  };
+};
+
+// apps/backend/src/modules/users/users.routes.js
+router.use(authenticate);
+router.get('/', authorize('ADMIN'), controller.list);
+router.post('/', authorize('ADMIN'), validate(createUserSchema), controller.create);
+router.delete('/:id', authorize('ADMIN'), controller.remove);
+
+// apps/backend/src/modules/aprendentes/aprendentes.routes.js
+// Dados clínicos: somente o psicopedagogo, inclusive para leitura
+router.use(authenticate, authorize('PSICOPEDAGOGO'));
+router.get('/', controller.list);
+router.get('/:id', controller.findById);
+\end{lstlisting}
+\fonte{Elaborado pela autora (2026).}
+
+\subsection{Filtro de titularidade}\label{sec:titularidade}
+
+A visibilidade dos aprendentes é controlada pelo campo \textit{responsavelId}, preenchido automaticamente com o identificador do usuário autenticado no momento do cadastro. Nas operações de listagem, consulta, alteração e exclusão, a camada de serviço aplica um filtro que restringe os resultados ao usuário responsável, sem exceção por perfil.
+
+O Código~\ref{cod:titularidade} mostra como essa regra é implementada. Cada serviço define uma função \textit{ownerFilter}, que devolve uma condição combinada à cláusula \textit{where} das consultas do Prisma. O filtro não depende do perfil: como as rotas clínicas já recusam o \textit{ADMIN}, ele atua como segunda barreira, de modo que um erro na configuração de uma rota não basta para expor registros de outro profissional. No caso dos relatórios, a condição percorre as relações até o aprendente, de modo que a titularidade é herdada do responsável pela criança, e não de quem redigiu o relatório. Como o filtro faz parte da própria consulta, um registro de outro profissional não é encontrado e a API responde com HTTP 404, sem revelar que o registro existe.
+
+\begin{lstlisting}[caption={Filtro de titularidade aplicado nas consultas de aprendentes e relatórios},label={cod:titularidade}]
+// apps/backend/src/modules/aprendentes/aprendentes.service.js
+const ownerFilter = (userId) => ({ responsavelId: userId });
+
+const findById = async (id, userId) => {
+  const where = { id, deletedAt: null, ...ownerFilter(userId) };
+  const item = await prisma.aprendente.findFirst({ where /* , include: ... */ });
+  if (!item) throw Object.assign(new Error('Aprendente não encontrado'), { status: 404 });
+  return item;
+};
+
+// apps/backend/src/modules/relatorios/relatorios.service.js
+// A titularidade do relatório segue a do aprendente da aplicação
+const ownerFilter = (userId) =>
+  ({ aplicacao: { aprendente: { responsavelId: userId } } });
+
+// No controlador, o usuário vem do token validado pelo middleware
+const item = await service.findById(req.params.id, req.user.id);
+\end{lstlisting}
+\fonte{Elaborado pela autora (2026).}
+
+A visibilidade dos instrumentos segue o mesmo princípio, pelo campo \textit{autorId}; a manutenção da titularidade entre versões é tratada na Seção~\ref{sec:instrumentos}. O \textit{dashboard} (\textit{GET /api/dashboard}) aplica os mesmos filtros nas contagens que apresenta ao psicopedagogo.
+
+\subsection{Testes automatizados do \textit{backend}}
+
+Os testes do \textit{backend} utilizam o Vitest, que executa os testes e gera o relatório de cobertura, e o Supertest, que envia requisições HTTP à aplicação carregada em memória, sem servidor externo. São 88 testes em dois níveis: testes de integração das rotas, que percorrem \textit{middlewares}, controladores e serviços com o acesso ao banco de dados substituído por um objeto simulado, e testes unitários das regras isoladas do serviço de autenticação e da extensão de auditoria. A Tabela~\ref{tab:testes_backend} apresenta a distribuição por arquivo e a cobertura de linhas por módulo, obtida com o provedor V8 do Vitest.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Distribuição dos testes e cobertura por módulo do \textit{backend}}
+\label{tab:testes_backend}
+\begin{tabular}{p{6.4cm} p{2.4cm} c p{3.2cm}}
+\hline
+\textbf{Módulo (arquivo de teste)} & \textbf{Nível} & \textbf{Testes} & \textbf{Cobertura (linhas)} \\
+\hline
+auth (rotas) (auth.test.js) & Integração & 7 & 68,32\% \\
+aprendentes (aprendentes.test.js) & Integração & 6 & 75,14\% \\
+avaliacoes (avaliacoes.test.js) & Integração & 11 & 78,66\% \\
+aplicacoes (aplicacoes.test.js) & Integração & 14 & 95,78\% \\
+relatorios (relatorios.test.js) & Integração & 8 & 95,70\% \\
+auditoria (auditoria.test.js) & Integração & 10 & 97,45\% \\
+users e dashboard (users.test.js) & Integração & 9 & 87,98\% (users); 97,80\% (dashboard) \\
+auth.service (auth.service.test.js) & Unitário & 4 & 42,50\% \\
+extensão do Prisma (audit.extension.test.js) & Unitário & 12 & 95,37\% \\
+pacote shared-utils (shared-utils.test.js) & Unitário & 7 & fora do relatório\textsuperscript{a} \\
+utilitários do \textit{backend} (JWT e e-mail) & Integração (indireta) & 0\textsuperscript{b} & 64,17\% \\
+\hline
+\textbf{Total} & & \textbf{88} & \textbf{83,06\% (linhas); 73,05\% (\textit{branches})} \\
+\hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026). \textsuperscript{a}O pacote fica fora do diretório do \textit{backend}; seus testes entram no total, mas não na porcentagem. \textsuperscript{b}Sem arquivo de teste próprio; exercitados indiretamente pelos testes de integração.}
+\end{table}
+
+A cobertura de 83,06\% das linhas e de 73,05\% dos \textit{branches} supera o mínimo de 70\% definido no RNF10. As menores coberturas estão no serviço de autenticação e nos utilitários de JWT e e-mail, reflexo da recuperação de senha e do envio de e-mail, que não têm testes de integração completos. Como o banco de dados é simulado, esses números indicam quanto do código foi exercitado, mas não substituem a verificação contra o banco real, descrita na Seção~\ref{sec:testes-validacao}.
+
+\subsection{Auditoria}\label{sec:auditoria}
+
+A rastreabilidade das operações é garantida por um registro de auditoria, armazenado na entidade \textit{audit\_logs}. As razões que motivaram esse registro, relacionadas às lacunas dos campos de controle do modelo de dados, são discutidas na Seção~\ref{sec:seguranca}; esta seção descreve sua implementação.
+
+O preenchimento é feito por uma extensão do Prisma Client: todas as operações executadas pela aplicação sobre o banco de dados passam por essa extensão antes de serem concluídas. Para que a extensão saiba qual usuário originou cada operação, o backend mantém um contexto por requisição, implementado com o \textit{AsyncLocalStorage} do Node.js. O contexto é criado no início de cada requisição, com o endereço IP de origem, e recebe o identificador e o perfil do usuário quando o \textit{middleware} de autenticação valida o \textit{token} de acesso. Dessa forma, os serviços de negócio não precisam repassar essas informações à camada de persistência.
+
+Nas operações de criação, alteração e exclusão, a extensão grava a ação realizada, a entidade, o identificador do registro, o usuário, o perfil, o IP e o momento da operação. Nas alterações e exclusões, os valores anteriores são lidos antes da operação, e o registro guarda somente os campos alterados, com seus valores anteriores e novos. As exclusões lógicas, feitas pelo preenchimento do campo \textit{deletedAt}, são registradas como exclusões. O \textit{hash} da senha nunca é gravado: quando ele muda, o registro indica apenas que o campo foi alterado.
+
+Nas entidades com dados clínicos de crianças (aprendentes, histórico de acompanhamento, aplicações e relatórios), também as consultas são registradas, inclusive as listagens, com um registro para cada item exibido. Cada registro é associado ao aprendente a que o dado pertence, o que permite responder quem acessou os dados de uma determinada criança. Os \textit{logins} bem-sucedidos e as tentativas recusadas também são registrados, estas sem a senha informada.
+
+A consulta ao registro é feita pela rota \textit{GET /api/auditoria}, com filtros por aprendente, usuário, entidade, ação e período. O perfil \textit{ADMIN} consulta todo o registro, mas apenas seus metadados nas entidades clínicas (aprendentes, histórico, aplicações, respostas e relatórios): quem realizou a operação, quando, de qual IP, sobre qual entidade e qual ação. Os valores registrados não lhe são enviados; nas alterações, recebe somente os nomes dos campos alterados. A ocultação é feita na consulta, e não na gravação, de modo que o registro permanece completo. O perfil \textit{PSICOPEDAGOGO} consulta apenas o registro de acessos dos aprendentes sob sua responsabilidade, com os valores completos, o que inclui as operações feitas pelo administrador, como a transferência de responsabilidade.
+
+As limitações desse registro de auditoria são discutidas na Seção~\ref{sec:seguranca}.
+
+\section{Desenvolvimento do \textit{frontend}}\label{sec:frontend}
+
+O \textit{frontend} foi desenvolvido com React 18 e Vite 5 como uma aplicação de página única (\textit{Single Page Application}, SPA). A interface utiliza o Material UI (MUI) 5, a navegação é feita com o React Router 6, as chamadas à API usam o Axios e os dados obtidos do servidor são gerenciados pelo TanStack Query 5. Os formulários usam React Hook Form com os mesmos esquemas Zod do \textit{backend}, de modo que os dados são validados antes do envio e novamente no servidor. As páginas seguem os mesmos módulos funcionais do \textit{backend}, e as funções de uso geral, como formatação de datas e cálculo de idade, ficam em um pacote compartilhado entre as duas aplicações.
+
+O componente \textit{ProtectedRoute} separa as páginas públicas das que exigem autenticação e redireciona ao \textit{dashboard} o perfil não autorizado. A interface também usa o perfil do usuário para exibir apenas as ações que ele pode executar: os menus de usuários e de auditoria e o botão de exclusão de instrumentos aparecem somente ao administrador, e os itens de aprendentes, aplicações e relatórios são omitidos do seu menu. Essa restrição é apenas um auxílio à navegação, já que o controle efetivo é feito no \textit{backend} (Seção~\ref{sec:backend}). Na página de usuários, o administrador vê quantos aprendentes estão sob a responsabilidade de cada profissional, sem identificá-los, e pode transferi-los a outro psicopedagogo ativo.
+
+O registro de auditoria aparece em dois pontos. A página de auditoria, exclusiva do administrador, lista as operações com filtros por entidade, ação e aprendente e, nos registros clínicos, mostra apenas os nomes dos campos alterados. Na página de detalhe do aprendente, a aba ``Registro de Acessos'' mostra ao psicopedagogo responsável, com os valores completos, quem consultou, criou, alterou ou excluiu dados daquela criança, inclusive as operações do administrador.
+
+\subsection{Principais telas do sistema}\label{sec:telas}
+
+Esta subseção apresenta as telas do fluxo principal de uso, do acesso à emissão do relatório. As capturas foram obtidas com a aplicação em execução no ambiente Docker descrito na Seção~\ref{sec:arquitetura}, com o perfil \textit{PSICOPEDAGOGO}. Todos os dados exibidos são fictícios, provenientes da carga inicial do banco de desenvolvimento. \preencher{refazer as capturas das Figuras~\ref{fig:tela_aprendente_form}, \ref{fig:tela_aprendente_detalhe} e \ref{fig:tela_relatorio_impresso} com um aprendente fictício da Educação Infantil (4 ou 5 anos, pré-escola) e um instrumento compatível com a faixa etária; corrigir também a data em formato 2026-08-10 no relatório}
+
+A Figura~\ref{fig:tela_login} mostra a tela de \textit{login}, que, junto com as telas de autocadastro e de recuperação de senha, compõe a área pública do sistema. O botão ao lado do campo de senha permite exibir o texto digitado e possui nome acessível para leitores de tela.
+
+\begin{figure}[H]
+    \centering
+    \caption{Tela de \textit{login}}
+    \label{fig:tela_login}
+    \includegraphics[width=0.70\textwidth]{tela_login.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+Após a autenticação, o usuário é direcionado ao \textit{dashboard} (Figura~\ref{fig:tela_dashboard}). A estrutura da tela se repete nas demais páginas autenticadas: a barra superior e o menu lateral são fornecidos pelo componente \textit{AppLayout}. Os indicadores mostram os totais de aprendentes, de instrumentos ativos e de aplicações, além das aplicações mais recentes com o respectivo status, considerando apenas os registros do profissional autenticado.
+
+\begin{figure}[H]
+    \centering
+    \caption{\textit{Dashboard} do perfil psicopedagogo}
+    \label{fig:tela_dashboard}
+    \includegraphics[width=\textwidth]{tela_dashboard.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+O cadastro de aprendentes (Figura~\ref{fig:tela_aprendente_form}) organiza os campos em três grupos: dados do aprendente, dados do responsável e dados escolares. Os campos obrigatórios são marcados com asterisco e validados pelo mesmo esquema Zod do \textit{backend}, compartilhado entre as duas aplicações pelo pacote \textit{shared-validation}. O mesmo formulário é utilizado para cadastro e edição; na edição, os campos são preenchidos com os dados atuais do registro.
+
+\begin{figure}[H]
+    \centering
+    \caption{Formulário de cadastro e edição de aprendente}
+    \label{fig:tela_aprendente_form}
+    \includegraphics[width=\textwidth]{tela_aprendente_form.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+A página de detalhe do aprendente (Figura~\ref{fig:tela_aprendente_detalhe}) reúne, em abas, os dados cadastrais, o histórico de acompanhamento e o registro de acessos.
+
+\begin{figure}[H]
+    \centering
+    \caption{Página de detalhe do aprendente, com as abas de dados cadastrais, histórico e registro de acessos}
+    \label{fig:tela_aprendente_detalhe}
+    \includegraphics[width=\textwidth]{tela_aprendente_detalhe.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+O editor de instrumentos (Figura~\ref{fig:tela_instrumento_editor}) permite definir o nome, a categoria, a descrição e o status do instrumento e compor sua lista de perguntas. Para cada pergunta são escolhidos o tipo de resposta e a obrigatoriedade; os campos complementares variam conforme o tipo, como os limites e rótulos de uma escala, mostrados na pergunta 2, ou as opções de uma questão de múltipla escolha. Quando o instrumento já foi aplicado, um aviso no topo da tela informa que a alteração das perguntas criará uma nova versão, mecanismo detalhado na Seção~\ref{sec:instrumentos}.
+
+\begin{figure}[H]
+    \centering
+    \caption{Editor de instrumento avaliativo, com o aviso de criação de nova versão}
+    \label{fig:tela_instrumento_editor}
+    \includegraphics[width=\textwidth]{tela_instrumento_editor.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+A Figura~\ref{fig:tela_aplicacao} mostra a tela de aplicação de um instrumento a um aprendente. Cada pergunta é apresentada com o componente de entrada correspondente ao seu tipo: campo de texto, botões de opção, sim/não ou campo numérico. Os três botões ao final correspondem aos estados da aplicação: as respostas podem ser salvas como rascunho ou como progresso normal e retomadas depois, e a finalização verifica o preenchimento das perguntas obrigatórias e bloqueia a edição das respostas, conforme descrito na Seção~\ref{sec:aplicacoes}.
+
+\begin{figure}[H]
+    \centering
+    \caption{Tela de aplicação de um instrumento, com perguntas de tipos diferentes}
+    \label{fig:tela_aplicacao}
+    \includegraphics[width=\textwidth]{tela_aplicacao.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+Por fim, a Figura~\ref{fig:tela_relatorio_impresso} apresenta o relatório na forma em que é impresso ou exportado em PDF pelo navegador. A folha de estilos de impressão oculta o menu, a barra superior e os botões, e o documento reúne os dados do aprendente, a identificação do instrumento e de sua versão, as respostas registradas, as observações e a conclusão do profissional, seguidas do espaço para assinatura. A organização desse documento é discutida na Seção~\ref{sec:relatorios}.
+
+\begin{figure}[H]
+    \centering
+    \caption{Relatório de avaliação psicopedagógica no formato de impressão}
+    \label{fig:tela_relatorio_impresso}
+    \includegraphics[width=0.85\textwidth,height=0.80\textheight,keepaspectratio]{tela_relatorio_impresso.png}
+    \fonte{Elaborado pela autora (2026).}
+\end{figure}
+
+\subsection{Testes do \textit{frontend}}
+
+Os testes do \textit{frontend} utilizam o Vitest e a React Testing Library, que renderiza os componentes em ambiente simulado (jsdom) e permite interagir com eles como um usuário faria, sem navegador real. Assim como no \textit{backend}, as chamadas à API são simuladas. Foram implementados 58 testes em 11 arquivos, concentrados nas páginas e componentes com mais lógica de apresentação, conforme o Quadro~\ref{qua:testes_frontend}.
+
+\begin{quadro}[H]
+\centering
+\footnotesize
+\caption{Distribuição dos testes automatizados do \textit{frontend}}
+\begin{tabular}{|p{5.2cm}|c|p{7.6cm}|}
+\hline
+\textbf{Arquivo de teste} & \textbf{Testes} & \textbf{Escopo} \\ \hline
+LoginPage.test.jsx & 6 & Formulário de \textit{login}, validações e nome acessível do botão de senha \\ \hline
+ProtectedRoute.test.jsx & 6 & Redirecionamento por autenticação e perfil, inclusive do administrador nas rotas clínicas \\ \hline
+AvaliacaoFormPage.test.jsx & 8 & Formulário de criação e edição de instrumento \\ \hline
+AvaliacaoDetailPage.test.jsx & 6 & Exibição do instrumento e ausência da edição para o administrador \\ \hline
+AplicacaoDetailPage.test.jsx & 9 & Preenchimento e finalização de aplicação \\ \hline
+Auditoria.test.jsx & 6 & Listagem, filtros e aviso de valores clínicos omitidos \\ \hline
+RelatorioDetailPage.test.jsx & 6 & Exibição e edição de relatório \\ \hline
+DashboardPage.test.jsx & 2 & \textit{Dashboard} do administrador (só totais) e do psicopedagogo \\ \hline
+UsersListPage.test.jsx & 2 & Transferência de aprendentes entre profissionais \\ \hline
+StatusChip.test.jsx & 4 & Componente de status e suas variações visuais \\ \hline
+print.test.jsx & 3 & Função utilitária de impressão/PDF \\ \hline
+\textbf{Total} & \textbf{58} & \\ \hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:testes_frontend}
+\end{quadro}
+
+A cobertura de linhas do \textit{frontend} foi de 55,84\%. O valor é menor que o do \textit{backend} porque várias telas não têm testes próprios, como as listagens, o formulário e a página de detalhe do aprendente e as telas de autocadastro e de recuperação de senha. Os testes priorizaram os fluxos de maior risco: autenticação, controle de acesso por perfil, preenchimento e finalização das aplicações e relatórios. Não foi definido critério mínimo de cobertura para o \textit{frontend}.
+
+
+\section{Funcionalidades do processo avaliativo}\label{sec:funcionalidades}
+
+As funcionalidades centrais do sistema acompanham o percurso de uma avaliação: o profissional cadastra e, quando necessário, adapta um instrumento; aplica-o a um aprendente, registrando as respostas; e, ao final, elabora o relatório. Esta seção descreve cada uma dessas etapas, cuja estrutura de dados foi apresentada na Seção~\ref{sec:modelagem}.
+
+\subsection{Gerenciamento e versionamento dos instrumentos}\label{sec:instrumentos}
+
+Para criar um instrumento, o profissional acessa o módulo de instrumentos e cria um novo instrumento informando nome, categoria e descrição. Em seguida, adiciona as questões, definindo para cada uma o texto, o tipo de resposta, a obrigatoriedade e a ordem de apresentação. O instrumento é criado com estado \textit{DRAFT} e só fica disponível para aplicação após ser explicitamente ativado (\textit{ACTIVE}).
+
+Enquanto o instrumento não foi usado em nenhuma aplicação, todas as edições, inclusive a adição, a remoção e a alteração de questões, são salvas no próprio registro, sem gerar nova versão. Quando o profissional tenta editar as questões de um instrumento que já possui ao menos uma aplicação vinculada, a interface exibe um aviso informando que a alteração criará uma nova versão. Ao confirmar, o sistema arquiva o registro atual (estado \textit{ARCHIVED}) e cria automaticamente um novo registro com versão incrementada, herdando os metadados e recebendo as novas questões. O registro anterior permanece intacto e continua associado a todas as aplicações já realizadas com ele.
+
+Alterações apenas no nome, na categoria, na descrição ou no status não geram nova versão; são aplicadas ao registro existente e ficam documentadas na auditoria, com os valores anteriores e os novos. A tela do instrumento mostra a versão de origem e as versões derivadas, o que permite navegar pelo histórico. Como cada aplicação guarda uma referência direta à versão utilizada, alterações posteriores nunca modificam retroativamente o histórico do aprendente.
+
+O sistema não oferece, contudo, um campo para que o profissional registre a justificativa de cada adaptação. Essa informação fica registrada apenas de forma estrutural (número da versão, data e usuário, na auditoria), o que é uma limitação da implementação atual; a motivação precisa ser anotada por outros meios, como o histórico do aprendente.
+
+Quanto à titularidade, ao criar uma nova versão o sistema atribui como autor o usuário que realizou a alteração. Como a edição de instrumentos é exclusiva do perfil \textit{PSICOPEDAGOGO} e cada profissional só edita os instrumentos que criou, o autor da nova versão é sempre o próprio autor do instrumento, e a titularidade se mantém entre as versões.
+
+Ressalta-se que o versionamento registra e organiza as versões, mas não realiza a validação metodológica de uma adaptação, cuja adequação permanece sob responsabilidade do profissional.
+
+\subsection{Aplicação dos instrumentos}\label{sec:aplicacoes}
+
+A aplicação relaciona um instrumento a um aprendente e registra as respostas obtidas no atendimento. Seu andamento é representado por quatro estados: \textit{PENDING} (criada, sem respostas registradas), \textit{IN\_PROGRESS} (respostas salvas em modo de progresso normal), \textit{DRAFT} (respostas salvas explicitamente como rascunho pelo profissional, sinalizando preenchimento pausado intencionalmente) e \textit{COMPLETED} (finalizada). Os estados \textit{IN\_PROGRESS} e \textit{DRAFT} têm o mesmo comportamento, pois ambos guardam as respostas e permitem retomar o preenchimento depois. A diferença é apenas de sinalização: ao salvar como rascunho, o profissional indica que pausou a aplicação de propósito, por exemplo para continuar em outra sessão, e essa informação aparece nas listagens. Os testes com usuários não avaliaram se essa distinção é clara para os profissionais, ponto que pode ser simplificado em versões futuras.
+
+A partir de qualquer estado não finalizado, o profissional pode concluir a aplicação. Nesse momento, o sistema verifica o preenchimento das questões obrigatórias, e as respostas ficam bloqueadas para edição; aplicações finalizadas também não podem ser excluídas. O formulário de preenchimento é construído a partir da configuração das questões do instrumento, apresentando para cada uma o componente de entrada correspondente ao seu tipo.
+
+Separar o instrumento de suas aplicações preserva o histórico: o instrumento é uma estrutura reutilizável, e cada aplicação é uma ocorrência específica, associada à versão empregada (Seção~\ref{sec:instrumentos}). Assim, um mesmo aprendente pode ter várias aplicações em momentos diferentes, cada uma com seus próprios registros.
+
+
+\subsection{Geração dos relatórios}\label{sec:relatorios}
+
+O relatório é elaborado após a finalização de uma aplicação e documenta as considerações do profissional a partir das informações obtidas no processo avaliativo. Cada relatório pertence a uma única aplicação (Seção~\ref{sec:modelagem}) e, por meio dela, fica contextualizado: identifica o aprendente, o instrumento e sua versão, o profissional, a data e as respostas registradas, de modo que a devolutiva não é tratada como um registro isolado.
+
+Os campos destinados ao conteúdo do relatório são \textit{conclusao}, que registra a síntese elaborada pelo profissional, e \textit{observacoesProfissional}, que permite acrescentar informações complementares. As respostas dos instrumentos permanecem na entidade \textit{respostas}, separadas da interpretação registrada no relatório. Essa separação é deliberada: o sistema não converte os resultados de uma avaliação em diagnósticos ou conclusões psicopedagógicas, e a análise e a interpretação permanecem atribuições do profissional responsável pelo atendimento.
+
+A página do relatório tem uma função de impressão, que abre o diálogo do navegador e permite imprimir o documento ou salvá-lo em PDF. Uma folha de estilos aplicada apenas na impressão configura a página em A4, oculta o cabeçalho, o menu lateral e os botões, imprime as observações e a conclusão como texto corrido, mantém cada pergunta e sua resposta na mesma página e encerra o documento com um espaço para a assinatura do profissional. A geração do PDF, portanto, usa a capacidade nativa do navegador, sem bibliotecas no servidor.
+
+O documento inclui, na seção ``Dados da Avaliação'', o nome, a categoria e a versão do instrumento (por exemplo, ``v2''), como mostra a Figura~\ref{fig:tela_relatorio_impresso}. Como cada aplicação aponta para a versão do instrumento efetivamente utilizada, e não para a mais recente, o documento continua identificando corretamente o protocolo vigente no momento da avaliação mesmo após adaptações posteriores do instrumento.
+
+
+\section{Segurança e controle de acesso}\label{sec:seguranca}
+
+Os mecanismos de autenticação, autorização e validação foram descritos nas Seções~\ref{sec:backend} e~\ref{sec:frontend}. Esta seção discute o que eles garantem, a rastreabilidade das operações e as limitações para o uso com dados reais.
+
+Todas as decisões de acesso são tomadas no \textit{backend}, onde os dois controles se complementam. O perfil (RBAC) separa a administração do sistema do atendimento, pelas razões discutidas na Seção~\ref{sec:separacao_admin}, e a titularidade garante que psicopedagogos distintos não acessem os registros uns dos outros, mesmo tendo o mesmo perfil. Registros de outros profissionais são tratados como inexistentes, sem revelar que existem, e a criação de uma aplicação exige que o aprendente e o instrumento pertençam ao próprio profissional. O campo \textit{status} da entidade \textit{users} permite ainda desativar uma conta, que deixa de ser aceita na validação de cada requisição.
+
+No cadastro, na redefinição e na alteração de senha, o \textit{backend} gera um \textit{hash} com o algoritmo bcrypt, utilizando fator de custo 12, e somente esse \textit{hash} é gravado no campo \textit{passwordHash} da entidade \textit{users}. Na autenticação, a senha informada é comparada ao \textit{hash} armazenado, sem que a senha original precise ser recuperada.
+
+Quanto à rastreabilidade, os campos de data (\textit{createdAt} e \textit{updatedAt}) e de autoria (\textit{responsavelId}, \textit{autorId} e \textit{aplicadorId}) não bastam para dados de saúde de crianças: indicam quem criou cada registro e quando ele foi alterado pela última vez, mas não quem fez cada alteração, quais eram os valores anteriores nem quem consultou as informações, que é justamente o que a LGPD e o sigilo profissional mais exigem. Por isso, o sistema mantém o registro de auditoria descrito na Seção~\ref{sec:auditoria}, que identifica o autor de cada operação, guarda os valores anteriores, associa as consultas a dados clínicos ao aprendente e registra as operações do administrador, como a transferência de responsabilidade. Esse registro apresenta, entretanto, as seguintes limitações:
+
+\begin{itemize}
+    \item o registro é gravado após a operação, em uma conexão separada, e não faz parte da mesma transação. Se a gravação da auditoria falhar, a operação é mantida e a falha aparece apenas no \textit{log} do servidor. Em operações executadas dentro de uma transação, o registro pode permanecer mesmo que a transação seja desfeita;
+    \item não há garantia de imutabilidade. A aplicação não oferece meios de alterar ou excluir o registro, mas quem tem acesso direto ao banco de dados pode modificá-lo, pois não há encadeamento criptográfico dos registros nem armazenamento externo somente de gravação;
+    \item acessos feitos diretamente ao banco de dados ou às suas cópias de segurança não passam pela aplicação e, portanto, não são registrados;
+    \item o próprio registro contém dados sensíveis, pois guarda valores anteriores e novos dos dados clínicos. Por isso, a consulta geral é restrita ao administrador, que recebe apenas os metadados dos registros clínicos, mas não foi definida uma política de retenção e descarte desses registros;
+    \item as consultas do administrador ao próprio registro de auditoria não são registradas;
+    \item as leituras feitas internamente pelo sistema, como a verificação de permissão antes de uma alteração, também são registradas como consultas, e as listagens geram um registro por item exibido. Isso aumenta o volume de registros e pode dificultar a análise. Contagens agregadas, como as do \textit{dashboard}, não são registradas, assim como as tentativas de acesso negadas a registros de outros profissionais;
+    \item o endereço IP registrado depende da configuração do \textit{proxy} reverso. Se a API estiver acessível diretamente, sem passar pelo \textit{proxy}, o cabeçalho que informa o IP de origem pode ser falsificado.
+\end{itemize}
+
+Trata-se, portanto, de um mecanismo básico de rastreabilidade, compatível com o estágio de protótipo.
+
+\subsection{Separação entre administração e acesso aos dados clínicos}\label{sec:separacao_admin}
+
+Na primeira versão do sistema, o perfil \textit{ADMIN} tinha acesso irrestrito a todos os registros, inclusive às avaliações e aos relatórios das crianças, seguindo o padrão comum de tratar o administrador como superusuário. Essa escolha reunia em um mesmo perfil duas atribuições distintas, a gestão técnica do sistema e o atendimento psicopedagógico, e quem cadastra contas não é necessariamente o profissional responsável pelas crianças.
+
+Do ponto de vista do sigilo profissional, esse acesso não se justifica. O Código de Ética do Psicopedagogo determina que o profissional mantenha o sigilo e preserve a confidencialidade dos dados obtidos no exercício da atividade (art. 7º) e estabelece que os registros de atendimento psicopedagógico são documentos sigilosos cujo acesso é restrito ao psicopedagogo responsável (art. 9º); o compartilhamento com outros especialistas só deixa de constituir quebra de sigilo quando autorizado pelos próprios atendidos ou por seus responsáveis legais (art. 7º, §1º) \cite{abpp2019_codigo_etica}. Um sistema que concede a um terceiro acesso irrestrito a esses registros faz, pelo \textit{software}, o compartilhamento que o próprio profissional não poderia fazer sem autorização. A LGPD aponta na mesma direção: o princípio da necessidade limita o tratamento ao mínimo necessário para suas finalidades (art. 6º, III), e os agentes de tratamento devem adotar medidas de segurança aptas a proteger os dados de acessos não autorizados (art. 46) \cite{brasil2018_lgpd}. Administrar contas de usuário não exige ler a avaliação de uma criança. Em termos de projeto de sistemas, trata-se do princípio do menor privilégio, segundo o qual cada usuário deve operar com o mínimo de privilégios necessário para realizar sua tarefa \cite{saltzer1975_protection}.
+
+Por esses motivos, a administração de usuários foi separada do acesso aos dados clínicos:
+
+\begin{itemize}
+    \item as rotas de aprendentes, histórico de acompanhamento, aplicações e relatórios exigem o perfil \textit{PSICOPEDAGOGO} em todas as operações, inclusive nas de leitura, e respondem HTTP 403 ao administrador antes de qualquer consulta ao banco de dados. O filtro de titularidade deixou de ter exceção por perfil e funciona como segunda barreira;
+    \item o \textit{dashboard} do administrador apresenta apenas contagens agregadas, sem a lista das últimas aplicações, que identifica as crianças atendidas;
+    \item no registro de auditoria, o administrador continua consultando quem realizou cada operação, quando e de onde, mas os valores dos registros clínicos não lhe são enviados, apenas os nomes dos campos alterados. O psicopedagogo responsável mantém o acesso aos valores completos dos registros de seus aprendentes;
+    \item o administrador pode consultar e excluir instrumentos avaliativos, que descrevem protocolos e não contêm dados de crianças, mas não criá-los nem editá-los: tanto a criação quanto a edição atribuem a autoria a quem as realiza, e ficam restritas ao psicopedagogo, que cria e edita os próprios instrumentos.
+\end{itemize}
+
+A separação cria um problema de continuidade: se o psicopedagogo responsável deixa o serviço, nenhum usuário teria mais acesso às crianças que ele acompanhava. Para resolvê-lo, o administrador pode transferir os aprendentes de um profissional para outro psicopedagogo ativo, junto com os instrumentos criados pelo profissional de origem, para que o novo responsável continue a aplicar os mesmos protocolos. A operação troca apenas o responsável: os identificadores dos aprendentes são obtidos pela relação do usuário, sem consulta ao conteúdo dos registros, e cada aprendente transferido recebe, em seu registro de acessos, uma alteração com o responsável anterior e o novo. O sistema também recusa a exclusão de um profissional e sua promoção a administrador enquanto houver aprendentes sob sua responsabilidade, evitando que essas crianças fiquem sem profissional com acesso a elas. A desativação da conta, por outro lado, continua imediata, pois pode ser necessária por razões de segurança; nesse caso, a transferência é feita em seguida.
+
+A separação reduz, mas não elimina, a confiança depositada no administrador:
+
+\begin{itemize}
+    \item quem gerencia as contas pode criar um usuário com perfil de psicopedagogo e transferir para ele os aprendentes de outro profissional, ou alterar o e-mail de uma conta existente e solicitar a recuperação de senha em nome dela. Essas operações ficam registradas na auditoria, e a transferência aparece no registro de acessos de cada criança, mas não são impedidas. Em uso real, exigiriam controles organizacionais complementares, como a aprovação da transferência por um segundo responsável ou a notificação do profissional de origem;
+    \item a tela de \textit{login} oferece autocadastro. \preencher{confirmar no código como a conta criada pelo autocadastro é tratada: se ela já nasce ativa com perfil PSICOPEDAGOGO, manter a frase a seguir; se depende de aprovação do administrador, substituir pela descrição desse fluxo}. Como a conta criada dessa forma recebe o perfil de psicopedagogo, qualquer pessoa com acesso à tela pode criar um usuário; ela não acessa dados de outros profissionais, graças ao filtro de titularidade, mas, em uso real, o autocadastro deveria ser desativado ou depender de aprovação do administrador;
+    \item quem administra a infraestrutura, com acesso direto ao banco de dados ou às cópias de segurança, continua alcançando todos os dados, limitação que depende da criptografia em repouso discutida na subseção seguinte;
+    \item o compartilhamento autorizado previsto no art. 7º, §1º, do Código de Ética não é representado no sistema: um psicopedagogo não pode conceder a outro o acesso a um aprendente específico, por exemplo para supervisão ou atendimento conjunto, sem transferir a responsabilidade inteira.
+\end{itemize}
+
+\subsection{Adequação à LGPD e limitações para uso em produção}
+
+O sistema armazena dois tipos de dados com proteção legal reforçada pela Lei Geral de Proteção de Dados \cite{brasil2018_lgpd}. Os dados dos aprendentes envolvem crianças, categoria sujeita ao art. 14 da LGPD, que exige tratamento no melhor interesse do menor e, em regra, consentimento do responsável legal. As respostas das avaliações e os relatórios podem conter dados de saúde, classificados como dados pessoais sensíveis pelo art. 5º, inciso II, e sujeitos às restrições do art. 11, que limita as bases legais admissíveis para seu tratamento.
+
+Do ponto de vista da minimização, os campos opcionais da entidade \textit{aprendentes} (contato secundário, e-mail, escola, série e turno) permitem que o profissional registre apenas as informações necessárias ao atendimento. Os campos obrigatórios (nome, data de nascimento, sexo, responsável e contato principal) foram definidos com base nas informações mínimas identificadas como necessárias ao processo avaliativo. Ainda assim, a decisão sobre quais campos preencher é do profissional, e o sistema não impede o registro de informações além do estritamente necessário.
+
+As seguintes medidas foram implementadas em relação à proteção dos dados: controle de acesso por perfil e titularidade, separação entre a administração do sistema e o acesso aos dados clínicos, armazenamento de senhas por \textit{hash}, registro de auditoria das operações e acessos, e exclusão lógica dos registros. Contudo, o sistema apresenta limitações relevantes para uso com dados reais que precisam ser reconhecidas:
+
+\begin{itemize}
+    \item \textbf{Consentimento do responsável legal}: o sistema não possui mecanismo para registrar o consentimento do responsável da criança para o tratamento de seus dados, exigido pelo art. 14 da LGPD. Essa responsabilidade recai sobre o profissional que utiliza o sistema, devendo ser gerenciada por procedimentos externos à plataforma;
+    \item \textbf{Base legal}: o sistema não registra a base legal utilizada para o tratamento dos dados de cada aprendente. Para dados de saúde de crianças, as bases admissíveis são restritas (art. 11, LGPD), e sua documentação é necessária para eventual prestação de contas (\textit{accountability});
+    \item \textbf{Criptografia em repouso}: os dados armazenados no banco de dados não são criptografados em nível de campo. A proteção depende inteiramente dos controles de acesso à infraestrutura, como a autenticação no banco e as permissões do sistema operacional. Para uso com dados reais, recomenda-se criptografar os campos sensíveis, especialmente os de texto livre de aprendentes, históricos, respostas e relatórios;
+    \item \textbf{Cópias de segurança}: não foi definida uma política de \textit{backup}. Cópias de segurança do banco de dados contêm os mesmos dados sensíveis que a aplicação principal e devem ser protegidas com os mesmos controles de acesso. Acessos a essas cópias não passam pela aplicação e, portanto, não são registrados na auditoria;
+    \item \textbf{Retenção e descarte}: não foi definida uma política de retenção e descarte dos dados. A LGPD exige que os dados sejam eliminados ao término do tratamento ou mediante solicitação do titular, e o Código de Ética do Psicopedagogo prevê a guarda dos registros de atendimento por cinco anos após o seu encerramento (art. 9º, §1º) \cite{abpp2019_codigo_etica}, prazo que poderia orientar essa política. O sistema implementa exclusão lógica (campo \textit{deletedAt}), mas não possui mecanismo de exclusão definitiva dos dados nem de seus registros de auditoria.
+\end{itemize}
+
+Essas limitações são próprias do estágio de protótipo e não impedem a avaliação funcional do sistema. Para uso em produção com dados reais de crianças, seria necessário endereçar cada um desses pontos, além de elaborar um Relatório de Impacto à Proteção de Dados Pessoais (RIPD) conforme previsto no art. 38 da LGPD.
+
+\section{Testes e validação}\label{sec:testes-validacao}
+
+A validação foi organizada em duas frentes complementares: os testes técnicos, conduzidos durante o desenvolvimento, e a avaliação com profissionais da psicopedagogia. No \textit{backend}, os testes automatizados (Seção~\ref{sec:backend}) cobriram dois dos níveis descritos na Seção~\ref{sec:fund_testes}: testes unitários de regras isoladas e testes de integração das rotas, com o banco de dados simulado. Esses testes contemplaram:
+
+\begin{itemize}
+    \item o \textit{login} e a identificação do usuário autenticado;
+    \item o cadastro e a consulta de aprendentes e de instrumentos avaliativos, incluindo a criação de novas versões e a validação das perguntas;
+    \item a restrição de acesso por titularidade em aprendentes, instrumentos, aplicações, relatórios e \textit{dashboard};
+    \item as regras de finalização das aplicações e a preservação da autoria de aplicações e relatórios;
+    \item o controle de acesso por perfil, incluindo a recusa do administrador nas rotas de dados clínicos e na criação e edição de instrumentos;
+    \item o registro de auditoria, incluindo a ocultação dos valores clínicos na consulta do administrador;
+    \item a transferência de aprendentes entre profissionais e a recusa em excluir ou promover a administrador um profissional que ainda tem aprendentes.
+\end{itemize}
+
+Não têm testes automatizados o cadastro de usuários, a renovação de sessão, o \textit{logout} e a recuperação de senha. Como o banco é simulado, o comportamento junto ao banco real foi verificado separadamente, por roteiros executados contra uma instância descartável do MySQL, cobrindo o fluxo de aplicação de instrumentos com perguntas de seleção e o registro de auditoria. A separação entre administração e acesso clínico também foi verificada contra o banco real, com usuários e aprendente fictícios criados para esse fim: as rotas clínicas recusaram o administrador, a transferência passou o aprendente ao novo responsável e gerou o registro correspondente em sua auditoria, e nenhuma leitura dos dados da criança foi registrada em nome do administrador.
+
+No \textit{frontend}, os testes abrangem as telas e os componentes listados no Quadro~\ref{qua:testes_frontend}, também com as chamadas à API simuladas. Além dos testes automatizados, foram realizados testes funcionais e exploratórios durante o desenvolvimento, percorrendo o fluxo completo do cadastro do aprendente à geração do relatório.
+
+Por fim, realizou-se uma avaliação com profissionais da psicopedagogia, voltada a aspectos que os testes automatizados não alcançam, como a compreensão da interface, a navegação e a adequação ao fluxo de trabalho. Após utilizarem o sistema, as participantes responderam a um questionário com questões fechadas e espaço para sugestões (Apêndice~\ref{apendice:questionario}); os resultados são apresentados no Capítulo~\ref{capitulo6}. Essa avaliação diz respeito ao sistema, e não constitui validação clínica ou metodológica de instrumentos psicopedagógicos.

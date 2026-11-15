@@ -1,23 +1,56 @@
 \chapter[Materiais e Métodos]{Materiais e Métodos}\label{capitulo4}
 
-Este capítulo descreve os materiais e os procedimentos metodológicos adotados na pesquisa, situada no campo da psicopedagogia articulada à engenharia de software. O estudo caracteriza-se como pesquisa aplicada \cite{Gil_2002, Prodanov_Freitas_2013}, pois buscou propor uma solução tecnológica para um problema concreto identificado na prática psicopedagógica: a falta de sistemas web que permitam ao psicopedagogo cadastrar e adaptar seus próprios instrumentos avaliativos preservando a rastreabilidade das aplicações já realizadas, lacuna verificada no levantamento de soluções existentes apresentado na Seção~\ref{sec:solucoes_mercado}.
+Este capítulo descreve os materiais e os procedimentos adotados na pesquisa. O estudo caracteriza-se como pesquisa aplicada \cite{Gil_2002, Prodanov_Freitas_2013}, pois propõe uma solução tecnológica para um problema concreto da prática psicopedagógica: a falta de sistemas web que permitam ao psicopedagogo cadastrar e adaptar seus próprios instrumentos avaliativos preservando a rastreabilidade das aplicações já realizadas, lacuna identificada no Capítulo~\ref{capitulo2}.
 
-Do ponto de vista dos procedimentos, o trabalho se enquadra na abordagem da \textit{Design Science Research} \cite{Hevner_2004, Dresch_Lacerda_Antunes_2015}, voltada ao projeto, construção e avaliação de artefatos de tecnologia da informação como resposta a problemas identificados em contextos organizacionais ou profissionais. Essa abordagem é adequada ao estudo porque o objetivo central não é apenas descrever ou explicar um fenômeno, mas desenvolver e avaliar um artefato (o sistema web) que atenda às necessidades do processo de avaliação psicopedagógica.
+Quanto aos procedimentos, o trabalho segue a abordagem da \textit{Design Science Research} (DSR) \cite{Hevner_2004, Dresch_Lacerda_Antunes_2015}, voltada ao projeto, à construção e à avaliação de artefatos que respondam a problemas reais de um campo profissional. A abordagem é adequada porque o objetivo central não é apenas descrever um fenômeno, mas desenvolver e avaliar um artefato, o sistema web, para o processo de avaliação psicopedagógica. O Quadro~\ref{qua:etapas_dsr} relaciona as etapas da DSR, com base em \citeonline{Dresch_Lacerda_Antunes_2015}, às atividades realizadas e às seções em que são descritas.
 
-\section{Softwares e Tecnologias Utilizadas}
+\begin{quadro}[H]
+\centering
+\footnotesize
+\caption{Etapas da \textit{Design Science Research} e sua correspondência neste trabalho}
+\begin{tabular}{|p{3.6cm}|p{7.6cm}|p{3.0cm}|}
+\hline
+\textbf{Etapa da DSR} & \textbf{Atividade realizada} & \textbf{Onde é descrita} \\ \hline
+Identificação e conscientização do problema & Revisão da literatura, levantamento de soluções de mercado e entrevista com uma psicopedagoga & Capítulos~\ref{capitulo2} e \ref{capitulo3-0}; Seção~\ref{sec:coleta_dados} \\ \hline
+Proposição e projeto do artefato & Definição dos requisitos, da arquitetura e do modelo de dados & Seções~\ref{sec:requisitos} a \ref{sec:modelagem} \\ \hline
+Desenvolvimento do artefato & Implementação incremental do \textit{backend}, do \textit{frontend} e dos mecanismos de segurança & Seções~\ref{sec:backend} a \ref{sec:seguranca} \\ \hline
+Avaliação do artefato & Testes automatizados, verificação de acessibilidade e questionário com profissionais & Seção~\ref{sec:testes-validacao} e Capítulo~\ref{capitulo6} \\ \hline
+Explicitação das aprendizagens e comunicação & Discussão dos resultados, limitações e trabalhos futuros & Seção~\ref{sec:discussao} e Capítulo~\ref{capitulo7} \\ \hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026), com base em \citeonline{Dresch_Lacerda_Antunes_2015}.}
+\label{qua:etapas_dsr}
+\end{quadro}
 
-O desenvolvimento do sistema web tomou como base um conjunto de tecnologias amplamente utilizadas no ambiente profissional, de modo a combinar robustez, escalabilidade e facilidade de manutenção com aderência às exigências de segurança e proteção de dados. O ecossistema tecnológico adotado compreende:
+\section{Softwares e Tecnologias Utilizadas}\label{sec:tecnologias}
 
-\begin{itemize}
-    \item camada de frontend implementada em React.js, explorando componentes reutilizáveis, gerenciamento de estado e organização modular da interface, o que favorece a manutenção e a evolução futura do sistema;
-    \item camada de backend desenvolvida em Node.js com o uso do framework Express.js, possibilitando a criação de uma API REST estruturada, com rotas bem definidas e separação entre lógica de negócio e acesso a dados;
-    \item banco de dados relacional MySQL, escolhido por sua maturidade, suporte transacional adequado e ampla documentação, aspectos relevantes para o armazenamento de informações sensíveis e para a modelagem de relações entre atendimentos, instrumentos e registros qualitativos;
-    \item uso de Git para controle de versão do código-fonte e GitHub como repositório remoto, garantindo rastreabilidade das alterações, histórico de desenvolvimento e possibilidade de colaboração;
-\end{itemize}
+As tecnologias foram escolhidas por serem amplamente utilizadas no mercado, terem boa documentação e atenderem às exigências de segurança do sistema. O Quadro~\ref{qua:tecnologias} apresenta as principais, agrupadas por camada, com a finalidade de cada uma; as versões relevantes são indicadas no Capítulo~\ref{capitulo5}.
+
+\begin{quadro}[H]
+\centering
+\footnotesize
+\caption{Tecnologias utilizadas no desenvolvimento do sistema}
+\begin{tabular}{|p{2.6cm}|p{4.4cm}|p{7.2cm}|}
+\hline
+\textbf{Camada} & \textbf{Tecnologia} & \textbf{Finalidade} \\ \hline
+\textit{Frontend} & React, Vite, Material UI, React Router & Construção da interface como aplicação de página única, componentes visuais e navegação \\ \hline
+\textit{Frontend} & Axios, TanStack Query, React Hook Form & Comunicação com a API, gerenciamento dos dados obtidos do servidor e formulários \\ \hline
+\textit{Backend} & Node.js, Express & Execução do servidor e construção da API REST \\ \hline
+\textit{Backend} & jsonwebtoken, bcrypt, express-rate-limit, Nodemailer & Autenticação por JWT, \textit{hash} de senhas, limitação de requisições e envio de e-mail de recuperação de senha \\ \hline
+Compartilhada & Zod & Validação dos dados, com os mesmos esquemas no \textit{frontend} e no \textit{backend} \\ \hline
+Persistência & MySQL, Prisma & Banco de dados relacional e mapeamento objeto-relacional \\ \hline
+Documentação & Swagger/OpenAPI & Documentação dos recursos da API \\ \hline
+Testes & Vitest, Supertest, React Testing Library & Testes automatizados do \textit{backend} e do \textit{frontend} e relatório de cobertura \\ \hline
+Acessibilidade & axe-core, Playwright & Verificação automatizada dos critérios das WCAG \\ \hline
+Implantação & Docker, Nginx & Execução dos serviços em contêineres e entrega do \textit{frontend} \\ \hline
+Versionamento & Git, GitHub & Controle de versão do código-fonte \\ \hline
+\end{tabular}
+\fonte{Elaborado pela autora (2026).}
+\label{qua:tecnologias}
+\end{quadro}
 
 \section{Referenciais Documentais e Instrumentos Psicopedagógicos}
 
-A definição dos requisitos funcionais e da lógica de organização dos módulos do sistema fundamentou-se em referenciais documentais amplamente utilizados na avaliação do desenvolvimento infantil e na prática psicopedagógica. Entre os principais instrumentos e documentos analisados, destacam-se:
+A definição dos requisitos e da organização dos módulos também se apoiou na análise de instrumentos e documentos usados na avaliação do desenvolvimento infantil e na prática psicopedagógica:
 
 \begin{itemize}
     \item Inventário Portage Operacionalizado \cite{PORTAGE_2018};
@@ -27,15 +60,15 @@ A definição dos requisitos funcionais e da lógica de organização dos módul
     \item Diretrizes da Base Nacional Comum Curricular pertinentes ao desenvolvimento infantil \cite{bncc2017}.
 \end{itemize}
 
-A leitura desses materiais permitiu identificar dimensões do desenvolvimento frequentemente avaliadas, tipos de tarefas e formatos de registro empregados na prática profissional. Com base nessa análise, foram delineadas as estruturas de formulários, as categorias de registro e os tipos de questão contemplados pelo sistema.
+A leitura desses materiais permitiu identificar as dimensões do desenvolvimento mais avaliadas, os tipos de tarefa e os formatos de registro usados na prática, o que orientou a definição dos tipos de questão aceitos pelo sistema.
 
 Nenhum desses instrumentos foi reproduzido ou distribuído pelo sistema. Parte deles, como o IDADI e o Denver II, são testes psicológicos comercializados, com uso restrito a profissionais habilitados e registrados no Sistema de Avaliação de Testes Psicológicos (SATEPSI) do Conselho Federal de Psicologia. O que o profissional cadastra é a estrutura de um protocolo próprio, composta por questões e tipos de resposta definidos por ele. 
 
-Para demonstração das funcionalidades, foram criados dois instrumentos de exemplo no ambiente de desenvolvimento, uma avaliação de leitura e escrita e uma avaliação psicomotora, elaborados especificamente para fins de teste, sem reproduzir o conteúdo de nenhum dos instrumentos referenciados.
+Para demonstração das funcionalidades, foram criados instrumentos de exemplo no ambiente de desenvolvimento, elaborados apenas para fins de teste e sem reproduzir o conteúdo de nenhum dos instrumentos referenciados.
 
 \section{Público-alvo e Contexto de Uso}
 
-O sistema é direcionado a psicopedagogos atuantes em contextos clínicos, em consultórios ou serviços especializados, que demandam registros organizados de avaliações, devolutivas e planos de acompanhamento. O público-alvo é composto exclusivamente por esses profissionais: embora o atendimento se destine a crianças de zero a seis anos, nem elas nem suas famílias interagem com o sistema. O uso contemplado abrange:
+O sistema é direcionado a psicopedagogos que atuam em consultórios ou serviços especializados. Embora o atendimento se destine a crianças da Educação Infantil, nem elas nem suas famílias interagem com o sistema; os usuários são exclusivamente os profissionais. O uso contemplado abrange:
 
 \begin{itemize}
     \item registro de dados de identificação de aprendentes e de responsáveis;
@@ -43,17 +76,17 @@ O sistema é direcionado a psicopedagogos atuantes em contextos clínicos, em co
     \item elaboração de relatórios interpretativos e registro de encaminhamentos.
 \end{itemize}
 
-\section{Coleta de Dados}
+\section{Coleta de Dados}\label{sec:coleta_dados}
 
-A coleta de dados para fundamentação da proposta tecnológica ocorreu em três frentes complementares, articuladas entre si:
+A coleta de dados que fundamentou a proposta ocorreu em três frentes:
 
 \begin{itemize}
     \item revisão bibliográfica narrativa, com foco em literatura recente sobre desenvolvimento infantil, avaliação psicopedagógica, instrumentos de triagem e diagnóstico, uso de tecnologias digitais na educação e requisitos para sistemas de informação em saúde e educação;
     \item análise documental de instrumentos psicopedagógicos e protocolos de avaliação do desenvolvimento infantil, com identificação de categorias de registro, tipos de evidências coletadas e formas de devolutiva presentes nesses materiais;
-    \item levantamento de requisitos por meio de análise das tarefas psicopedagógicas descritas na literatura, identificação de limitações dos registros manuais, estudo comparativo de funcionalidades oferecidas por sistemas escolares e de gestão educacional amplamente utilizados, como SED, i-Educar e soluções afins, e entrevista semiestruturada com uma psicopedagoga atuante em contexto clínico.
+    \item levantamento de requisitos, a partir das tarefas psicopedagógicas descritas na literatura, das funcionalidades divulgadas pelas soluções de mercado (Seção~\ref{sec:solucoes_mercado}) e de uma entrevista semiestruturada com uma psicopedagoga atuante em contexto clínico.
 \end{itemize}
 
-A entrevista semiestruturada foi realizada previamente ao desenvolvimento do sistema, com o objetivo de complementar o levantamento de requisitos a partir da perspectiva de uma profissional em exercício. A participante possui atuação em consultório particular com atendimento a crianças na Educação Infantil e anos iniciais do Ensino Fundamental. O roteiro abordou os seguintes eixos temáticos:
+A entrevista foi realizada antes do desenvolvimento do sistema, com o objetivo de complementar o levantamento de requisitos com a perspectiva de uma profissional em exercício. A participante atua em consultório particular, atendendo crianças da Educação Infantil e dos anos iniciais do Ensino Fundamental. A entrevista ocorreu em março de 2026, de forma remota, teve duração aproximada de 30 minutos e foi registrada por meio de anotações da pesquisadora. O roteiro abordou quatro eixos:
 
 \begin{enumerate}
     \item organização atual dos registros dos atendimentos (ferramentas utilizadas, formatos adotados, dificuldades encontradas);
@@ -62,15 +95,15 @@ A entrevista semiestruturada foi realizada previamente ao desenvolvimento do sis
     \item necessidades não atendidas pelas ferramentas disponíveis e expectativas em relação a um sistema digital de apoio.
 \end{enumerate}
 
-A síntese das respostas indicou que a profissional utiliza planilhas e documentos de texto para organizar os registros dos aprendentes, sem integração entre as informações de diferentes atendimentos. Relatou dificuldade em localizar registros anteriores e em manter o histórico longitudinal dos aprendentes de forma organizada. Em relação aos instrumentos, destacou que costuma adaptar protocolos existentes conforme as características de cada criança, e que não possui forma sistematizada de registrar essas adaptações nem de retomar versões anteriores. Quanto aos relatórios, apontou a necessidade de um documento que reúna os dados da avaliação e permita o registro das conclusões profissionais, sem impor uma estrutura rígida que desconsidere o caráter interpretativo do processo. Também mencionou a importância de que o sistema respeite o sigilo das informações, restringindo o acesso dos dados de cada criança ao profissional responsável pelo atendimento.
+A síntese das respostas mostrou que a profissional utiliza planilhas e documentos de texto para organizar os registros dos aprendentes, sem integração entre as informações de diferentes atendimentos. Relatou dificuldade em localizar registros anteriores e em manter o histórico longitudinal dos aprendentes de forma organizada. Em relação aos instrumentos, destacou que costuma adaptar protocolos existentes conforme as características de cada criança, e que não possui forma sistematizada de registrar essas adaptações nem de retomar versões anteriores. Quanto aos relatórios, apontou a necessidade de um documento que reúna os dados da avaliação e permita o registro das conclusões profissionais, sem impor uma estrutura rígida que desconsidere o caráter interpretativo do processo. Também mencionou a importância de que o sistema respeite o sigilo das informações, restringindo o acesso dos dados de cada criança ao profissional responsável pelo atendimento.
 
-Essas informações orientaram diretamente a definição dos requisitos funcionais RF03, RF04, RF06, RF07, RF08, RF09, RF12 e RF13, bem como os requisitos não funcionais RNF02, RNF03 e RNF05, descritos na Seção~\ref{sec:requisitos}.
+Essas informações orientaram a definição dos requisitos funcionais RF03, RF04, RF06, RF07, RF08, RF09, RF12 e RF13, bem como os requisitos não funcionais RNF02, RNF03 e RNF05, descritos na Seção~\ref{sec:requisitos}.
 
-Complementarmente, após a implementação do sistema, foi aplicado um questionário com profissionais de psicopedagogia para avaliar a adequação da plataforma às atividades do processo avaliativo. Essa etapa é descrita na Seção~\ref{sec:testes}.
+Depois da implementação, foi aplicado um questionário a profissionais da psicopedagogia para avaliar a adequação do sistema ao processo avaliativo, conforme descrito na Seção~\ref{sec:avaliacao_usuarios}.
 
 \section{Análise de Dados}
 
-Os dados coletados por meio da literatura, dos instrumentos e da análise de sistemas existentes foram tratados predominantemente de forma qualitativa. Adotou-se um procedimento de análise temática, identificando categorias recorrentes associadas a:
+Os dados obtidos na literatura, nos instrumentos, nas soluções existentes e na entrevista foram tratados de forma qualitativa, por meio de uma síntese organizada em categorias recorrentes:
 
 \begin{itemize}
     \item necessidade de padronização e rastreabilidade dos registros;
@@ -79,11 +112,11 @@ Os dados coletados por meio da literatura, dos instrumentos e da análise de sis
     \item ausência, em sistemas educacionais generalistas, de relatórios clínicos estruturados e de módulos específicos para psicopedagogia.
 \end{itemize}
 
-Essas categorias foram relacionadas com princípios de engenharia de software e requisitos de sistemas de informação discutidos na fundamentação teórica. A partir dessa articulação, elaborou-se um conjunto de requisitos funcionais e não funcionais que orientou a modelagem do sistema. A análise não se limitou a listar problemas, mas buscou traduzi-los em decisões de projeto, como a necessidade de base de dados orientada a registros longitudinais, módulos distintos para etapas da avaliação e mecanismos de controle de acesso e de versão de protocolos.
+Cada categoria foi relacionada aos conceitos de engenharia de software discutidos no Capítulo~\ref{capitulo3-0} e traduzida em requisitos e decisões de projeto, como um banco de dados orientado a registros longitudinais, módulos separados para as etapas da avaliação e mecanismos de controle de acesso e de versão dos instrumentos.
 
 \section{Desenvolvimento do Sistema}
 
-No que diz respeito ao desenvolvimento do sistema, adotou-se como referência um modelo incremental e iterativo, em que os artefatos de análise e de projeto foram progressivamente refinados à medida que novos elementos foram incorporados. As etapas adotadas foram:
+Dentro da etapa de desenvolvimento da DSR, adotou-se um modelo incremental e iterativo, em que os artefatos de análise e de projeto foram refinados à medida que novas funcionalidades eram incorporadas. As atividades foram organizadas da seguinte forma:
 
 \begin{enumerate}
     \item Definição de requisitos
@@ -111,13 +144,13 @@ No que diz respeito ao desenvolvimento do sistema, adotou-se como referência um
     \end{enumerate}
 \end{enumerate}
 
-\section{Procedimentos Éticos}
+\section{Procedimentos Éticos}\label{sec:etica}
 
-Considerando que o sistema envolve dados potencialmente sensíveis relativos a atendimentos psicopedagógicos, foram observados princípios éticos compatíveis com a legislação vigente e com diretrizes de proteção de dados no contexto educacional e de saúde. Entre as medidas adotadas destacam-se:
+Como o sistema lida com dados sensíveis de atendimentos psicopedagógicos, foram adotadas as seguintes medidas:
 
 \begin{itemize}
     \item adoção de princípios da Lei Geral de Proteção de Dados, como necessidade, minimização de dados, finalidade e transparência;
-    \item anonimização dos registros utilizados em ambiente de demonstração, sem uso de dados reais de crianças ou prontuários clínicos;
+    \item uso exclusivo de dados fictícios no ambiente de demonstração, sem dados reais de crianças ou prontuários clínicos;
     \item armazenamento seguro em banco de dados protegido, com mecanismos de autenticação, autorização por perfis de acesso e registro de auditoria;
     \item apresentação de Termo de Consentimento Livre e Esclarecido (TCLE) à profissional participante da entrevista de levantamento de requisitos, assegurando ciência sobre os objetivos da pesquisa, voluntariedade e confidencialidade das informações fornecidas (Apêndice~\ref{apendice:tcle});
     \item aplicação do questionário de avaliação do sistema de forma anônima, sem coleta de nome, instituição ou qualquer dado que permitisse identificar os respondentes.
@@ -125,10 +158,16 @@ Considerando que o sistema envolve dados potencialmente sensíveis relativos a a
 
 A pesquisa não envolveu coleta direta de dados de crianças nem análise de prontuários reais. A entrevista de levantamento de requisitos e o questionário de avaliação foram realizados exclusivamente com psicopedagogos adultos, e os dados coletados limitaram-se às suas percepções profissionais e opiniões sobre o sistema.
 
-Em relação ao enquadramento ético, o questionário de avaliação, por ser anônimo e tratar apenas de opiniões sobre um produto de software, enquadra-se na hipótese de dispensa de registro em Comitê de Ética em Pesquisa prevista no art. 1º, parágrafo único, inciso I, da Resolução CNS n.º 510/2016, que exclui do âmbito de sua regulação as pesquisas de opinião realizadas com participantes não identificados. O instrumento utilizado consta no Apêndice~\ref{apendice:questionario}.
+Quanto ao enquadramento ético, o questionário de avaliação, por ser anônimo e tratar apenas de opiniões sobre um produto de software, enquadra-se na hipótese prevista no art. 1º, parágrafo único, inciso I, da Resolução CNS n.º 510/2016, que exclui da avaliação pelo sistema formado pelos Comitês de Ética em Pesquisa (CEP) e pela Comissão Nacional de Ética em Pesquisa (Conep) as pesquisas de opinião pública com participantes não identificados. O instrumento consta no Apêndice~\ref{apendice:questionario}.
+
+A entrevista, por sua vez, não foi submetida ao sistema CEP/Conep. Ela teve caráter de consulta a uma especialista do domínio para fins de levantamento de requisitos de \textit{software} e tratou exclusivamente dos processos de trabalho da profissional, como as ferramentas utilizadas, a forma de registro dos atendimentos e a elaboração de relatórios. Não foram coletados dados pessoais da participante além do necessário ao contato, nem dados de saúde, informações sobre os aprendentes por ela atendidos ou quaisquer dados de terceiros. Ainda assim, foi apresentado o TCLE (Apêndice~\ref{apendice:tcle}), e nenhuma informação que permita identificar a participante é divulgada neste trabalho. Reconhece-se, contudo, que a ausência de consulta prévia ao Comitê de Ética em Pesquisa quanto ao enquadramento da entrevista constitui uma limitação procedimental do estudo.
+
+\section{Uso de ferramentas de inteligência artificial}\label{sec:uso_ia}
+
+Durante a elaboração deste trabalho, foram utilizadas ferramentas de inteligência artificial generativa como apoio. \preencher{descrever com exatidão: quais ferramentas (por exemplo, ChatGPT, Claude, GitHub Copilot), em quais etapas (revisão textual e de normas, organização da estrutura, apoio à escrita de código, depuração, tradução do resumo) e de que forma}. Todo o conteúdo produzido com esse apoio foi revisado, verificado e, quando necessário, reescrito pela autora, que assume integral responsabilidade pelo texto, pelas referências, pelo código e pelos resultados apresentados. As ferramentas não foram utilizadas para gerar dados, respostas de participantes ou resultados de testes.
 
 \section{Limitações do Método}
 
-O delineamento metodológico adotado apresenta limitações que precisam ser reconhecidas. Em primeiro lugar, a avaliação com profissionais envolveu um número reduzido de participantes, o que limita a generalização das percepções sobre usabilidade e adequação funcional. Além disso, o questionário foi elaborado para este trabalho e não corresponde a um instrumento padronizado de usabilidade, como a \textit{System Usability Scale} (SUS) \cite{brooke1996_sus}, o que dificulta a comparação direta dos resultados com os de outros estudos. Em segundo lugar, a ausência de coleta direta com crianças impede analisar o impacto do sistema sobre práticas concretas de avaliação em contexto real, restringindo a avaliação a uma perspectiva de viabilidade técnica e de percepção dos profissionais. Em terceiro lugar, a implementação foi realizada em ambiente de desenvolvimento controlado, sem implantação em larga escala em instituições, o que impossibilita examinar aspectos como desempenho em alta carga, integração com sistemas legados e adesão institucional.
+O método adotado tem limitações. Em primeiro lugar, a avaliação com profissionais envolveu um número reduzido de participantes, o que limita a generalização das percepções sobre usabilidade e adequação funcional. Além disso, o questionário foi elaborado para este trabalho e não corresponde a um instrumento padronizado de usabilidade, como a \textit{System Usability Scale} (SUS) \cite{brooke1996_sus}, o que dificulta a comparação direta dos resultados com os de outros estudos. Em segundo lugar, a entrevista de levantamento de requisitos foi realizada com uma única profissional, o que pode não representar a diversidade de práticas da área. Em terceiro lugar, a ausência de coleta direta com crianças impede analisar o impacto do sistema sobre práticas concretas de avaliação em contexto real, restringindo a avaliação a uma perspectiva de viabilidade técnica e de percepção dos profissionais. Acrescenta-se a isso a ausência de consulta ao Comitê de Ética em Pesquisa sobre o enquadramento da entrevista, discutida na Seção~\ref{sec:etica}. Por fim, a implementação foi realizada em ambiente de desenvolvimento controlado, sem implantação em larga escala em instituições, o que impossibilita examinar aspectos como desempenho em alta carga, integração com sistemas legados e adesão institucional.
 
-Apesar dessas limitações, o método adotado é adequado aos objetivos do trabalho, na medida em que permite consolidar uma proposta tecnológica coerente com a literatura, tecnicamente fundamentada e avaliada preliminarmente por profissionais da área.
+Apesar dessas limitações, o método é adequado aos objetivos do trabalho, pois permite construir uma proposta fundamentada na literatura e avaliá-la, ainda que de forma preliminar, com profissionais da área.
