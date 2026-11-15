@@ -1,0 +1,165 @@
+<!doctype html>
+<!--
+  Figura "Arquitetura geral do sistema" (Seção 5.2 do TCC).
+  Gerar PNG: capturar esta página com largura de 1000 px e fator de escala 2
+  (ex.: Edge/Chrome headless) e salvar em artigo/img/arquitetura_sistema.png.
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Arquitetura do sistema</title>
+<style>
+  :root {
+    --azul: #2e5d8a; --azul-claro: #eef3f9;
+    --verde: #2e7047; --verde-claro: #edf6ef;
+    --marrom: #8a5a22; --marrom-claro: #f8f1e8;
+    --amarelo: #fcf5e3; --texto: #222; --suave: #444;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; font-family: Arial, "Liberation Sans", Helvetica, sans-serif; color: var(--texto); }
+  #fig { width: 1000px; padding: 28px 44px 36px; }
+
+  .atores { display: flex; justify-content: center; gap: 120px; }
+  .ator { display: flex; align-items: center; gap: 14px; font-size: 25px; font-weight: 700; }
+  .ator small { display: block; font-size: 15px; font-weight: 400; color: var(--suave); margin-top: 2px; }
+  .ator svg { width: 46px; height: 52px; flex: none; }
+
+  .fluxo { display: flex; justify-content: center; gap: 56px; height: 74px; align-items: center; font-size: 17px; color: var(--suave); }
+  .seta { display: flex; align-items: center; gap: 12px; }
+  .seta .linha { width: 3px; height: 54px; background: #333; position: relative; }
+  .seta .linha::after { content: ""; position: absolute; left: -8px; border: 9.5px solid transparent; }
+  .baixo .linha::after { bottom: -8px; border-top: 14px solid #333; border-bottom: 0; }
+  .cima  .linha::after { top: -8px; border-bottom: 14px solid #333; border-top: 0; }
+  .direita { text-align: right; }
+
+  .camada { border: 3px solid; border-radius: 16px; overflow: hidden; }
+  .camada > header { color: #fff; text-align: center; padding: 12px 10px 10px; }
+  .camada > header h2 { margin: 0; font-size: 29px; }
+  .camada > header p { margin: 4px 0 0; font-size: 19px; }
+  .camada .corpo { padding: 16px 20px 18px; }
+  .apres { border-color: var(--azul); } .apres > header { background: var(--azul); } .apres .corpo { background: var(--azul-claro); }
+  .aplic { border-color: var(--verde); } .aplic > header { background: var(--verde); } .aplic .corpo { background: var(--verde-claro); }
+  .persist { border-color: var(--marrom); } .persist > header { background: var(--marrom); } .persist .corpo { background: var(--marrom-claro); }
+
+  .telas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grupo { background: #fff; border: 1.5px solid var(--azul); border-radius: 10px; padding: 9px 12px; font-size: 16px; line-height: 1.35; }
+  .grupo b { display: block; font-size: 15px; color: var(--azul); margin-bottom: 2px; }
+  .libs { margin-top: 11px; font-size: 14.5px; color: var(--suave); text-align: center; }
+
+  .passo { background: #fff; border: 2px solid var(--verde); border-radius: 10px; padding: 9px 14px; text-align: center; }
+  .passo h3 { margin: 0; font-size: 19px; }
+  .passo p { margin: 3px 0 0; font-size: 15.5px; color: var(--suave); line-height: 1.35; }
+  .mini { display: flex; justify-content: center; height: 22px; }
+  .mini span { width: 3px; background: #333; position: relative; }
+  .mini span::after { content: ""; position: absolute; bottom: -6px; left: -6.5px; border: 8px solid transparent; border-top: 11px solid #333; border-bottom: 0; }
+  .perfis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 7px; text-align: left; }
+  .perfil { border-radius: 8px; padding: 6px 10px; font-size: 14.5px; line-height: 1.3; }
+  .perfil.adm { background: #f1f1f1; border: 1px solid #999; }
+  .perfil.psi { background: var(--verde-claro); border: 1px solid var(--verde); }
+  .modulos { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 7px; }
+  .modulos span { border: 1px solid var(--verde); border-radius: 6px; padding: 2px 8px; font-size: 14.5px; font-family: Consolas, "Courier New", monospace; background: var(--verde-claro); }
+  .modulos span.clin { border-width: 2px; font-weight: 700; }
+
+  .orm { margin: 0 70px; border: 3px dashed var(--marrom); border-radius: 14px; background: var(--amarelo); text-align: center; padding: 12px 14px; }
+  .orm h3 { margin: 0; font-size: 21px; }
+  .orm p { margin: 4px 0 0; font-size: 16px; color: var(--suave); }
+  .duplo { display: flex; justify-content: center; align-items: center; gap: 12px; height: 62px; font-size: 16px; color: var(--suave); }
+  .duplo .linha { width: 3px; height: 44px; background: #333; position: relative; }
+  .duplo .linha::before, .duplo .linha::after { content: ""; position: absolute; left: -8px; border: 9.5px solid transparent; }
+  .duplo .linha::before { top: -8px; border-bottom: 13px solid #333; border-top: 0; }
+  .duplo .linha::after { bottom: -8px; border-top: 13px solid #333; border-bottom: 0; }
+  .duplo .vazio { width: 230px; }
+
+  .tabelas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .tab { background: #fff; border: 1.5px solid #c69a63; border-radius: 9px; padding: 8px 6px; text-align: center; }
+  .tab b { display: block; font-size: 16px; margin-bottom: 3px; }
+  .tab span { font-family: Consolas, "Courier New", monospace; font-size: 14px; color: var(--suave); }
+  .tab.audit { border: 2.5px solid var(--marrom); }
+  .legenda { margin-top: 12px; font-size: 14px; color: var(--suave); text-align: center; }
+  .legenda .chip { display: inline-block; border: 2px solid var(--verde); border-radius: 5px; padding: 0 6px; font-family: Consolas, "Courier New", monospace; font-weight: 700; background: var(--verde-claro); }
+</style>
+</head>
+<body>
+<div id="fig">
+
+  <div class="atores">
+    <div class="ator">
+      <svg viewBox="0 0 46 52" fill="none" stroke="#333" stroke-width="3"><circle cx="23" cy="14" r="11"/><path d="M3 50 V44 a14 14 0 0 1 14-14 h12 a14 14 0 0 1 14 14 V50 Z"/></svg>
+      <div>Psicopedagogo<small>atendimento e registros clínicos</small></div>
+    </div>
+    <div class="ator">
+      <svg viewBox="0 0 46 52" fill="none" stroke="#333" stroke-width="3"><circle cx="23" cy="14" r="11"/><path d="M3 50 V44 a14 14 0 0 1 14-14 h12 a14 14 0 0 1 14 14 V50 Z"/></svg>
+      <div>Administrador<small>gestão de usuários, sem dados clínicos</small></div>
+    </div>
+  </div>
+
+  <div class="fluxo">
+    <div class="seta baixo"><span class="direita">realiza a operação</span><div class="linha"></div></div>
+    <div class="seta cima"><div class="linha"></div><span>visualiza o resultado</span></div>
+  </div>
+
+  <section class="camada apres">
+    <header><h2>Camada de apresentação</h2><p>Frontend · React (SPA) com Material UI, servido pelo Nginx</p></header>
+    <div class="corpo">
+      <div class="telas">
+        <div class="grupo"><b>Psicopedagogo</b>aprendentes e histórico, instrumentos, aplicações, relatórios e registro de acessos de cada aprendente</div>
+        <div class="grupo"><b>Administrador</b>usuários e transferência de aprendentes, consulta e exclusão de instrumentos, auditoria e dashboard com totais</div>
+      </div>
+      <div class="libs">rotas protegidas por perfil (React Router) · chamadas à API com renovação do token (Axios) · formulários validados com Zod</div>
+    </div>
+  </section>
+
+  <div class="fluxo">
+    <div class="seta baixo"><span class="direita">requisição HTTP (JSON)<br>+ access token (JWT)</span><div class="linha"></div></div>
+    <div class="seta cima"><div class="linha"></div><span>resposta (JSON)</span></div>
+  </div>
+
+  <section class="camada aplic">
+    <header><h2>Camada de aplicação</h2><p>API REST · Node.js + Express</p></header>
+    <div class="corpo">
+      <div class="passo"><h3>Autenticação</h3><p>middleware <i>authenticate</i>: valida o access token e identifica o usuário e o perfil</p></div>
+      <div class="mini"><span></span></div>
+      <div class="passo"><h3>Autorização por perfil</h3><p>middleware <i>authorize</i></p>
+        <div class="perfis">
+          <div class="perfil adm"><b>ADMIN:</b> usuários, transferência de aprendentes, exclusão de instrumentos, auditoria sem valores clínicos</div>
+          <div class="perfil psi"><b>PSICOPEDAGOGO:</b> aprendentes, aplicações, relatórios, criação e edição de instrumentos</div>
+        </div>
+      </div>
+      <div class="mini"><span></span></div>
+      <div class="passo"><h3>Validação das requisições</h3><p>esquemas Zod compartilhados com o frontend</p></div>
+      <div class="mini"><span></span></div>
+      <div class="passo"><h3>Módulos de negócio</h3><p>filtro de titularidade: cada psicopedagogo alcança somente os próprios registros</p>
+        <div class="modulos">
+          <span>auth</span><span>users</span><span class="clin">aprendentes</span><span>avaliacoes</span><span class="clin">aplicacoes</span><span class="clin">relatorios</span><span>dashboard</span><span>auditoria</span>
+        </div>
+        <div class="legenda">em <span class="chip">destaque</span>: módulos com dados clínicos, exclusivos do psicopedagogo responsável</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="duplo"><div class="vazio"></div><div class="linha"></div><div class="vazio"></div></div>
+
+  <div class="orm">
+    <h3>Prisma ORM + extensão de auditoria</h3>
+    <p>registra quem realizou cada operação, quando, de qual IP e sobre qual dado,<br>incluindo as consultas aos dados clínicos</p>
+  </div>
+
+  <div class="duplo"><div class="vazio"></div><div class="linha"></div><div class="vazio" style="text-align:left">consulta e alteração dos dados</div></div>
+
+  <section class="camada persist">
+    <header><h2>Camada de persistência</h2><p>Banco de dados relacional · MySQL</p></header>
+    <div class="corpo">
+      <div class="tabelas">
+        <div class="tab"><b>Usuários e acesso</b><span>users<br>refresh_tokens<br>password_resets</span></div>
+        <div class="tab"><b>Aprendentes</b><span>aprendentes<br>historico_aprendentes</span></div>
+        <div class="tab"><b>Instrumentos</b><span>avaliacoes<br>questions</span></div>
+        <div class="tab"><b>Aplicações</b><span>aplicacoes<br>respostas</span></div>
+        <div class="tab"><b>Relatórios</b><span>relatorios</span></div>
+        <div class="tab audit"><b>Auditoria</b><span>audit_logs</span></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
