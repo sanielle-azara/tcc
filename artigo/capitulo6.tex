@@ -12,7 +12,7 @@ A estrutura do projeto foi organizada em módulos, contemplando autenticação, 
 
 O banco de dados foi estruturado para armazenar as informações dos usuários, aprendentes, instrumentos avaliativos, questões, aplicações, respostas, relatórios e registros de auditoria, além das estruturas relacionadas à autenticação. Ao todo, a implementação contempla 12 tabelas relacionadas entre si por meio de chaves primárias e estrangeiras.
 
-Quanto ao controle de acesso, foram implementados dois perfis: administrador (ADMIN) e psicopedagogo (PSICOPEDAGOGO). O administrador possui permissões para gerenciar usuários e acessar os recursos administrativos, enquanto o psicopedagogo pode utilizar as funcionalidades de avaliação e consultar os registros sob sua responsabilidade. O controle de propriedade dos dados também é aplicado no backend, restringindo o acesso do profissional aos seus próprios aprendentes e instrumentos.
+Quanto ao controle de acesso, foram implementados dois perfis: administrador (ADMIN) e psicopedagogo (PSICOPEDAGOGO). O administrador possui permissões para gerenciar usuários e acessar os recursos administrativos, enquanto o psicopedagogo pode utilizar as funcionalidades de avaliação e consultar os registros sob sua responsabilidade. Em respeito ao sigilo profissional, o administrador não acessa os dados clínicos das crianças: as rotas de aprendentes, aplicações e relatórios são exclusivas do psicopedagogo, o registro de auditoria lhe apresenta apenas os metadados das operações sobre esses dados, e a continuidade do atendimento é garantida pela transferência de aprendentes entre profissionais (Seção~\ref{sec:separacao_admin}). O controle de propriedade dos dados também é aplicado no backend, restringindo o acesso do profissional aos seus próprios aprendentes e instrumentos.
 
 \section{Funcionalidades implementadas}
 
@@ -45,7 +45,7 @@ O Quadro~\ref{qua:atendimento_requisitos_funcionais} apresenta o grau de atendim
 RF01 & Cadastro e autenticação de usuários & Atendido & Seções~\ref{sec:backend}, \ref{sec:frontend} \\
 RF02 & Controle de acesso por perfil & Atendido & Seções~\ref{sec:backend}, \ref{sec:seguranca} \\
 RF03 & Cadastro, edição e consulta de aprendentes & Atendido & Seções~\ref{sec:backend}, \ref{sec:frontend} \\
-RF04 & Restrição de visibilidade de aprendentes por responsável & Atendido & Seções~\ref{sec:backend}, \ref{sec:seguranca} \\
+RF04 & Restrição de visibilidade de aprendentes por responsável, sem exceção para o administrador & Atendido & Seções~\ref{sec:backend}, \ref{sec:separacao_admin} \\
 RF05 & Registro de informações do processo avaliativo & Atendido & Seções~\ref{sec:backend}, \ref{sec:aplicacoes} \\
 RF06 & Cadastro e gerenciamento de instrumentos avaliativos & Atendido & Seções~\ref{sec:backend}, \ref{sec:instrumentos} \\
 RF07 & Restrição de visibilidade de instrumentos por autor & Atendido & Seções~\ref{sec:backend}, \ref{sec:seguranca} \\
@@ -82,7 +82,7 @@ RNF06 & Usabilidade (média $\geq$ 4,0 em avaliação com usuários) & Atendido 
 RNF07 & Arquitetura em três camadas com módulos independentes por domínio & Atendido & 7 módulos de backend independentes; frontend separado em camadas de API, contexto, componentes e páginas (Seções~\ref{sec:arquitetura}, \ref{sec:backend}, \ref{sec:frontend}) \\
 RNF08 & Integridade e consistência dos dados & Atendido & Validação com Zod, chaves estrangeiras e restrições no banco (Seções~\ref{sec:modelagem}, \ref{sec:backend}) \\
 RNF09 & Tratamento adequado de erros & Atendido & Middleware centralizado de erros no backend (Seção~\ref{sec:backend}) \\
-RNF10 & Cobertura de testes do backend $\geq$ 70\% & Atendido & Cobertura de 80,03\% no backend (Seção~\ref{sec:testes}) \\
+RNF10 & Cobertura de testes do backend $\geq$ 70\% & Atendido & Cobertura de 83,06\% no backend (Seção~\ref{sec:testes}) \\
 RNF11 & Ausência de violações WCAG 2.2 (A e AA) detectáveis pelo axe-core & Atendido & Cinco tipos de violação corrigidos; nenhuma violação nas 18 telas após correção (Seção~\ref{sec:acessibilidade}) \\
 \hline
 \end{tabular}
@@ -94,47 +94,15 @@ Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois foram 
 
 \section{Fluxo de utilização}
 
-O fluxo principal de utilização da plataforma foi organizado para acompanhar as etapas de registro e documentação da avaliação psicopedagógica. As Figuras~\ref{fig:tela_dashboard} a~\ref{fig:tela_relatorio} ilustram as principais telas do sistema.
+O fluxo principal de utilização da plataforma foi organizado para acompanhar as etapas de registro e documentação da avaliação psicopedagógica. As telas desse fluxo foram apresentadas na Seção~\ref{sec:telas}.
 
 Inicialmente, o profissional realiza o login com suas credenciais, obtidas por meio do autocadastro na tela de cadastro, que cria uma conta com o perfil de psicopedagogo, ou do cadastro realizado pelo administrador no gerenciamento de usuários. Após a autenticação, é direcionado ao painel inicial (Figura~\ref{fig:tela_dashboard}), a partir do qual pode acessar os módulos disponíveis conforme suas permissões.
 
-O profissional pode cadastrar um novo aprendente ou consultar um registro existente (Figura~\ref{fig:tela_aprendente}). Em seguida, pode acessar o gerenciamento de instrumentos para selecionar um instrumento já cadastrado ou criar um novo, configurando suas questões e respectivas propriedades.
+O profissional pode cadastrar um novo aprendente ou consultar um registro existente (Figuras~\ref{fig:tela_aprendente_form} e~\ref{fig:tela_aprendente_detalhe}). Em seguida, pode acessar o gerenciamento de instrumentos para selecionar um instrumento já cadastrado ou criar um novo, configurando suas questões e respectivas propriedades.
 
 Para iniciar uma avaliação, o profissional seleciona o aprendente e o instrumento que será utilizado. O sistema registra a aplicação e permite o preenchimento das respostas (Figura~\ref{fig:tela_aplicacao}), com possibilidade de salvamento como rascunho. Após o preenchimento das questões obrigatórias, a aplicação pode ser finalizada.
 
-Por fim, o profissional elabora o relatório, no qual registra suas observações e conclusões (Figura~\ref{fig:tela_relatorio}). O documento pode ser consultado posteriormente e impresso ou salvo em PDF pelo navegador.
-
-\begin{figure}[H]
-    \centering
-    \caption{Painel inicial do sistema}
-    \label{fig:tela_dashboard}
-    \includegraphics[width=0.90\textwidth]{tela_dashboard.png}
-    \fonte{Elaborado pela autora (2026).}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \caption{Página de detalhe do aprendente}
-    \label{fig:tela_aprendente}
-    \includegraphics[width=0.90\textwidth]{tela_aprendente.png}
-    \fonte{Elaborado pela autora (2026).}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \caption{Preenchimento de respostas durante a aplicação de um instrumento}
-    \label{fig:tela_aplicacao}
-    \includegraphics[width=0.90\textwidth]{tela_aplicacao.png}
-    \fonte{Elaborado pela autora (2026).}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \caption{Elaboração do relatório de avaliação psicopedagógica}
-    \label{fig:tela_relatorio}
-    \includegraphics[width=0.90\textwidth]{tela_relatorio.png}
-    \fonte{Elaborado pela autora (2026).}
-\end{figure}
+Por fim, o profissional elabora o relatório, no qual registra suas observações e conclusões. O documento pode ser consultado posteriormente e impresso ou salvo em PDF pelo navegador (Figura~\ref{fig:tela_relatorio_impresso}).
 
 Esse fluxo permite concentrar em uma única plataforma as informações relacionadas às etapas de registro e documentação da avaliação, mantendo a associação entre aprendente, instrumento, aplicação, respostas e relatório.
 
@@ -142,9 +110,9 @@ Esse fluxo permite concentrar em uma única plataforma as informações relacion
 
 A verificação técnica do sistema foi realizada por meio de testes automatizados no backend e no frontend, utilizando Vitest. No backend, também foi utilizada a biblioteca Supertest para realizar testes das rotas da API. No frontend, foram empregados React Testing Library e jsdom para verificar o comportamento dos componentes e das funcionalidades da interface.
 
-Conforme o levantamento dos testes realizado durante a análise do código, foram identificados 18 arquivos de teste, sendo nove relacionados ao backend e nove ao frontend. Ao todo, foram executados 127 testes automatizados, dos quais 76 pertenciam ao backend e 51 ao frontend. Todos foram concluídos com sucesso, sem falhas.
+Conforme o levantamento dos testes realizado durante a análise do código, foram identificados 21 arquivos de teste, sendo dez relacionados ao backend e onze ao frontend. Ao todo, foram executados 146 testes automatizados, dos quais 88 pertenciam ao backend e 58 ao frontend. Todos foram concluídos com sucesso, sem falhas.
 
-A cobertura de código identificada foi de 80,03\% para o backend e 48,35\% para o frontend, considerando a cobertura de linhas e instruções. Esses resultados demonstram que parte significativa das funcionalidades do backend possui testes automatizados, enquanto o frontend ainda apresenta áreas que podem receber maior cobertura.
+A cobertura de código identificada foi de 83,06\% para o backend e 55,84\% para o frontend, considerando a cobertura de linhas e instruções. Esses resultados demonstram que parte significativa das funcionalidades do backend possui testes automatizados, enquanto o frontend ainda apresenta áreas que podem receber maior cobertura.
 
 Além dos testes automatizados, foi realizada a execução prática da plataforma em ambiente Docker, com os serviços necessários para seu funcionamento. Durante essa execução, foi possível utilizar o sistema e verificar seu funcionamento geral, sem ocorrência de problemas que impedissem sua utilização.
 
@@ -175,7 +143,7 @@ Lista inválida no painel & 1.3.1 (A) & Sério & Painel inicial & Remoção dos 
 
 As violações de maior impacto eram as duas classificadas como críticas. A ausência de nome acessível no botão de exibir senha fazia com que leitores de tela anunciassem apenas ``botão'', sem indicar sua função. Já a falta de rótulo nos campos de resposta afetava a tela central do sistema: um usuário de leitor de tela, ao percorrer os campos durante a aplicação de um instrumento, não ouvia o enunciado da questão a que cada campo se referia. A violação de estrutura do menu lateral, embora presente em 15 telas, decorria de um único componente e ocorria apenas para o perfil \textit{ADMIN}, pois o grupo de itens ``Admin'' não é exibido ao psicopedagogo.
 
-Como as causas estavam concentradas em poucos componentes, as correções foram aplicadas ainda durante o desenvolvimento. No caso do contraste, o axe-core apontou apenas a etiqueta ``Rascunho'', presente nos dados de demonstração; o cálculo das demais cores do tema mostrou que a etiqueta ``Em Andamento'' e a ação ``Alteração'' do registro de auditoria, que utilizam a cor de informação, também ficavam abaixo do mínimo, e ambas foram corrigidas. O mesmo padrão de lista inválida do painel foi encontrado no histórico de acompanhamento do aprendente, que não havia sido sinalizado porque esse conteúdo não estava visível durante a execução automatizada, e também foi corrigido. Após as correções, o teste automatizado do botão de exibir senha passou a verificar também seu nome acessível, e os 51 testes do frontend foram executados novamente com sucesso. Uma segunda execução do axe-core, nas mesmas 18 telas e com os mesmos critérios, não identificou violações.
+Como as causas estavam concentradas em poucos componentes, as correções foram aplicadas ainda durante o desenvolvimento. No caso do contraste, o axe-core apontou apenas a etiqueta ``Rascunho'', presente nos dados de demonstração; o cálculo das demais cores do tema mostrou que a etiqueta ``Em Andamento'' e a ação ``Alteração'' do registro de auditoria, que utilizam a cor de informação, também ficavam abaixo do mínimo, e ambas foram corrigidas. O mesmo padrão de lista inválida do painel foi encontrado no histórico de acompanhamento do aprendente, que não havia sido sinalizado porque esse conteúdo não estava visível durante a execução automatizada, e também foi corrigido. Após as correções, o teste automatizado do botão de exibir senha passou a verificar também seu nome acessível, e os testes do frontend foram executados novamente com sucesso. Uma segunda execução do axe-core, nas mesmas 18 telas e com os mesmos critérios, não identificou violações.
 
 É necessário considerar que ferramentas automatizadas verificam apenas parte dos critérios das WCAG. Aspectos como a navegação completa por teclado, a ordem lógica do foco, a clareza das mensagens de erro e a experiência real com leitores de tela exigem avaliação manual e, idealmente, testes com pessoas com deficiência, que não foram realizados neste trabalho. Além disso, o axe-core sinalizou 181 elementos cujo contraste não pôde ser determinado automaticamente, por estarem sobre fundos compostos, e que também demandariam verificação manual. Assim, a ausência de violações na segunda execução não significa que a interface esteja em conformidade com as WCAG 2.2, mas apenas que não foram detectados problemas pelos testes automatizados.
 

@@ -89,6 +89,10 @@
 % ---
 \usepackage[alf]{abntex2cite}	% Citações padrão ABNT
 \usepackage{url}
+\usepackage{xurl} % permite quebrar URLs longas em qualquer caractere (evita invadir a margem)
+\Urlmuskip=0mu plus 1mu % pequena elasticidade entre caracteres da URL
+% NBR 6023:2018 nao usa < > em volta das URLs (o abntex2cite os define)
+\AtBeginDocument{\def\UrlLeft{}\def\UrlRight{}}
 
 \pagenumbering{arabic} % MODIFICANDO A FORMA DE NUMERAÇÃO DAS PÁGINAS
 

@@ -27,37 +27,37 @@ POST & /api/auth/reset-password & Público & Redefinição de senha via token \\
 GET  & /api/users & ADMIN & Listagem de usuários \\
 POST & /api/users & ADMIN & Cadastro de usuário \\
 PUT  & /api/users/:id & ADMIN & Atualização de usuário \\
-DELETE & /api/users/:id & ADMIN & Exclusão lógica de usuário \\
+DELETE & /api/users/:id & ADMIN & Exclusão lógica de usuário (recusada se ainda houver aprendentes) \\
+POST & /api/users/:id/transferir-aprendentes & ADMIN & Transferência dos aprendentes e instrumentos para outro psicopedagogo \\
 \hline
-GET  & /api/aprendentes & Autenticado & Listagem dos aprendentes do profissional \\
-POST & /api/aprendentes & Autenticado & Cadastro de aprendente \\
-GET  & /api/aprendentes/:id & Autenticado & Consulta de aprendente \\
-PUT  & /api/aprendentes/:id & Autenticado & Atualização de aprendente \\
-DELETE & /api/aprendentes/:id & Autenticado & Exclusão lógica de aprendente \\
-GET  & /api/aprendentes/:id/historico & Autenticado & Histórico de acompanhamento \\
-POST & /api/aprendentes/:id/historico & Autenticado & Inclusão de registro no histórico \\
+GET  & /api/aprendentes & Psicopedagogo & Listagem dos aprendentes do profissional \\
+POST & /api/aprendentes & Psicopedagogo & Cadastro de aprendente \\
+GET  & /api/aprendentes/:id & Psicopedagogo & Consulta de aprendente \\
+PUT  & /api/aprendentes/:id & Psicopedagogo & Atualização de aprendente \\
+DELETE & /api/aprendentes/:id & Psicopedagogo & Exclusão lógica de aprendente \\
+GET  & /api/aprendentes/:id/historico & Psicopedagogo & Histórico de acompanhamento \\
+POST & /api/aprendentes/:id/historico & Psicopedagogo & Inclusão de registro no histórico \\
 \hline
 GET  & /api/avaliacoes & Autenticado & Listagem dos instrumentos do profissional \\
 POST & /api/avaliacoes & Autenticado & Cadastro de instrumento \\
 GET  & /api/avaliacoes/:id & Autenticado & Consulta de instrumento \\
-PUT  & /api/avaliacoes/:id & Autenticado & Edição (cria nova versão se aplicado) \\
+PUT  & /api/avaliacoes/:id & Psicopedagogo & Edição (cria nova versão se aplicado) \\
 DELETE & /api/avaliacoes/:id & ADMIN & Exclusão de instrumento \\
 \hline
-GET  & /api/aplicacoes & Autenticado & Listagem de aplicações \\
-POST & /api/aplicacoes & Autenticado & Criação de aplicação \\
-GET  & /api/aplicacoes/:id & Autenticado & Consulta de aplicação \\
-DELETE & /api/aplicacoes/:id & Autenticado & Exclusão (somente se não COMPLETED) \\
-PUT  & /api/aplicacoes/:id/answers & Autenticado & Registro ou atualização de respostas \\
-POST & /api/aplicacoes/:id/finalize & Autenticado & Finalização da aplicação \\
+GET  & /api/aplicacoes & Psicopedagogo & Listagem de aplicações \\
+POST & /api/aplicacoes & Psicopedagogo & Criação de aplicação \\
+GET  & /api/aplicacoes/:id & Psicopedagogo & Consulta de aplicação \\
+DELETE & /api/aplicacoes/:id & Psicopedagogo & Exclusão (somente se não COMPLETED) \\
+PUT  & /api/aplicacoes/:id/answers & Psicopedagogo & Registro ou atualização de respostas \\
+POST & /api/aplicacoes/:id/finalize & Psicopedagogo & Finalização da aplicação \\
 \hline
-GET  & /api/relatorios & Autenticado & Listagem de relatórios \\
-GET  & /api/relatorios/:id & Autenticado & Consulta de relatório \\
-GET  & /api/relatorios/aplicacao/:id & Autenticado & Relatório por aplicação \\
-POST & /api/relatorios & Autenticado & Criação de relatório \\
-PUT  & /api/relatorios/:id & Autenticado & Atualização de relatório \\
+GET  & /api/relatorios & Psicopedagogo & Listagem de relatórios \\
+GET  & /api/relatorios/:id & Psicopedagogo & Consulta de relatório \\
+GET  & /api/relatorios/aplicacao/:id & Psicopedagogo & Relatório por aplicação \\
+POST & /api/relatorios & Psicopedagogo & Criação ou atualização de relatório \\
 \hline
-GET  & /api/dashboard & Autenticado & Dados do painel geral \\
-GET  & /api/auditoria & Autenticado & Consulta do registro de auditoria \\
+GET  & /api/dashboard & Autenticado & Dados do painel geral (para o ADMIN, apenas totais) \\
+GET  & /api/auditoria & Autenticado & Consulta do registro de auditoria (para o ADMIN, sem valores clínicos) \\
 \hline
 \end{tabular}
 \fonte{Elaborado pela autora (2026).}
@@ -96,11 +96,11 @@ O processo de recuperação de senha utiliza um token gerado com \texttt{crypto.
 
 Para proteção contra ataques de força bruta e abuso da API, o backend aplica limitação de taxa (\textit{rate limiting}) globalmente por meio da biblioteca \textit{express-rate-limit}: no máximo 100 requisições por endereço IP em uma janela de 15 minutos. Ao atingir o limite, a API retorna HTTP 429 com mensagem de erro. Os valores são configuráveis por variável de ambiente.
 
-O backend contempla os perfis \textit{ADMIN} e \textit{PSICOPEDAGOGO}, com controle de acesso por perfil aplicado via middleware \textit{authorize} nas rotas que exigem permissão específica, na forma de um controle de acesso baseado em papéis \cite{sandhu1996_rbac}. Como esse modelo não expressa restrições que dependem do registro acessado, o sistema o complementa com uma restrição baseada em um atributo do recurso, a titularidade, à maneira do controle de acesso baseado em atributos \cite{hu2014_abac}: aprendentes e avaliações são vinculados ao usuário que os criou, e aplicações e relatórios seguem a titularidade do aprendente a que pertencem. As operações de leitura e escrita alcançam somente os registros pertencentes ao usuário autenticado, exceto para o perfil \textit{ADMIN}, que possui acesso irrestrito.
+O backend contempla os perfis \textit{ADMIN} e \textit{PSICOPEDAGOGO}, com controle de acesso por perfil aplicado via middleware \textit{authorize} nas rotas que exigem permissão específica, na forma de um controle de acesso baseado em papéis \cite{sandhu1996_rbac}. Como esse modelo não expressa restrições que dependem do registro acessado, o sistema o complementa com uma restrição baseada em um atributo do recurso, a titularidade, à maneira do controle de acesso baseado em atributos \cite{hu2014_abac}: aprendentes e avaliações são vinculados ao usuário que os criou, e aplicações e relatórios seguem a titularidade do aprendente a que pertencem. As operações de leitura e escrita alcançam somente os registros pertencentes ao usuário autenticado. Os dois mecanismos se combinam na separação entre administração e atendimento, discutida na Seção~\ref{sec:seguranca}: as rotas de aprendentes, aplicações e relatórios exigem o perfil \textit{PSICOPEDAGOGO}, de modo que o \textit{ADMIN}, responsável pela gestão de usuários, não alcança dados clínicos; e, entre os psicopedagogos, o filtro de titularidade restringe cada um aos próprios registros.
 
-O Código~\ref{cod:authorize} apresenta o middleware \textit{authorize} e seu uso nas rotas de usuários. A função recebe a lista de perfis autorizados e devolve um middleware do Express, que é executado depois do \textit{authenticate} e, portanto, já encontra em \textit{req.user} o usuário validado a partir do token. A distinção entre as duas respostas de erro segue a semântica do HTTP: 401 indica que a requisição não está autenticada, e 403, que o usuário está autenticado mas não possui o perfil exigido.
+O Código~\ref{cod:authorize} apresenta o middleware \textit{authorize} e seu uso em dois módulos: nas rotas de usuários, restritas ao \textit{ADMIN}, e nas de aprendentes, restritas ao \textit{PSICOPEDAGOGO} em todas as operações, inclusive nas de leitura. A função recebe a lista de perfis autorizados e devolve um middleware do Express, que é executado depois do \textit{authenticate} e, portanto, já encontra em \textit{req.user} o usuário validado a partir do token. A distinção entre as duas respostas de erro segue a semântica do HTTP: 401 indica que a requisição não está autenticada, e 403, que o usuário está autenticado mas não possui o perfil exigido.
 
-\begin{lstlisting}[caption={Middleware \textit{authorize} e sua aplicação nas rotas de usuários},label={cod:authorize}]
+\begin{lstlisting}[caption={Middleware \textit{authorize} e sua aplicação nas rotas de usuários e de aprendentes},label={cod:authorize}]
 // apps/backend/src/middlewares/auth.middleware.js
 const authorize = (...roles) => {
   return (req, res, next) => {
@@ -119,6 +119,12 @@ router.use(authenticate);
 router.get('/', authorize('ADMIN'), controller.list);
 router.post('/', authorize('ADMIN'), validate(createUserSchema), controller.create);
 router.delete('/:id', authorize('ADMIN'), controller.remove);
+
+// apps/backend/src/modules/aprendentes/aprendentes.routes.js
+// Dados clínicos: somente o psicopedagogo, inclusive para leitura
+router.use(authenticate, authorize('PSICOPEDAGOGO'));
+router.get('/', controller.list);
+router.get('/:id', controller.findById);
 \end{lstlisting}
 \fonte{Elaborado pela autora (2026).}
 
@@ -126,17 +132,16 @@ router.delete('/:id', authorize('ADMIN'), controller.remove);
 
 O módulo de aprendentes disponibiliza as operações necessárias para o cadastro e gerenciamento dos indivíduos acompanhados pelo profissional. Os dados são posteriormente utilizados nas aplicações dos instrumentos avaliativos, mantendo a associação entre o aprendente e os registros produzidos durante o processo de avaliação.
 
-A visibilidade dos aprendentes é controlada pelo campo \textit{responsavelId}, preenchido automaticamente com o identificador do usuário autenticado no momento do cadastro. Nas operações de listagem e consulta individual, o módulo aplica um filtro que restringe os resultados ao usuário responsável. O perfil \textit{ADMIN} constitui exceção a essa regra, tendo acesso irrestrito a todos os registros. Essa lógica é implementada na camada de serviço, antes da consulta ao banco de dados, sem expor ao cliente a distinção entre registros próprios e de outros usuários.
+A visibilidade dos aprendentes é controlada pelo campo \textit{responsavelId}, preenchido automaticamente com o identificador do usuário autenticado no momento do cadastro. Nas operações de listagem e consulta individual, o módulo aplica um filtro que restringe os resultados ao usuário responsável, sem exceção por perfil. Essa lógica é implementada na camada de serviço, antes da consulta ao banco de dados, sem expor ao cliente a distinção entre registros próprios e de outros usuários.
 
-O Código~\ref{cod:titularidade} mostra como essa regra é implementada. Cada serviço define uma função \textit{ownerFilter}, que devolve um objeto vazio para o perfil \textit{ADMIN} e, para os demais perfis, uma condição que é combinada à cláusula \textit{where} das consultas do Prisma. No caso dos relatórios, a condição percorre as relações até o aprendente, de modo que a titularidade é herdada do responsável pela criança, e não de quem redigiu o relatório. Como o filtro faz parte da própria consulta, um registro de outro profissional não é encontrado e a API responde com HTTP 404, sem revelar que o registro existe.
+O Código~\ref{cod:titularidade} mostra como essa regra é implementada. Cada serviço define uma função \textit{ownerFilter}, que devolve uma condição combinada à cláusula \textit{where} das consultas do Prisma. O filtro não depende do perfil: como as rotas clínicas já recusam o \textit{ADMIN}, ele atua como segunda barreira, de modo que um erro na configuração de uma rota não basta para expor registros de outro profissional. No caso dos relatórios, a condição percorre as relações até o aprendente, de modo que a titularidade é herdada do responsável pela criança, e não de quem redigiu o relatório. Como o filtro faz parte da própria consulta, um registro de outro profissional não é encontrado e a API responde com HTTP 404, sem revelar que o registro existe.
 
 \begin{lstlisting}[caption={Filtro de titularidade aplicado nas consultas de aprendentes e relatórios},label={cod:titularidade}]
 // apps/backend/src/modules/aprendentes/aprendentes.service.js
-const ownerFilter = (userId, userRole) =>
-  userRole === 'ADMIN' ? {} : { responsavelId: userId };
+const ownerFilter = (userId) => ({ responsavelId: userId });
 
-const findById = async (id, userId, userRole) => {
-  const where = { id, deletedAt: null, ...ownerFilter(userId, userRole) };
+const findById = async (id, userId) => {
+  const where = { id, deletedAt: null, ...ownerFilter(userId) };
   const item = await prisma.aprendente.findFirst({ where /* , include: ... */ });
   if (!item) throw Object.assign(new Error('Aprendente não encontrado'), { status: 404 });
   return item;
@@ -144,18 +149,17 @@ const findById = async (id, userId, userRole) => {
 
 // apps/backend/src/modules/relatorios/relatorios.service.js
 // A titularidade do relatório segue a do aprendente da aplicação
-const ownerFilter = (userId, userRole) =>
-  userRole === 'ADMIN' ? {}
-    : { aplicacao: { aprendente: { responsavelId: userId } } };
+const ownerFilter = (userId) =>
+  ({ aplicacao: { aprendente: { responsavelId: userId } } });
 
 // No controlador, o usuário vem do token validado pelo middleware
-const item = await service.findById(req.params.id, req.user.id, req.user.role);
+const item = await service.findById(req.params.id, req.user.id);
 \end{lstlisting}
 \fonte{Elaborado pela autora (2026).}
 
 O módulo de avaliações é responsável pelo gerenciamento dos instrumentos utilizados pelo sistema. A estrutura adotada permite representar avaliações compostas por diferentes questões e tipos de resposta. O versionamento desses instrumentos é mantido na camada de persistência, conforme apresentado na modelagem do banco de dados, permitindo relacionar diferentes versões de uma mesma avaliação.
 
-De maneira análoga ao módulo de aprendentes, a visibilidade das avaliações é controlada pelo campo \textit{autorId}, atribuído automaticamente ao usuário que criou o instrumento. As consultas de listagem e de detalhe aplicam o mesmo filtro de restrição por responsável, garantindo que cada profissional acesse somente os instrumentos que criou. Ao criar uma nova versão de uma avaliação, o campo \textit{autorId} recebe o usuário que realizou a alteração. Como o psicopedagogo só edita os próprios instrumentos, a titularidade se mantém entre as versões; quando a edição é feita pelo administrador, a nova versão passa a pertencer a ele, limitação discutida na Seção~\ref{sec:instrumentos}.
+De maneira análoga ao módulo de aprendentes, a visibilidade das avaliações é controlada pelo campo \textit{autorId}, atribuído automaticamente ao usuário que criou o instrumento. As consultas de listagem e de detalhe aplicam o mesmo filtro de restrição por responsável, garantindo que cada profissional acesse somente os instrumentos que criou. Ao criar uma nova versão de uma avaliação, o campo \textit{autorId} recebe o usuário que realizou a alteração. Como a edição é exclusiva do perfil \textit{PSICOPEDAGOGO} e cada profissional só edita os próprios instrumentos, a titularidade se mantém entre as versões (Seção~\ref{sec:instrumentos}). O administrador pode consultar e excluir instrumentos, mas não criá-los nem editá-los.
 
 As aplicações são tratadas separadamente pelo módulo \textit{aplicacoes}, permitindo associar uma avaliação a um aprendente e registrar o andamento desse processo. Essa separação entre avaliação e aplicação possibilita que um mesmo instrumento seja utilizado em diferentes processos avaliativos, mantendo cada aplicação como um registro independente.
 
@@ -173,7 +177,7 @@ A API possui documentação baseada em Swagger/OpenAPI, disponibilizada durante 
 
 Para os testes automatizados do backend foram utilizadas as ferramentas Vitest e Supertest. O Vitest é responsável pela execução e pela geração do relatório de cobertura, enquanto o Supertest possibilita a realização de requisições HTTP reais contra a aplicação em memória, sem necessidade de servidor externo. O frontend utiliza Vitest combinado com Testing Library para testes de componentes React.
 
-O backend conta com 76 testes automatizados distribuídos em dois níveis: testes de integração, que exercitam as rotas da API de ponta a ponta, e testes unitários, voltados para as regras de negócio isoladas dos módulos de autenticação e do mecanismo de auditoria. A Tabela~\ref{qua:testes_backend} apresenta a distribuição por arquivo de teste e a cobertura de linhas por módulo obtida com o relatório gerado pelo Vitest com provider V8.
+O backend conta com 88 testes automatizados distribuídos em dois níveis: testes de integração, que exercitam as rotas da API de ponta a ponta, e testes unitários, voltados para as regras de negócio isoladas dos módulos de autenticação e do mecanismo de auditoria. A Tabela~\ref{qua:testes_backend} apresenta a distribuição por arquivo de teste e a cobertura de linhas por módulo obtida com o relatório gerado pelo Vitest com provider V8.
 
 \begin{quadro}[H]
 \centering
@@ -184,27 +188,28 @@ O backend conta com 76 testes automatizados distribuídos em dois níveis: teste
 \textbf{Módulo / Arquivo de teste} & \textbf{Nível} & \textbf{Testes} & \textbf{Cobertura (linhas)} \\
 \hline
 auth (rotas) - auth.test.js & Integração & 7 & 68,32\% \\
-aprendentes - aprendentes.test.js & Integração & 6 & 74,85\% \\
-avaliacoes - avaliacoes.test.js & Integração & 10 & 78,57\% \\
-aplicacoes - aplicacoes.test.js & Integração & 14 & 95,83\% \\
-relatorios - relatorios.test.js & Integração & 8 & 95,67\% \\
-auditoria - auditoria.test.js & Integração & 8 & 97,08\% \\
+aprendentes - aprendentes.test.js & Integração & 6 & 75,14\% \\
+avaliacoes - avaliacoes.test.js & Integração & 11 & 78,66\% \\
+aplicacoes - aplicacoes.test.js & Integração & 14 & 95,78\% \\
+relatorios - relatorios.test.js & Integração & 8 & 95,70\% \\
+auditoria - auditoria.test.js & Integração & 10 & 97,45\% \\
+users e dashboard - users.test.js & Integração & 9 & 87,98\% (users) e 97,80\% (dashboard) \\
 auth.service - auth.service.test.js & Unitário & 4 & - \\
 Extensão Prisma - audit.extension.test.js & Unitário & 12 & 95,37\% \\
 Pacote shared-utils - shared-utils.test.js & Unitário & 7 & - \\
 Utilitários do backend (JWT e e-mail) - sem arquivo próprio & Integração (indireta) & - & 64,17\% \\
 \hline
-\textbf{Total} & & \textbf{76} & \textbf{80,03\% (linhas)} \\
- & & & \textbf{71,83\% (branches)} \\
+\textbf{Total} & & \textbf{88} & \textbf{83,06\% (linhas)} \\
+ & & & \textbf{73,05\% (branches)} \\
 \hline
 \end{tabular}
 \fonte{Elaborado pela autora (2026).}
 \label{qua:testes_backend}
 \end{quadro}
 
-A cobertura de linhas de 80,03\% e de branches de 71,83\% superam o critério mínimo de 70\% estabelecido em RNF10. Os módulos com menor cobertura são \textit{auth.service} (42,50\% de linhas nos testes unitários isolados), os utilitários do backend (64,17\%) e \textit{users} (64,31\%), reflexo de operações administrativas, de recuperação de senha e de envio de e-mail que não possuem testes de integração completos. O pacote compartilhado \textit{shared-utils} fica fora do diretório do backend e, por isso, não entra no relatório de cobertura: seus 7 testes unitários fazem parte do total de testes, mas não da porcentagem.
+A cobertura de linhas de 83,06\% e de branches de 73,05\% superam o critério mínimo de 70\% estabelecido em RNF10. Os módulos com menor cobertura são \textit{auth.service} (42,50\% de linhas nos testes unitários isolados) e os utilitários do backend (64,17\%), reflexo das operações de recuperação de senha e de envio de e-mail, que não possuem testes de integração completos. Os testes de \textit{users.test.js} verificam a separação entre administração e acesso clínico: a transferência de aprendentes, a recusa em excluir ou promover a administrador um profissional que ainda tem aprendentes e o dashboard do administrador sem a lista de aplicações; os testes de aprendentes, aplicações e relatórios verificam que o \textit{ADMIN} recebe HTTP 403 sem que o banco de dados seja consultado, e os de auditoria, que os valores dos registros clínicos não chegam a ele. O pacote compartilhado \textit{shared-utils} fica fora do diretório do backend e, por isso, não entra no relatório de cobertura: seus 7 testes unitários fazem parte do total de testes, mas não da porcentagem.
 
-O frontend conta com 51 testes distribuídos em 9 arquivos, cobrindo as páginas e componentes de maior complexidade de lógica: LoginPage, ProtectedRoute, AvaliacaoFormPage, AvaliacaoDetailPage, AplicacaoDetailPage, Auditoria, RelatorioDetailPage, StatusChip e a função utilitária de impressão. A cobertura do frontend atingiu 48,35\%.
+O frontend conta com 58 testes distribuídos em 11 arquivos, cobrindo as páginas e componentes de maior complexidade de lógica: LoginPage, ProtectedRoute, AvaliacaoFormPage, AvaliacaoDetailPage, AplicacaoDetailPage, Auditoria, RelatorioDetailPage, DashboardPage, UsersListPage, StatusChip e a função utilitária de impressão. A cobertura do frontend atingiu 55,84\%.
 
 Também foram definidos procedimentos para geração do cliente do Prisma, execução das migrações e população inicial do banco de dados. Essas operações permitem preparar o ambiente de desenvolvimento de forma padronizada e manter a estrutura do banco sincronizada com o modelo utilizado pela aplicação.
 
@@ -218,7 +223,7 @@ Nas operações de criação, alteração e exclusão, a extensão grava a açã
 
 Nas entidades com dados clínicos de crianças (aprendentes, histórico de acompanhamento, aplicações e relatórios), também as consultas são registradas, inclusive as listagens, com um registro para cada item exibido. Cada registro é associado ao aprendente a que o dado pertence, o que permite responder quem acessou os dados de uma determinada criança. Os logins bem-sucedidos e as tentativas recusadas também são registrados, estas sem a senha informada.
 
-A consulta ao registro é feita pelo endpoint \textit{GET /api/auditoria}, com filtros por aprendente, usuário, entidade, ação e período. O perfil \textit{ADMIN} consulta todo o registro. O perfil \textit{PSICOPEDAGOGO} consulta apenas o registro de acessos dos aprendentes sob sua responsabilidade, o que inclui os acessos feitos pelo administrador aos dados dessas crianças.
+A consulta ao registro é feita pelo endpoint \textit{GET /api/auditoria}, com filtros por aprendente, usuário, entidade, ação e período. O perfil \textit{ADMIN} consulta todo o registro, mas apenas seus metadados nas entidades clínicas (aprendentes, histórico, aplicações, respostas e relatórios): quem realizou a operação, quando, de qual IP, sobre qual entidade e qual ação. Os valores registrados não lhe são enviados; nas alterações, recebe somente os nomes dos campos alterados. A ocultação é feita na consulta, e não na gravação, de modo que o registro permanece completo. O perfil \textit{PSICOPEDAGOGO} consulta apenas o registro de acessos dos aprendentes sob sua responsabilidade, com os valores completos, o que inclui as operações feitas pelo administrador, como a transferência de responsabilidade.
 
 As limitações desse registro de auditoria são discutidas na Seção~\ref{sec:seguranca}.
 

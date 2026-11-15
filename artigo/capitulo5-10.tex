@@ -9,13 +9,14 @@ No backend, foram utilizados Vitest e Supertest para a realização de testes au
     \item o cadastro e a consulta de aprendentes e de instrumentos avaliativos, incluindo a criação de novas versões e a validação das perguntas;
     \item a restrição de acesso por titularidade em aprendentes, instrumentos, aplicações, relatórios e dashboard;
     \item as regras de finalização das aplicações e a preservação da autoria de aplicações e relatórios;
-    \item o controle de acesso por perfil;
-    \item o registro de auditoria.
+    \item o controle de acesso por perfil, incluindo a recusa do administrador nas rotas de dados clínicos e na criação e edição de instrumentos;
+    \item o registro de auditoria, incluindo a ocultação dos valores clínicos na consulta do administrador;
+    \item a transferência de aprendentes entre profissionais e a recusa em excluir ou promover a administrador um profissional que ainda tem aprendentes.
 \end{itemize}
 
-Não foram contemplados por testes automatizados o cadastro de usuários, a renovação de sessão, o logout e a recuperação de senha. Como o banco de dados é simulado nesses testes, o comportamento junto ao banco real foi verificado separadamente, por roteiros executados contra uma instância descartável do MySQL, cobrindo o fluxo de aplicação de instrumentos com perguntas de seleção e o registro de auditoria.
+Não foram contemplados por testes automatizados o cadastro de usuários, a renovação de sessão, o logout e a recuperação de senha. Como o banco de dados é simulado nesses testes, o comportamento junto ao banco real foi verificado separadamente, por roteiros executados contra uma instância descartável do MySQL, cobrindo o fluxo de aplicação de instrumentos com perguntas de seleção e o registro de auditoria. A separação entre administração e acesso clínico também foi verificada contra o banco real, com usuários e aprendente fictícios criados para esse fim: as rotas clínicas recusaram o administrador, a transferência passou o aprendente ao novo responsável e gerou o registro correspondente em sua auditoria, e nenhuma leitura dos dados da criança foi registrada em nome do administrador.
 
-No frontend, foram utilizados Vitest e React Testing Library, permitindo verificar o comportamento dos componentes e das páginas da aplicação. Foram considerados a tela de login, a proteção das rotas conforme o perfil do usuário, o formulário e a tela de visualização dos instrumentos, o preenchimento, o salvamento e a finalização das aplicações, a criação e a impressão dos relatórios e a consulta ao registro de auditoria. Nesses testes, as chamadas à API também são simuladas.
+No frontend, foram utilizados Vitest e React Testing Library, permitindo verificar o comportamento dos componentes e das páginas da aplicação. Foram considerados a tela de login, a proteção das rotas conforme o perfil do usuário, o formulário e a tela de visualização dos instrumentos, o preenchimento, o salvamento e a finalização das aplicações, a criação e a impressão dos relatórios, a consulta ao registro de auditoria, o dashboard do administrador e a transferência de aprendentes na página de usuários. Nesses testes, as chamadas à API também são simuladas.
 
 Além dos testes automatizados, foram realizados testes funcionais e exploratórios durante o desenvolvimento, buscando verificar o funcionamento integrado das funcionalidades do sistema. Nessa etapa, foram observados fluxos como autenticação, cadastro e consulta de aprendentes, criação e gerenciamento de instrumentos de avaliação, realização de aplicações, registro de respostas e geração de relatórios. Também foram verificadas situações relacionadas à consistência dos dados e ao acesso às funcionalidades protegidas.
 

@@ -56,9 +56,11 @@ No caso dos instrumentos avaliativos, a estrutura do backend permite diferentes 
 
 A autenticação do usuário está integrada à estrutura do frontend por meio do \textit{AuthContext} e dos componentes responsáveis pela proteção das rotas. Após o processo de autenticação, a interface disponibiliza as funcionalidades correspondentes ao perfil do usuário.
 
-Foram definidos dois perfis de acesso no sistema. O perfil \textit{ADMIN} possui acesso total às funcionalidades, incluindo o gerenciamento de usuários e a visualização de todos os registros cadastrados no sistema. O perfil \textit{PSICOPEDAGOGO} possui permissões para criar e editar aprendentes, avaliações, aplicações e relatórios, visualizando somente os registros vinculados ao seu próprio usuário.
+Foram definidos dois perfis de acesso no sistema, com atribuições separadas. O perfil \textit{ADMIN} administra o sistema: gerencia usuários, consulta e exclui instrumentos avaliativos (sem criá-los nem editá-los), transfere aprendentes entre profissionais e consulta o registro de auditoria, mas não acessa aprendentes, aplicações nem relatórios, conforme a separação discutida na Seção~\ref{sec:seguranca}. O perfil \textit{PSICOPEDAGOGO} cria e edita aprendentes, avaliações, aplicações e relatórios, visualizando somente os registros vinculados ao seu próprio usuário.
 
-O controle efetivo das permissões por perfil é aplicado no backend, por meio do middleware \textit{authorize}, que restringe ao perfil \textit{ADMIN} as operações exclusivas do administrador, como o gerenciamento de usuários e a exclusão de instrumentos avaliativos. A interface, por sua vez, utiliza o perfil do usuário autenticado para condicionar a exibição de elementos interativos (como o menu de usuários, cuja rota também é protegida pelo componente \textit{ProtectedRoute}, e o botão de exclusão de instrumentos) reduzindo a exposição de ações que o usuário não pode executar.
+O controle efetivo das permissões por perfil é aplicado no backend, por meio do middleware \textit{authorize}, que restringe ao perfil \textit{ADMIN} as operações de administração e ao perfil \textit{PSICOPEDAGOGO} as de atendimento. A interface, por sua vez, utiliza o perfil do usuário autenticado para condicionar a exibição de elementos interativos, reduzindo a exposição de ações que o usuário não pode executar: o menu de usuários e de auditoria e o botão de exclusão de instrumentos aparecem somente ao administrador, enquanto os itens de aprendentes, aplicações e relatórios são omitidos do seu menu. As rotas correspondentes também são protegidas pelo componente \textit{ProtectedRoute}, que redireciona ao dashboard o perfil não autorizado. Para o administrador, o dashboard exibe apenas os totais, sem a lista das últimas aplicações, que identifica as crianças atendidas.
+
+Na página de usuários, uma coluna informa quantos aprendentes estão sob a responsabilidade de cada profissional, sem identificá-los, e a ação ``Transferir aprendentes'' permite escolher o psicopedagogo ativo que assumirá esses aprendentes e os instrumentos do profissional de origem, como no caso de um profissional que deixa o serviço.
 
 A filtragem dos registros por titularidade também é aplicada integralmente na camada de serviço do backend, de forma que a interface recebe apenas os dados que o usuário autenticado tem permissão de visualizar.
 
@@ -70,7 +72,7 @@ O módulo de aprendentes disponibiliza a interface para o gerenciamento dos indi
 
 Os relatórios possuem um módulo próprio, permitindo consultar e gerenciar as devolutivas associadas às aplicações. O dashboard, por sua vez, concentra a apresentação das informações gerais disponibilizadas pelo backend.
 
-O registro de auditoria é apresentado em dois pontos da interface. A página de auditoria, acessível somente ao perfil \textit{ADMIN}, lista todas as operações registradas, com filtros por entidade, ação e aprendente, e permite visualizar os valores anteriores e novos de cada alteração. Na página de detalhe do aprendente, a aba ``Registro de Acessos'' mostra ao psicopedagogo responsável quem consultou, criou, alterou ou excluiu dados daquela criança, inclusive o administrador do sistema. Ambas utilizam o mesmo componente de tabela, \textit{AuditLogTable}.
+O registro de auditoria é apresentado em dois pontos da interface. A página de auditoria, acessível somente ao perfil \textit{ADMIN}, lista todas as operações registradas, com filtros por entidade, ação e aprendente; nos registros de instrumentos e usuários, permite visualizar os valores anteriores e novos de cada alteração, e nos registros clínicos informa que os valores não são exibidos ao administrador, indicando apenas os campos alterados. Na página de detalhe do aprendente, a aba ``Registro de Acessos'' mostra ao psicopedagogo responsável, com os valores completos, quem consultou, criou, alterou ou excluiu dados daquela criança, inclusive as operações do administrador, como uma transferência de responsabilidade. Ambas utilizam o mesmo componente de tabela, \textit{AuditLogTable}.
 
 A divisão da interface em módulos acompanha a organização funcional do sistema e permite manter relacionadas as páginas e componentes pertencentes a cada área.
 
@@ -152,7 +154,7 @@ Por fim, a Figura~\ref{fig:tela_relatorio_impresso} apresenta o relatório na fo
 
 O frontend utiliza Vitest e React Testing Library para a realização de testes automatizados. O Vitest executa os testes e gera o relatório de cobertura; a React Testing Library fornece utilitários para renderizar componentes React em ambiente simulado (jsdom) e interagir com eles como um usuário faria, sem depender de um navegador real.
 
-Foram implementados 51 testes distribuídos em 9 arquivos, cobrindo as páginas e componentes de maior complexidade de lógica de apresentação, conforme o Quadro~\ref{qua:testes_frontend}.
+Foram implementados 58 testes distribuídos em 11 arquivos, cobrindo as páginas e componentes de maior complexidade de lógica de apresentação, conforme o Quadro~\ref{qua:testes_frontend}.
 
 \begin{quadro}[H]
 \centering
@@ -163,22 +165,24 @@ Foram implementados 51 testes distribuídos em 9 arquivos, cobrindo as páginas 
 \textbf{Arquivo de teste} & \textbf{Testes} & \textbf{Escopo} \\
 \hline
 LoginPage.test.jsx & 6 & Formulário de login, validações e nome acessível do botão de senha \\
-ProtectedRoute.test.jsx & 5 & Redirecionamento por autenticação e perfil \\
+ProtectedRoute.test.jsx & 6 & Redirecionamento por autenticação e perfil, inclusive do administrador nas rotas clínicas \\
 AvaliacaoFormPage.test.jsx & 8 & Formulário de criação e edição de instrumento \\
-AvaliacaoDetailPage.test.jsx & 5 & Exibição de instrumento e questões \\
+AvaliacaoDetailPage.test.jsx & 6 & Exibição de instrumento e questões e ausência da edição para o administrador \\
 AplicacaoDetailPage.test.jsx & 9 & Preenchimento e finalização de aplicação \\
-Auditoria.test.jsx & 5 & Listagem e filtros do registro de auditoria \\
+Auditoria.test.jsx & 6 & Listagem e filtros do registro de auditoria e aviso de valores clínicos omitidos \\
 RelatorioDetailPage.test.jsx & 6 & Exibição e edição de relatório \\
+DashboardPage.test.jsx & 2 & Dashboard do administrador (só totais) e do psicopedagogo \\
+UsersListPage.test.jsx & 2 & Transferência de aprendentes entre profissionais \\
 StatusChip.test.jsx & 4 & Componente de status com variações visuais \\
 print.test.jsx & 3 & Função utilitária de impressão/PDF \\
 \hline
-\textbf{Total} & \textbf{51} & \\
+\textbf{Total} & \textbf{58} & \\
 \hline
 \end{tabular}
 \fonte{Elaborado pela autora (2026).}
 \label{qua:testes_frontend}
 \end{quadro}
 
-A cobertura de linhas do frontend atingiu 48,35\%, valor inferior ao do backend em razão da natureza da camada de apresentação: componentes visuais, estilos e integrações com bibliotecas de UI têm menor aderência a testes automatizados do que serviços de negócio. Os testes implementados cobrem os fluxos de maior risco: autenticação, controle de acesso, preenchimento de avaliações e geração de relatórios.
+A cobertura de linhas do frontend atingiu 55,84\%, valor inferior ao do backend em razão da natureza da camada de apresentação: componentes visuais, estilos e integrações com bibliotecas de UI têm menor aderência a testes automatizados do que serviços de negócio. Os testes implementados cobrem os fluxos de maior risco: autenticação, controle de acesso, preenchimento de avaliações e geração de relatórios.
 
 Dessa forma, o desenvolvimento do frontend estabeleceu a camada de interação do sistema, integrando autenticação, navegação, formulários, gerenciamento dos dados provenientes da API e apresentação das funcionalidades relacionadas aos aprendentes, avaliações, aplicações, relatórios e demais módulos. A organização adotada separa os componentes visuais, as páginas e os mecanismos de comunicação com o backend, contribuindo para a manutenção e evolução da aplicação.
