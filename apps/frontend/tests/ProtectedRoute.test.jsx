@@ -78,6 +78,31 @@ describe('ProtectedRoute', () => {
     expect(screen.queryByText('Só para admin')).not.toBeInTheDocument();
   });
 
+  it('redireciona o ADMIN para /dashboard nas rotas de dados clínicos', () => {
+    render(
+      <MemoryRouter initialEntries={['/aprendentes']}>
+        <AuthContext.Provider value={{
+          user: { id: 'a1', role: 'ADMIN' }, loading: false,
+          login: vi.fn(), logout: vi.fn(), isAdmin: true,
+        }}>
+          <Routes>
+            <Route path="/dashboard" element={<div>Dashboard</div>} />
+            <Route
+              path="/aprendentes"
+              element={
+                <ProtectedRoute roles={['PSICOPEDAGOGO']}>
+                  <div>Lista de aprendentes</div>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </AuthContext.Provider>
+      </MemoryRouter>
+    );
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.queryByText('Lista de aprendentes')).not.toBeInTheDocument();
+  });
+
   it('exibe conteúdo quando perfil está na lista de roles permitidas', () => {
     const routeComRoles = (
       <MemoryRouter initialEntries={['/protegida']}>

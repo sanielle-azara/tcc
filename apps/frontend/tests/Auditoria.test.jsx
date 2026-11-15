@@ -53,15 +53,40 @@ describe('AuditoriaPage (ADMIN)', () => {
     expect(auditoriaApi.list).toHaveBeenCalledWith({ page: 1, limit: 10 });
   });
 
-  it('mostra os valores anteriores e novos de uma alteração', async () => {
+  it('mostra os valores anteriores e novos de uma alteração não clínica', async () => {
+    // Valores de registros clínicos não chegam ao ADMIN; os de instrumentos, sim
+    auditoriaApi.list.mockResolvedValue({ data: { data: [{
+      id: 'l4', timestamp: '2026-11-13T12:00:00.000Z', userId: 'user-001', userRole: 'PSICOPEDAGOGO', action: 'UPDATE',
+      entity: 'Avaliacao', entityId: 'av-1', aprendenteId: null, ip: '10.0.0.2',
+      diff: { name: { de: 'Leitura', para: 'Leitura e Escrita' } },
+      user: { id: 'user-001', name: 'Ana Lima' },
+    }], meta: { total: 1 } } });
     renderAt('/auditoria', '/auditoria', <AuditoriaPage />);
     const user = userEvent.setup();
 
     await user.click(await screen.findByRole('button', { name: 'Ver detalhes' }));
 
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText(/"de": "3º ano"/)).toBeInTheDocument();
-    expect(within(dialog).getByText(/"para": "4º ano"/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/"de": "Leitura"/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/"para": "Leitura e Escrita"/)).toBeInTheDocument();
+  });
+
+  it('explica a omissão dos valores clínicos e lista os campos alterados', async () => {
+    auditoriaApi.list.mockResolvedValue({ data: { data: [{
+      id: 'l3', timestamp: '2026-11-13T12:00:00.000Z', userId: 'user-001', userRole: 'PSICOPEDAGOGO', action: 'UPDATE',
+      entity: 'Relatorio', entityId: 'rel-1', aprendenteId: 'ap-001', ip: '10.0.0.2',
+      diff: { omitido: true, campos: ['conclusao', 'observacoesProfissional'] },
+      user: { id: 'user-001', name: 'Ana Lima' },
+    }], meta: { total: 1 } } });
+    renderAt('/auditoria', '/auditoria', <AuditoriaPage />);
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Ver detalhes' }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/não são exibidos ao administrador/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/conclusao, observacoesProfissional/)).toBeInTheDocument();
+    expect(within(dialog).queryByText(/"omitido"/)).not.toBeInTheDocument();
   });
 
   it('filtra por ação', async () => {

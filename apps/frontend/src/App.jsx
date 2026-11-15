@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from '@mui/material/styles';
@@ -56,23 +56,32 @@ function App() {
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
 
-                <Route path="/aprendentes" element={<AprendentesListPage />} />
-                <Route path="/aprendentes/novo" element={<AprendenteFormPage />} />
-                <Route path="/aprendentes/:id" element={<AprendenteDetailPage />} />
-                <Route path="/aprendentes/:id/editar" element={<AprendenteFormPage />} />
+                {/* Dados clínicos: somente o psicopedagogo (o ADMIN é redirecionado ao dashboard) */}
+                <Route element={<ProtectedRoute roles={['PSICOPEDAGOGO']}><Outlet /></ProtectedRoute>}>
+                  <Route path="/aprendentes" element={<AprendentesListPage />} />
+                  <Route path="/aprendentes/novo" element={<AprendenteFormPage />} />
+                  <Route path="/aprendentes/:id" element={<AprendenteDetailPage />} />
+                  <Route path="/aprendentes/:id/editar" element={<AprendenteFormPage />} />
+
+                  <Route path="/aplicacoes" element={<AplicacoesListPage />} />
+                  <Route path="/aplicacoes/nova" element={<AplicacaoFormPage />} />
+                  <Route path="/aplicacoes/:id" element={<AplicacaoDetailPage />} />
+
+                  <Route path="/relatorios" element={<RelatoriosListPage />} />
+                  <Route path="/relatorios/:id" element={<RelatorioDetailPage />} />
+                  <Route path="/relatorios/aplicacao/:aplicacaoId" element={<RelatorioDetailPage />} />
+                </Route>
 
                 <Route path="/avaliacoes" element={<AvaliacoesListPage />} />
-                <Route path="/avaliacoes/nova" element={<AvaliacaoFormPage />} />
+                <Route
+                  path="/avaliacoes/nova"
+                  element={<ProtectedRoute roles={['PSICOPEDAGOGO']}><AvaliacaoFormPage /></ProtectedRoute>}
+                />
                 <Route path="/avaliacoes/:id" element={<AvaliacaoDetailPage />} />
-                <Route path="/avaliacoes/:id/editar" element={<AvaliacaoFormPage />} />
-
-                <Route path="/aplicacoes" element={<AplicacoesListPage />} />
-                <Route path="/aplicacoes/nova" element={<AplicacaoFormPage />} />
-                <Route path="/aplicacoes/:id" element={<AplicacaoDetailPage />} />
-
-                <Route path="/relatorios" element={<RelatoriosListPage />} />
-                <Route path="/relatorios/:id" element={<RelatorioDetailPage />} />
-                <Route path="/relatorios/aplicacao/:aplicacaoId" element={<RelatorioDetailPage />} />
+                <Route
+                  path="/avaliacoes/:id/editar"
+                  element={<ProtectedRoute roles={['PSICOPEDAGOGO']}><AvaliacaoFormPage /></ProtectedRoute>}
+                />
 
                 <Route path="/perfil/senha" element={<ChangePasswordPage />} />
 

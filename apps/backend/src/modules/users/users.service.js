@@ -22,7 +22,11 @@ const list = async (query) => {
       skip,
       take: limit,
       orderBy: { name: 'asc' },
-      select: { id: true, name: true, email: true, role: true, status: true, createdAt: true },
+      select: {
+        id: true, name: true, email: true, role: true, status: true, createdAt: true,
+        // Apenas a contagem: o ADMIN sabe quantos aprendentes transferir, não quem são
+        _count: { select: { aprendentes: { where: { deletedAt: null } } } },
+      },
     }),
     prisma.user.count({ where }),
   ]);
@@ -50,8 +54,18 @@ const create = async (data) => {
   });
 };
 
+const countAprendentes = (userId) =>
+  prisma.aprendente.count({ where: { responsavelId: userId, deletedAt: null } });
+
+const conflict = (message) => Object.assign(new Error(message), { status: 409 });
+
 const update = async (id, data) => {
-  await findById(id);
+  const current = await findById(id);
+  // O ADMIN não acessa dados clínicos: promover quem ainda é responsável por
+  // aprendentes deixaria essas crianças sem profissional com acesso a elas
+  if (data.role === 'ADMIN' && current.role !== 'ADMIN' && (await countAprendentes(id)) > 0) {
+    throw conflict('Transfira os aprendentes deste profissional antes de torná-lo administrador');
+  }
   if (data.email) {
     const exists = await prisma.user.findFirst({ where: { email: data.email, NOT: { id } } });
     if (exists) throw Object.assign(new Error('Email já cadastrado'), { status: 409 });
@@ -65,7 +79,48 @@ const update = async (id, data) => {
 
 const remove = async (id) => {
   await findById(id);
+  if ((await countAprendentes(id)) > 0) {
+    throw conflict('Transfira os aprendentes deste profissional antes de excluí-lo');
+  }
   await prisma.user.update({ where: { id }, data: { deletedAt: new Date() } });
 };
 
-module.exports = { list, findById, create, update, remove };
+// Continuidade do atendimento quando um profissional deixa o serviço: o ADMIN passa
+// os aprendentes ativos e os instrumentos de um psicopedagogo para outro, sem ler os
+// dados clínicos. Os ids vêm pela relação do usuário, cuja leitura não é auditada como
+// acesso às crianças; cada aprendente transferido gera um registro de alteração
+// (responsavelId de/para) associado a ele na auditoria.
+const transferirAprendentes = async (origemId, destinoId) => {
+  if (origemId === destinoId) {
+    throw Object.assign(new Error('Origem e destino devem ser profissionais diferentes'), { status: 400 });
+  }
+  const origem = await prisma.user.findFirst({
+    where: { id: origemId, deletedAt: null },
+    select: { id: true, aprendentes: { where: { deletedAt: null }, select: { id: true } } },
+  });
+  if (!origem) throw Object.assign(new Error('Usuário não encontrado'), { status: 404 });
+
+  const destino = await prisma.user.findFirst({
+    where: { id: destinoId, deletedAt: null },
+    select: { id: true, role: true, status: true },
+  });
+  if (!destino) throw Object.assign(new Error('Profissional de destino não encontrado'), { status: 404 });
+  if (destino.role !== 'PSICOPEDAGOGO' || destino.status !== 'ACTIVE') {
+    throw Object.assign(new Error('O destino deve ser um psicopedagogo ativo'), { status: 422 });
+  }
+
+  const ids = origem.aprendentes.map((a) => a.id);
+  const results = await prisma.$transaction([
+    ...ids.map((id) => prisma.aprendente.update({
+      where: { id },
+      data: { responsavelId: destinoId },
+      select: { id: true, responsavelId: true },
+    })),
+    // Sem os instrumentos, o novo responsável não poderia aplicar os mesmos protocolos
+    prisma.avaliacao.updateMany({ where: { autorId: origemId, deletedAt: null }, data: { autorId: destinoId } }),
+  ]);
+
+  return { aprendentes: ids.length, avaliacoes: results[results.length - 1].count };
+};
+
+module.exports = { list, findById, create, update, remove, transferirAprendentes };

@@ -59,11 +59,13 @@ const AvaliacoesListPage = () => {
               <VisibilityIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Editar">
-            <IconButton size="small" onClick={() => navigate(`/avaliacoes/${row.id}/editar`)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {!isAdmin && (
+            <Tooltip title="Editar">
+              <IconButton size="small" onClick={() => navigate(`/avaliacoes/${row.id}/editar`)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
           {isAdmin && (
             <Tooltip title="Excluir">
               <IconButton size="small" color="error" onClick={() => setDeleteId(row.id)}>
@@ -81,7 +83,7 @@ const AvaliacoesListPage = () => {
       <PageHeader
         title="Avaliações"
         subtitle="Formulários de avaliação psicopedagógica"
-        action={() => navigate('/avaliacoes/nova')}
+        action={isAdmin ? undefined : () => navigate('/avaliacoes/nova')}
         actionLabel="Nova Avaliação"
       />
       <Box mb={2}>

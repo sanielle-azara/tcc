@@ -85,6 +85,25 @@ describe('POST /api/avaliacoes', () => {
     expect(prisma.avaliacao.update).not.toHaveBeenCalled();
   });
 
+  it('retorna 403 quando ADMIN tenta criar ou editar instrumento (exclusivo do psicopedagogo)', async () => {
+    const token = await getToken('ADMIN');
+    prisma.user.findUnique.mockResolvedValue(makeUser('ADMIN'));
+
+    const edicao = await request(app)
+      .put('/api/avaliacoes/av-001')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Nome alterado' });
+    const criacao = await request(app)
+      .post('/api/avaliacoes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Instrumento do admin', status: 'ACTIVE', questions: [{ text: 'Pergunta?', type: 'TEXT', required: true }] });
+
+    expect([edicao.status, criacao.status]).toEqual([403, 403]);
+    expect(prisma.avaliacao.findFirst).not.toHaveBeenCalled();
+    expect(prisma.avaliacao.update).not.toHaveBeenCalled();
+    expect(prisma.avaliacao.create).not.toHaveBeenCalled();
+  });
+
   it('cria avaliação com autorId do usuário logado', async () => {
     const token = await getToken('PSICOPEDAGOGO');
     prisma.user.findUnique.mockResolvedValue(makeUser());

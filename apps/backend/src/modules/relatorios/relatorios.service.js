@@ -2,13 +2,12 @@ const prisma = require('../../config/prisma');
 const { parsePagination } = require('@psicopedagogia/shared-utils');
 
 // A titularidade de um relatório segue a do aprendente da aplicação:
-// o psicopedagogo responsável pelo aprendente acessa seus relatórios; o ADMIN acessa todos.
-const ownerFilter = (userId, userRole) =>
-  userRole === 'ADMIN' ? {} : { aplicacao: { aprendente: { responsavelId: userId } } };
+// somente o psicopedagogo responsável pelo aprendente acessa seus relatórios.
+const ownerFilter = (userId) => ({ aplicacao: { aprendente: { responsavelId: userId } } });
 
-const list = async (query, userId, userRole) => {
+const list = async (query, userId) => {
   const { page, limit, skip } = parsePagination(query);
-  const where = ownerFilter(userId, userRole);
+  const where = ownerFilter(userId);
   const [data, total] = await Promise.all([
     prisma.relatorio.findMany({
       where,
@@ -30,9 +29,9 @@ const list = async (query, userId, userRole) => {
   return { data, total, page, limit };
 };
 
-const findById = async (id, userId, userRole) => {
+const findById = async (id, userId) => {
   const item = await prisma.relatorio.findFirst({
-    where: { id, ...ownerFilter(userId, userRole) },
+    where: { id, ...ownerFilter(userId) },
     include: {
       aplicacao: {
         include: {
@@ -49,9 +48,9 @@ const findById = async (id, userId, userRole) => {
   return item;
 };
 
-const findByAplicacao = async (aplicacaoId, userId, userRole) => {
+const findByAplicacao = async (aplicacaoId, userId) => {
   return prisma.relatorio.findFirst({
-    where: { aplicacaoId, ...ownerFilter(userId, userRole) },
+    where: { aplicacaoId, ...ownerFilter(userId) },
     include: {
       aplicacao: {
         include: {
@@ -66,11 +65,11 @@ const findByAplicacao = async (aplicacaoId, userId, userRole) => {
   });
 };
 
-const createOrUpdate = async (data, userId, userRole) => {
+const createOrUpdate = async (data, userId) => {
   const aplicacao = await prisma.aplicacao.findFirst({
     where: {
       id: data.aplicacaoId,
-      ...(userRole !== 'ADMIN' && { aprendente: { responsavelId: userId } }),
+      aprendente: { responsavelId: userId },
     },
   });
   if (!aplicacao) throw Object.assign(new Error('Aplicação não encontrada'), { status: 404 });

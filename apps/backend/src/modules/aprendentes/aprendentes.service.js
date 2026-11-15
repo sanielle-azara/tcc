@@ -1,14 +1,15 @@
 const prisma = require('../../config/prisma');
 const { parsePagination } = require('@psicopedagogia/shared-utils');
 
-const ownerFilter = (userId, userRole) =>
-  userRole === 'ADMIN' ? {} : { responsavelId: userId };
+// Sem exceção por perfil: as rotas clínicas já recusam o ADMIN, e o filtro garante,
+// como segunda barreira, que cada profissional só alcance os próprios aprendentes.
+const ownerFilter = (userId) => ({ responsavelId: userId });
 
-const list = async (query, userId, userRole) => {
+const list = async (query, userId) => {
   const { page, limit, skip } = parsePagination(query);
   const where = {
     deletedAt: null,
-    ...ownerFilter(userId, userRole),
+    ...ownerFilter(userId),
     ...(query.search && {
       OR: [
         { name: { contains: query.search } },
@@ -37,8 +38,8 @@ const list = async (query, userId, userRole) => {
   return { data, total, page, limit };
 };
 
-const findById = async (id, userId, userRole) => {
-  const where = { id, deletedAt: null, ...ownerFilter(userId, userRole) };
+const findById = async (id, userId) => {
+  const where = { id, deletedAt: null, ...ownerFilter(userId) };
   const item = await prisma.aprendente.findFirst({
     where,
     include: {
@@ -60,27 +61,27 @@ const create = async (data, userId) => {
   });
 };
 
-const update = async (id, data, userId, userRole) => {
-  await findById(id, userId, userRole);
+const update = async (id, data, userId) => {
+  await findById(id, userId);
   const updateData = { ...data };
   if (data.birthDate) updateData.birthDate = new Date(data.birthDate);
   return prisma.aprendente.update({ where: { id }, data: updateData });
 };
 
-const remove = async (id, userId, userRole) => {
-  await findById(id, userId, userRole);
+const remove = async (id, userId) => {
+  await findById(id, userId);
   await prisma.aprendente.update({ where: { id }, data: { deletedAt: new Date() } });
 };
 
-const addHistorico = async (aprendentId, descricao, userId, userRole) => {
-  await findById(aprendentId, userId, userRole);
+const addHistorico = async (aprendentId, descricao, userId) => {
+  await findById(aprendentId, userId);
   return prisma.historicoAprendente.create({
     data: { aprendentId, descricao },
   });
 };
 
-const listHistorico = async (aprendentId, userId, userRole) => {
-  await findById(aprendentId, userId, userRole);
+const listHistorico = async (aprendentId, userId) => {
+  await findById(aprendentId, userId);
   return prisma.historicoAprendente.findMany({
     where: { aprendentId },
     orderBy: { data: 'desc' },

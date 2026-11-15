@@ -55,7 +55,13 @@ const DashboardPage = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" mb={2}>Últimas Aplicações</Typography>
-              {data.ultimasAplicacoes.length === 0 ? (
+              {/* A API envia null ao administrador: a lista identifica as crianças atendidas */}
+              {data.ultimasAplicacoes === null ? (
+                <Typography color="text.secondary">
+                  Por sigilo profissional, o administrador vê apenas os totais. As aplicações e os
+                  dados das crianças ficam restritos ao psicopedagogo responsável.
+                </Typography>
+              ) : data.ultimasAplicacoes.length === 0 ? (
                 <Typography color="text.secondary">Nenhuma aplicação registrada</Typography>
               ) : (
                 <List disablePadding>

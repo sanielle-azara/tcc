@@ -5,6 +5,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AvaliacaoDetailPage from '../src/pages/avaliacoes/AvaliacaoDetailPage';
 import { avaliacoesApi } from '../src/api/avaliacoes';
+import { AuthContext } from '../src/contexts/AuthContext';
 
 vi.mock('../src/api/avaliacoes', () => ({
   avaliacoesApi: { findById: vi.fn() },
@@ -51,6 +52,23 @@ describe('AvaliacaoDetailPage', () => {
     expect(screen.getByText('Ativo')).toBeInTheDocument();
     expect(screen.getByText('4')).toBeInTheDocument();
     expect(avaliacoesApi.findById).toHaveBeenCalledWith('av-002');
+  });
+
+  it('não oferece a edição ao administrador', async () => {
+    avaliacoesApi.findById.mockResolvedValue({ data: { data: makeAvaliacao() } });
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <AuthContext.Provider value={{ user: { id: 'a1', role: 'ADMIN' }, loading: false, isAdmin: true }}>
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter initialEntries={['/avaliacoes/av-002']}>
+            <Routes><Route path="/avaliacoes/:id" element={<AvaliacaoDetailPage />} /></Routes>
+          </MemoryRouter>
+        </QueryClientProvider>
+      </AuthContext.Provider>
+    );
+
+    expect(await screen.findByText('Avaliação de Leitura')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /editar/i })).not.toBeInTheDocument();
   });
 
   it('exibe as perguntas com tipo, obrigatoriedade, ajuda, opções e escala', async () => {

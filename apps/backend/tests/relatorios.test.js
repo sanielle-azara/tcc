@@ -46,15 +46,13 @@ describe('GET /api/relatorios', () => {
     expect(countArg.where).toMatchObject(ownerWhere);
   });
 
-  it('ADMIN não recebe filtro de titularidade', async () => {
+  it('ADMIN não acessa relatórios: 403 sem consultar o banco', async () => {
     const token = await getToken('ADMIN');
-    prisma.relatorio.findMany.mockResolvedValue([]);
-    prisma.relatorio.count.mockResolvedValue(0);
 
-    await request(app).get('/api/relatorios').set('Authorization', `Bearer ${token}`);
+    const res = await request(app).get('/api/relatorios').set('Authorization', `Bearer ${token}`);
 
-    const [queryArg] = prisma.relatorio.findMany.mock.calls[0];
-    expect(queryArg.where).not.toHaveProperty('aplicacao');
+    expect(res.status).toBe(403);
+    expect(prisma.relatorio.findMany).not.toHaveBeenCalled();
   });
 });
 

@@ -58,18 +58,17 @@ describe('GET /api/aprendentes', () => {
     expect(queryArg.where).toMatchObject({ responsavelId: 'user-001' });
   });
 
-  it('ADMIN não recebe filtro de responsavelId', async () => {
+  it('ADMIN não acessa dados clínicos: 403 sem consultar o banco', async () => {
     const token = await getToken('ADMIN');
     prisma.user.findUnique.mockResolvedValue(makeUser('ADMIN'));
-    prisma.aprendente.findMany.mockResolvedValue([]);
-    prisma.aprendente.count.mockResolvedValue(0);
 
-    await request(app)
-      .get('/api/aprendentes')
-      .set('Authorization', `Bearer ${token}`);
+    const lista = await request(app).get('/api/aprendentes').set('Authorization', `Bearer ${token}`);
+    const detalhe = await request(app).get('/api/aprendentes/ap-001').set('Authorization', `Bearer ${token}`);
+    const historico = await request(app).get('/api/aprendentes/ap-001/historico').set('Authorization', `Bearer ${token}`);
 
-    const [queryArg] = prisma.aprendente.findMany.mock.calls[0];
-    expect(queryArg.where).not.toHaveProperty('responsavelId');
+    expect([lista.status, detalhe.status, historico.status]).toEqual([403, 403, 403]);
+    expect(prisma.aprendente.findMany).not.toHaveBeenCalled();
+    expect(prisma.aprendente.findFirst).not.toHaveBeenCalled();
   });
 });
 

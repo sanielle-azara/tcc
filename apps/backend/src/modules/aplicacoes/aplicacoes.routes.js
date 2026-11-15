@@ -6,18 +6,19 @@ const { createAplicacaoSchema, saveAnswersSchema } = require('@psicopedagogia/sh
 const { z } = require('zod');
 
 const router = Router();
-router.use(authenticate);
+// Dados clínicos de crianças: acessíveis somente ao psicopedagogo, e apenas os seus
+// (filtro de titularidade no service). O ADMIN administra usuários, não atendimentos.
+router.use(authenticate, authorize('PSICOPEDAGOGO'));
 
 router.get('/', controller.list);
 router.get('/:id', controller.findById);
-router.post('/', authorize('ADMIN', 'PSICOPEDAGOGO'), validate(createAplicacaoSchema), controller.create);
-router.put('/:id/answers', authorize('ADMIN', 'PSICOPEDAGOGO'), validate(saveAnswersSchema), controller.saveAnswers);
+router.post('/', validate(createAplicacaoSchema), controller.create);
+router.put('/:id/answers', validate(saveAnswersSchema), controller.saveAnswers);
 router.post(
   '/:id/finalize',
-  authorize('ADMIN', 'PSICOPEDAGOGO'),
   validate(z.object({ observacoes: z.string().max(2000).optional() })),
   controller.finalize
 );
-router.delete('/:id', authorize('ADMIN', 'PSICOPEDAGOGO'), controller.remove);
+router.delete('/:id', controller.remove);
 
 module.exports = router;

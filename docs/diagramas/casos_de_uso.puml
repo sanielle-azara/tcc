@@ -24,7 +24,8 @@ skinparam rectangle {
 
 actor "Psicopedagogo" as P
 actor "Administrador" as A
-A -|> P
+' O Administrador não herda os casos de uso do Psicopedagogo: por sigilo
+' profissional, não acessa aprendentes, aplicações nem relatórios.
 
 rectangle "Sistema de apoio à avaliação psicopedagógica" {
   usecase "Cadastrar-se\n(RF01)" as UC01
@@ -41,7 +42,8 @@ rectangle "Sistema de apoio à avaliação psicopedagógica" {
   usecase "Consultar acessos aos\nseus aprendentes (RF15)" as UC12
   usecase "Gerenciar usuários\n(RF02)" as UC13
   usecase "Excluir instrumentos" as UC14
-  usecase "Consultar registro de\nauditoria completo (RF15)" as UC15
+  usecase "Consultar registro de auditoria\nsem valores clínicos (RF15)" as UC15
+  usecase "Transferir aprendentes\nentre profissionais (RF04)" as UC16
 }
 
 P --> UC01
@@ -54,9 +56,12 @@ P --> UC08
 P --> UC10
 P --> UC12
 
+A --> UC02
+A --> UC03
 A --> UC13
 A --> UC14
 A --> UC15
+A --> UC16
 
 UC06 ..> UC07 : <<include>>
 ' Escrito no sentido inverso para que os casos base fiquem na coluna do ator

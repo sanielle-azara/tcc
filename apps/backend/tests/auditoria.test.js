@@ -53,6 +53,40 @@ describe('GET /api/auditoria', () => {
     expect(queryArg.orderBy).toEqual({ timestamp: 'desc' });
   });
 
+  it('ADMIN recebe os registros clínicos sem os valores, e os demais completos', async () => {
+    const token = await getToken('ADMIN');
+    prisma.auditLog.findMany.mockResolvedValue([
+      { id: 'l2', userId: 'user-001', action: 'UPDATE', entity: 'Relatorio', aprendenteId: 'ap-001',
+        diff: { conclusao: { de: 'texto anterior', para: 'texto novo' } } },
+      { id: 'l3', userId: 'user-001', action: 'CREATE', entity: 'Aprendente', aprendenteId: 'ap-001',
+        diff: { depois: { name: 'João', birthDate: '2015-03-12' } } },
+      { id: 'l4', userId: 'user-001', action: 'UPDATE', entity: 'Avaliacao',
+        diff: { name: { de: 'Leitura', para: 'Leitura e Escrita' } } },
+    ]);
+
+    const res = await request(app).get('/api/auditoria').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    const [relatorio, aprendente, avaliacao] = res.body.data;
+    expect(relatorio.diff).toEqual({ omitido: true, campos: ['conclusao'] });
+    expect(aprendente.diff).toEqual({ omitido: true });
+    expect(JSON.stringify(res.body)).not.toContain('João');
+    expect(avaliacao.diff).toEqual({ name: { de: 'Leitura', para: 'Leitura e Escrita' } });
+  });
+
+  it('PSICOPEDAGOGO recebe os valores completos dos registros do seu aprendente', async () => {
+    const token = await getToken('PSICOPEDAGOGO');
+    prisma.aprendente.findFirst.mockResolvedValue({ id: 'ap-001' });
+    const diff = { conclusao: { de: 'texto anterior', para: 'texto novo' } };
+    prisma.auditLog.findMany.mockResolvedValue([
+      { id: 'l2', userId: 'user-001', action: 'UPDATE', entity: 'Relatorio', aprendenteId: 'ap-001', diff },
+    ]);
+
+    const res = await request(app).get('/api/auditoria?aprendenteId=ap-001').set('Authorization', `Bearer ${token}`);
+
+    expect(res.body.data[0].diff).toEqual(diff);
+  });
+
   it('PSICOPEDAGOGO consulta os acessos de um aprendente próprio, incluindo os do ADMIN', async () => {
     const token = await getToken('PSICOPEDAGOGO');
     prisma.aprendente.findFirst.mockResolvedValue({ id: 'ap-001' });

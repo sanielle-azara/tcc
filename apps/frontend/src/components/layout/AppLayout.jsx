@@ -20,12 +20,13 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const DRAWER_WIDTH = 240;
 
+// clinical: módulos com dados de crianças, ocultos para o ADMIN (que também é recusado pela API)
 const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
-  { label: 'Aprendentes', path: '/aprendentes', icon: <SchoolIcon /> },
+  { label: 'Aprendentes', path: '/aprendentes', icon: <SchoolIcon />, clinical: true },
   { label: 'Avaliações', path: '/avaliacoes', icon: <AssignmentIcon /> },
-  { label: 'Aplicações', path: '/aplicacoes', icon: <PlaylistAddCheckIcon /> },
-  { label: 'Relatórios', path: '/relatorios', icon: <DescriptionIcon /> },
+  { label: 'Aplicações', path: '/aplicacoes', icon: <PlaylistAddCheckIcon />, clinical: true },
+  { label: 'Relatórios', path: '/relatorios', icon: <DescriptionIcon />, clinical: true },
 ];
 
 const adminItems = [
@@ -61,7 +62,7 @@ const AppLayout = () => {
       </Toolbar>
       <Divider />
       <List>
-        {navItems.map((item) => (
+        {navItems.filter((item) => !(isAdmin && item.clinical)).map((item) => (
           <ListItem key={item.path} disablePadding>
             <ListItemButton
               selected={isActive(item.path)}

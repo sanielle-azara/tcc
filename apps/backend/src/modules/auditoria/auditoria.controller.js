@@ -14,8 +14,11 @@ const { buildPaginatedResponse } = require('@psicopedagogia/shared-utils');
  *   get:
  *     summary: Consultar o registro de auditoria
  *     description: >
- *       O ADMIN consulta todo o registro. O PSICOPEDAGOGO consulta apenas o registro
- *       de acessos de um aprendente sob sua responsabilidade (aprendenteId obrigatório).
+ *       O ADMIN consulta todo o registro, mas, nas entidades clínicas (aprendente,
+ *       histórico, aplicação, resposta e relatório), o diff chega sem os valores:
+ *       apenas os nomes dos campos alterados ou a quantidade de registros. O
+ *       PSICOPEDAGOGO consulta apenas o registro de acessos de um aprendente sob sua
+ *       responsabilidade (aprendenteId obrigatório), com os valores completos.
  *     tags: [Auditoria]
  *     parameters:
  *       - in: query

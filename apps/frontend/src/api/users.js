@@ -6,4 +6,5 @@ export const usersApi = {
   create: (data) => api.post('/users', data),
   update: (id, data) => api.put(`/users/${id}`, data),
   remove: (id) => api.delete(`/users/${id}`),
+  transferirAprendentes: (id, destinoId) => api.post(`/users/${id}/transferir-aprendentes`, { destinoId }),
 };

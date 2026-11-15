@@ -52,15 +52,13 @@ describe('GET /api/aplicacoes', () => {
     expect(countArg.where).toMatchObject({ aprendente: { responsavelId: 'user-001' } });
   });
 
-  it('ADMIN não recebe filtro de titularidade', async () => {
+  it('ADMIN não acessa aplicações: 403 sem consultar o banco', async () => {
     const token = await getToken('ADMIN');
-    prisma.aplicacao.findMany.mockResolvedValue([]);
-    prisma.aplicacao.count.mockResolvedValue(0);
 
-    await request(app).get('/api/aplicacoes').set('Authorization', `Bearer ${token}`);
+    const res = await request(app).get('/api/aplicacoes').set('Authorization', `Bearer ${token}`);
 
-    const [queryArg] = prisma.aplicacao.findMany.mock.calls[0];
-    expect(queryArg.where).not.toHaveProperty('aprendente');
+    expect(res.status).toBe(403);
+    expect(prisma.aplicacao.findMany).not.toHaveBeenCalled();
   });
 });
 
@@ -186,7 +184,7 @@ describe('PUT /api/aplicacoes/:id/answers', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('preserva o aplicador registrado na criação', async () => {
-    const token = await getToken('ADMIN');
+    const token = await getToken('PSICOPEDAGOGO');
     prisma.aplicacao.findFirst.mockResolvedValue(makeAplicacao());
     const tx = { resposta: { upsert: vi.fn() }, aplicacao: { update: vi.fn() } };
     prisma.$transaction.mockImplementationOnce((fn) => fn(tx));

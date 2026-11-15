@@ -11,6 +11,8 @@ const getStats = async (userId, userRole) => {
   const avaliacaoWhere = { deletedAt: null, status: 'ACTIVE', ...ownerFilterAvaliacoes(userId, userRole) };
   const aplicacaoWhere = userRole === 'ADMIN' ? {} : { aprendente: { responsavelId: userId } };
 
+  // O ADMIN recebe apenas contagens agregadas: a lista das últimas aplicações
+  // identifica as crianças atendidas e fica restrita ao psicopedagogo.
   const [
     totalAprendentes,
     totalAvaliacoes,
@@ -23,16 +25,18 @@ const getStats = async (userId, userRole) => {
     prisma.avaliacao.count({ where: avaliacaoWhere }),
     prisma.aplicacao.count({ where: aplicacaoWhere }),
     prisma.aplicacao.groupBy({ by: ['status'], where: aplicacaoWhere, _count: { id: true } }),
-    prisma.aplicacao.findMany({
-      where: aplicacaoWhere,
-      take: 10,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        aprendente: { select: { id: true, name: true } },
-        avaliacao: { select: { id: true, name: true } },
-        aplicador: { select: { id: true, name: true } },
-      },
-    }),
+    userRole === 'ADMIN'
+      ? null
+      : prisma.aplicacao.findMany({
+        where: aplicacaoWhere,
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          aprendente: { select: { id: true, name: true } },
+          avaliacao: { select: { id: true, name: true } },
+          aplicador: { select: { id: true, name: true } },
+        },
+      }),
     prisma.avaliacao.findMany({
       where: avaliacaoWhere,
       take: 5,

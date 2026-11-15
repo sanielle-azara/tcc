@@ -96,9 +96,19 @@ const AuditLogTable = ({ params = {}, showAprendente = false, emptyMessage = 'Ne
               Registro: {detail.entityId}
             </Typography>
           )}
-          <Box component="pre" sx={{ m: 0, fontSize: 13, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-            {detail && JSON.stringify(detail.diff, null, 2)}
-          </Box>
+          {detail?.diff?.omitido ? (
+            // A API não envia ao administrador os valores de registros clínicos
+            <Alert severity="info">
+              Os valores deste registro não são exibidos ao administrador, por se tratar de dados clínicos
+              protegidos pelo sigilo profissional.
+              {detail.diff.campos?.length > 0 && ` Campos alterados: ${detail.diff.campos.join(', ')}.`}
+              {detail.diff.quantidade !== undefined && ` Registros afetados: ${detail.diff.quantidade}.`}
+            </Alert>
+          ) : (
+            <Box component="pre" sx={{ m: 0, fontSize: 13, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+              {detail && JSON.stringify(detail.diff, null, 2)}
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDetail(null)}>Fechar</Button>

@@ -5,18 +5,21 @@ import { Box, IconButton, Tooltip, Alert, Snackbar, TextField, InputAdornment } 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { usersApi } from '../../api/users';
 import { formatDate } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 import DataTable from '../../components/common/DataTable';
 import StatusChip from '../../components/common/StatusChip';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import TransferirAprendentesDialog from './TransferirAprendentesDialog';
 
 const UsersListPage = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState('');
   const [deleteId, setDeleteId] = useState(null);
+  const [transferOrigem, setTransferOrigem] = useState(null);
   const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -41,11 +44,19 @@ const UsersListPage = () => {
     { id: 'email', label: 'Email' },
     { id: 'role', label: 'Perfil', render: (row) => <StatusChip status={row.role} /> },
     { id: 'status', label: 'Status', render: (row) => <StatusChip status={row.status} /> },
+    { id: 'aprendentes', label: 'Aprendentes', align: 'center', render: (row) => row._count?.aprendentes ?? 0 },
     { id: 'createdAt', label: 'Cadastrado em', render: (row) => formatDate(row.createdAt) },
     {
-      id: 'actions', label: 'Ações', align: 'center', width: 100,
+      id: 'actions', label: 'Ações', align: 'center', width: 140,
       render: (row) => (
         <Box display="flex" justifyContent="center" gap={0.5}>
+          {row._count?.aprendentes > 0 && (
+            <Tooltip title="Transferir aprendentes">
+              <IconButton size="small" onClick={() => setTransferOrigem(row)}>
+                <SwapHorizIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
           <Tooltip title="Editar">
             <IconButton size="small" onClick={() => navigate(`/users/${row.id}/editar`)}>
               <EditIcon fontSize="small" />
@@ -96,6 +107,18 @@ const UsersListPage = () => {
         message="Tem certeza que deseja excluir este usuário?"
         onConfirm={() => deleteMutation.mutate(deleteId)}
         onCancel={() => setDeleteId(null)}
+      />
+      <TransferirAprendentesDialog
+        origem={transferOrigem}
+        onClose={() => setTransferOrigem(null)}
+        onDone={({ aprendentes, avaliacoes }) => {
+          setTransferOrigem(null);
+          setSnack({
+            open: true,
+            severity: 'success',
+            message: `${aprendentes} aprendente(s) e ${avaliacoes} instrumento(s) transferidos`,
+          });
+        }}
       />
       <Snackbar open={snack.open} autoHideDuration={4000} onClose={() => setSnack((s) => ({ ...s, open: false }))}>
         <Alert severity={snack.severity}>{snack.message}</Alert>

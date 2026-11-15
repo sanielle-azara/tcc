@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -5,6 +6,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { avaliacoesApi } from '../../api/avaliacoes';
+import { AuthContext } from '../../contexts/AuthContext';
 import { formatDate } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 import StatusChip from '../../components/common/StatusChip';
@@ -74,6 +76,8 @@ const VersionLink = ({ version, onClick }) => (
 const AvaliacaoDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  // Só o psicopedagogo edita instrumentos; o administrador apenas os consulta e exclui
+  const isAdmin = useContext(AuthContext)?.user?.role === 'ADMIN';
 
   const { data: a, isLoading, error } = useQuery({
     queryKey: ['avaliacao', id],
@@ -101,7 +105,7 @@ const AvaliacaoDetailPage = () => {
       <PageHeader
         title={a.name}
         subtitle={`Versão ${a.version}${a.category ? ` • ${a.category}` : ''}`}
-        action={() => navigate(`/avaliacoes/${id}/editar`)}
+        action={isAdmin ? undefined : () => navigate(`/avaliacoes/${id}/editar`)}
         actionLabel="Editar"
         actionIcon={<EditIcon />}
       />

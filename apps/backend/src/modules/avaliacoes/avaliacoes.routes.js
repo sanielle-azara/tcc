@@ -10,8 +10,9 @@ router.use(authenticate);
 router.get('/categories', controller.getCategories);
 router.get('/', controller.list);
 router.get('/:id', controller.findById);
-router.post('/', authorize('ADMIN', 'PSICOPEDAGOGO'), validate(createAvaliacaoSchema), controller.create);
-router.put('/:id', authorize('ADMIN', 'PSICOPEDAGOGO'), validate(updateAvaliacaoSchema), controller.update);
+// Criar e editar atribuem a autoria a quem executa: só o psicopedagogo cria e edita os próprios instrumentos
+router.post('/', authorize('PSICOPEDAGOGO'), validate(createAvaliacaoSchema), controller.create);
+router.put('/:id', authorize('PSICOPEDAGOGO'), validate(updateAvaliacaoSchema), controller.update);
 router.delete('/:id', authorize('ADMIN'), controller.remove);
 
 module.exports = router;

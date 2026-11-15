@@ -164,4 +164,45 @@ const remove = async (req, res, next) => {
   }
 };
 
-module.exports = { list, findById, create, update, remove };
+/**
+ * @swagger
+ * /users/{id}/transferir-aprendentes:
+ *   post:
+ *     summary: Transferir aprendentes e instrumentos de um profissional para outro
+ *     description: >
+ *       Usado quando um psicopedagogo deixa o serviço. O ADMIN não lê os dados clínicos;
+ *       apenas troca o responsável. Cada aprendente transferido fica registrado na auditoria.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *         description: Profissional de origem
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [destinoId]
+ *             properties:
+ *               destinoId: { type: string, description: Psicopedagogo ativo que assume os aprendentes }
+ *     responses:
+ *       200:
+ *         description: Quantidade de aprendentes e de instrumentos transferidos
+ *       404:
+ *         description: Origem ou destino não encontrado
+ *       422:
+ *         description: Destino não é um psicopedagogo ativo
+ */
+const transferirAprendentes = async (req, res, next) => {
+  try {
+    const result = await usersService.transferirAprendentes(req.params.id, req.body.destinoId);
+    res.json(buildSuccessResponse(result, 'Aprendentes transferidos com sucesso'));
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { list, findById, create, update, remove, transferirAprendentes };
