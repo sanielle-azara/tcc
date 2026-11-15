@@ -23,7 +23,7 @@ const AprendenteFormPage = () => {
     enabled: isEdit,
   });
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(isEdit ? updateAprendentSchema : createAprendentSchema),
   });
 
@@ -68,7 +68,7 @@ const AprendenteFormPage = () => {
                 <TextField {...register('birthDate')} label="Data de Nascimento *" type="date" fullWidth InputLabelProps={{ shrink: true }} error={!!errors.birthDate} helperText={errors.birthDate?.message} />
               </Grid>
               <Grid item xs={12} md={3}>
-                <TextField {...register('sexo')} label="Sexo *" select fullWidth error={!!errors.sexo} helperText={errors.sexo?.message} defaultValue="">
+                <TextField {...register('sexo')} label="Sexo *" select fullWidth error={!!errors.sexo} helperText={errors.sexo?.message} value={watch('sexo') ?? ''}>
                   <MenuItem value="MASCULINO">Masculino</MenuItem>
                   <MenuItem value="FEMININO">Feminino</MenuItem>
                   <MenuItem value="OUTRO">Outro</MenuItem>

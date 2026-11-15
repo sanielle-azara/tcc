@@ -8,7 +8,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import { aprendentesApi } from '../../api/aprendentes';
-import { formatDate, calculateAge } from '@psicopedagogia/shared-utils';
+import { formatDate, formatDateOnly, calculateAge } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 import AuditLogTable from '../../components/common/AuditLogTable';
 
@@ -68,7 +68,7 @@ const AprendenteDetailPage = () => {
                 <Typography variant="subtitle1" fontWeight={600} mb={2}>Dados Pessoais</Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={6}><InfoField label="Nome" value={a.name} /></Grid>
-                  <Grid item xs={6}><InfoField label="Data de Nascimento" value={`${formatDate(a.birthDate)} (${calculateAge(a.birthDate)} anos)`} /></Grid>
+                  <Grid item xs={6}><InfoField label="Data de Nascimento" value={`${formatDateOnly(a.birthDate)} (${calculateAge(a.birthDate)} anos)`} /></Grid>
                   <Grid item xs={6}><InfoField label="Sexo" value={a.sexo} /></Grid>
                 </Grid>
               </CardContent>

@@ -20,8 +20,9 @@ const UserFormPage = () => {
     enabled: isEdit,
   });
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(isEdit ? updateUserSchema : createUserSchema),
+    defaultValues: { role: 'PSICOPEDAGOGO', status: 'ACTIVE' },
   });
 
   useEffect(() => { if (user) reset(user); }, [user, reset]);
@@ -56,13 +57,13 @@ const UserFormPage = () => {
                 </Grid>
               )}
               <Grid item xs={12} md={3}>
-                <TextField {...register('role')} label="Perfil" select fullWidth defaultValue="PSICOPEDAGOGO">
+                <TextField {...register('role')} label="Perfil" select fullWidth value={watch('role') ?? 'PSICOPEDAGOGO'}>
                   <MenuItem value="ADMIN">Administrador</MenuItem>
                   <MenuItem value="PSICOPEDAGOGO">Psicopedagogo</MenuItem>
                 </TextField>
               </Grid>
               <Grid item xs={12} md={3}>
-                <TextField {...register('status')} label="Status" select fullWidth defaultValue="ACTIVE">
+                <TextField {...register('status')} label="Status" select fullWidth value={watch('status') ?? 'ACTIVE'}>
                   <MenuItem value="ACTIVE">Ativo</MenuItem>
                   <MenuItem value="INACTIVE">Inativo</MenuItem>
                 </TextField>

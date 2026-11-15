@@ -45,10 +45,11 @@ describe('shared-utils', () => {
   });
 
   describe('calculateAge', () => {
-    it('calculates age correctly', () => {
-      const birthDate = new Date();
-      birthDate.setFullYear(birthDate.getFullYear() - 10);
-      expect(calculateAge(birthDate)).toBe(10);
+    it('calculates age from a date-only value (stored as UTC midnight)', () => {
+      const today = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const tenYearsAgo = `${today.getFullYear() - 10}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+      expect(calculateAge(tenYearsAgo)).toBe(10);
     });
   });
 });

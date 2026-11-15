@@ -8,7 +8,7 @@ import {
 import PrintIcon from '@mui/icons-material/Print';
 import SaveIcon from '@mui/icons-material/Save';
 import { relatoriosApi } from '../../api/relatorios';
-import { formatDate, formatDateTime, calculateAge } from '@psicopedagogia/shared-utils';
+import { formatDate, formatDateOnly, formatDateTime, calculateAge } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 
 const SectionTitle = ({ children }) => (
@@ -135,7 +135,7 @@ const RelatorioDetailPage = () => {
           <SectionTitle>Dados do Aprendente</SectionTitle>
           <Grid container spacing={1}>
             <Field label="Nome" value={aprendente?.name} />
-            <Field label="Nascimento" value={`${formatDate(aprendente?.birthDate)} (${calculateAge(aprendente?.birthDate)} anos)`} />
+            <Field label="Nascimento" value={`${formatDateOnly(aprendente?.birthDate)} (${calculateAge(aprendente?.birthDate)} anos)`} />
             <Field label="Sexo" value={aprendente?.sexo} />
             <Field label="Responsável" value={aprendente?.responsavelNome} />
             <Field label="Escola" value={aprendente?.escolaNome} />
@@ -147,7 +147,7 @@ const RelatorioDetailPage = () => {
             <Field label="Nome" value={avaliacao?.name} />
             <Field label="Categoria" value={avaliacao?.category} />
             <Field label="Versão" value={avaliacao ? `v${avaliacao.version}` : ''} />
-            <Field label="Data de Aplicação" value={ap?.dataAplicacao ? formatDate(ap.dataAplicacao) : formatDate(ap?.finalizadaAt)} />
+            <Field label="Data de Aplicação" value={ap?.dataAplicacao ? formatDateOnly(ap.dataAplicacao) : formatDate(ap?.finalizadaAt)} />
             <Field label="Profissional" value={r.autor?.name} />
           </Grid>
 

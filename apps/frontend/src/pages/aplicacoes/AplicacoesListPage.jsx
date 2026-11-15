@@ -5,7 +5,7 @@ import { Box, IconButton, Tooltip, Alert, Snackbar } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { aplicacoesApi } from '../../api/aplicacoes';
-import { formatDate } from '@psicopedagogia/shared-utils';
+import { formatDate, formatDateOnly } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 import DataTable from '../../components/common/DataTable';
 import StatusChip from '../../components/common/StatusChip';
@@ -39,7 +39,7 @@ const AplicacoesListPage = () => {
     { id: 'avaliacao', label: 'Avaliação', render: (row) => row.avaliacao?.name },
     { id: 'aplicador', label: 'Aplicador', render: (row) => row.aplicador?.name },
     { id: 'status', label: 'Status', render: (row) => <StatusChip status={row.status} /> },
-    { id: 'dataAplicacao', label: 'Data', render: (row) => row.dataAplicacao ? formatDate(row.dataAplicacao) : '—' },
+    { id: 'dataAplicacao', label: 'Data', render: (row) => row.dataAplicacao ? formatDateOnly(row.dataAplicacao) : '—' },
     { id: 'createdAt', label: 'Criada em', render: (row) => formatDate(row.createdAt) },
     {
       id: 'actions', label: 'Ações', align: 'center', width: 100,

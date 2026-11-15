@@ -3,6 +3,13 @@ export const formatDate = (date) => {
   return new Date(date).toLocaleDateString('pt-BR');
 };
 
+// Datas sem horário (nascimento, data de aplicação) são gravadas como meia-noite UTC;
+// formatá-las no fuso local (UTC-3) exibiria o dia anterior.
+export const formatDateOnly = (date) => {
+  if (!date) return '';
+  return new Date(date).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+};
+
 export const formatDateTime = (date) => {
   if (!date) return '';
   return new Date(date).toLocaleString('pt-BR');
@@ -11,9 +18,9 @@ export const formatDateTime = (date) => {
 export const calculateAge = (birthDate) => {
   const today = new Date();
   const birth = new Date(birthDate);
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+  let age = today.getFullYear() - birth.getUTCFullYear();
+  const monthDiff = today.getMonth() - birth.getUTCMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getUTCDate())) {
     age--;
   }
   return age;

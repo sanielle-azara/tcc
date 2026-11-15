@@ -51,7 +51,7 @@ const QuestionCard = ({ index, register, errors, watch, remove }) => {
               label="Tipo *"
               select
               fullWidth
-              defaultValue="TEXT"
+              value={type ?? 'TEXT'}
               error={!!qErrors?.type}
               helperText={qErrors?.type?.message}
             >
@@ -77,7 +77,7 @@ const QuestionCard = ({ index, register, errors, watch, remove }) => {
               select
               fullWidth
               size="small"
-              defaultValue={true}
+              value={watch(`questions.${index}.required`) ?? true}
             >
               <MenuItem value={true}>Sim</MenuItem>
               <MenuItem value={false}>Não</MenuItem>
@@ -221,7 +221,7 @@ const AvaliacaoFormPage = () => {
                 <TextField {...register('category')} label="Categoria" fullWidth error={!!errors.category} helperText={errors.category?.message} />
               </Grid>
               <Grid item xs={12} md={3}>
-                <TextField {...register('status')} label="Status" select fullWidth defaultValue="DRAFT">
+                <TextField {...register('status')} label="Status" select fullWidth value={watch('status') ?? 'DRAFT'}>
                   <MenuItem value="DRAFT">Rascunho</MenuItem>
                   <MenuItem value="ACTIVE">Ativa</MenuItem>
                   <MenuItem value="ARCHIVED">Arquivada</MenuItem>

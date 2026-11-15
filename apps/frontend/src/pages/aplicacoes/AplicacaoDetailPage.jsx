@@ -10,7 +10,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { aplicacoesApi } from '../../api/aplicacoes';
-import { formatDate } from '@psicopedagogia/shared-utils';
+import { formatDateOnly } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 import StatusChip from '../../components/common/StatusChip';
 
@@ -166,7 +166,7 @@ const AplicacaoDetailPage = () => {
       <Box display="flex" gap={1} mb={3} flexWrap="wrap">
         <StatusChip status={ap.status} />
         <Chip label={`Aplicador: ${ap.aplicador?.name}`} size="small" variant="outlined" />
-        {ap.dataAplicacao && <Chip label={`Data: ${formatDate(ap.dataAplicacao)}`} size="small" variant="outlined" />}
+        {ap.dataAplicacao && <Chip label={`Data: ${formatDateOnly(ap.dataAplicacao)}`} size="small" variant="outlined" />}
       </Box>
 
       {questions.map((q, idx) => (

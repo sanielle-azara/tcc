@@ -8,7 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { aprendentesApi } from '../../api/aprendentes';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDate, calculateAge } from '@psicopedagogia/shared-utils';
+import { formatDateOnly, calculateAge } from '@psicopedagogia/shared-utils';
 import PageHeader from '../../components/common/PageHeader';
 import DataTable from '../../components/common/DataTable';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
@@ -44,7 +44,7 @@ const AprendentesListPage = () => {
   const columns = [
     { id: 'name', label: 'Nome' },
     { id: 'age', label: 'Idade', render: (row) => `${calculateAge(row.birthDate)} anos` },
-    { id: 'birthDate', label: 'Nascimento', render: (row) => formatDate(row.birthDate) },
+    { id: 'birthDate', label: 'Nascimento', render: (row) => formatDateOnly(row.birthDate) },
     { id: 'responsavelNome', label: 'Responsável' },
     { id: 'escolaNome', label: 'Escola' },
     { id: 'escolaSerie', label: 'Série' },

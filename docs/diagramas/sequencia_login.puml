@@ -1,0 +1,77 @@
+@startuml sequencia_login
+' Diagrama de sequência da autenticação com access token e refresh token (Seção 5.4 do TCC).
+' Gerar PNG: docker run --rm -v "$PWD/docs/diagramas:/data" plantuml/plantuml -tpng /data/sequencia_login.puml
+skinparam dpi 200
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam ArrowColor #222222
+skinparam SequenceLifeLineBorderColor #2e5d8a
+skinparam SequenceGroupBorderColor #2e5d8a
+skinparam SequenceGroupHeaderFontColor #2e5d8a
+skinparam SequenceDividerBackgroundColor #eaf1f8
+skinparam SequenceDividerBorderColor #2e5d8a
+skinparam participant {
+  BackgroundColor #eaf1f8
+  BorderColor #2e5d8a
+  BorderThickness 1.5
+}
+skinparam database {
+  BackgroundColor #eaf1f8
+  BorderColor #2e5d8a
+}
+skinparam actorBorderColor #2e5d8a
+skinparam actorBackgroundColor #ffffff
+skinparam noteBackgroundColor #fffbe6
+skinparam noteBorderColor #b8a03a
+autonumber
+hide footbox
+
+actor "Profissional" as U
+participant "Frontend\n(React + Axios)" as F
+participant "Middleware\nauthenticate" as M
+participant "API\n(Express)" as A
+database "MySQL" as DB
+
+== Login ==
+U -> F : informa e-mail e senha
+F -> A : POST /api/auth/login
+A -> DB : busca usuário por e-mail
+DB --> A : usuário (hash da senha, perfil, status)
+A -> A : bcrypt.compare(senha, hash)
+A -> A : gera access token (15 min)\ne refresh token (7 dias)
+A -> DB : grava refresh token\n(refresh_tokens)
+A -> DB : registra LOGIN (audit_logs)
+A --> F : 200 { accessToken, refreshToken, user }
+F -> F : salva tokens no localStorage
+
+== Requisição autenticada ==
+F -> M : GET /api/aprendentes\nAuthorization: Bearer <access token>
+M -> M : jwt.verify(token)
+M -> DB : busca usuário (sub) e confere status
+M -> A : req.user = { id, role }
+A -> DB : consulta com filtro de titularidade
+A --> F : 200 { dados }
+
+== Access token expirado ==
+F -> M : GET /api/aprendentes (token expirado)
+M --> F : 401 Token expirado
+note right of F
+  Interceptador de resposta do Axios
+  (executado uma única vez por requisição)
+end note
+F -> A : POST /api/auth/refresh { refreshToken }
+A -> DB : busca refresh token
+DB --> A : registro (não revogado, não expirado)
+A -> DB : revoga token anterior (revokedAt)
+A -> DB : grava novo refresh token
+A --> F : 200 { accessToken, refreshToken }
+F -> F : substitui tokens no localStorage
+F -> M : repete GET /api/aprendentes\ncom o novo access token
+M --> F : 200 { dados }
+
+alt refresh token inválido, revogado ou expirado
+  A --> F : 401
+  F -> F : remove tokens e redireciona para /login
+end
+@enduml

@@ -5,6 +5,13 @@ const formatDate = (date) => {
   return new Date(date).toLocaleDateString('pt-BR');
 };
 
+// Datas sem horário (nascimento, data de aplicação) são gravadas como meia-noite UTC;
+// formatá-las no fuso local (UTC-3) exibiria o dia anterior.
+const formatDateOnly = (date) => {
+  if (!date) return '';
+  return new Date(date).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+};
+
 const formatDateTime = (date) => {
   if (!date) return '';
   return new Date(date).toLocaleString('pt-BR');
@@ -13,9 +20,9 @@ const formatDateTime = (date) => {
 const calculateAge = (birthDate) => {
   const today = new Date();
   const birth = new Date(birthDate);
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+  let age = today.getFullYear() - birth.getUTCFullYear();
+  const monthDiff = today.getMonth() - birth.getUTCMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getUTCDate())) {
     age--;
   }
   return age;
@@ -60,6 +67,7 @@ const maskEmail = (email) => {
 
 module.exports = {
   formatDate,
+  formatDateOnly,
   formatDateTime,
   calculateAge,
   buildPaginatedResponse,
