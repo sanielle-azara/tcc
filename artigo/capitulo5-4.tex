@@ -191,19 +191,20 @@ relatorios - relatorios.test.js & Integração & 8 & 95,67\% \\
 auditoria - auditoria.test.js & Integração & 8 & 97,08\% \\
 auth.service - auth.service.test.js & Unitário & 4 & - \\
 Extensão Prisma - audit.extension.test.js & Unitário & 12 & 95,37\% \\
-Utilitários - shared-utils.test.js & Unitário & 7 & 70,14\% \\
+Pacote shared-utils - shared-utils.test.js & Unitário & 7 & - \\
+Utilitários do backend (JWT e e-mail) - sem arquivo próprio & Integração (indireta) & - & 64,17\% \\
 \hline
-\textbf{Total} & & \textbf{76} & \textbf{80,20\% (linhas)} \\
- & & & \textbf{70,27\% (branches)} \\
+\textbf{Total} & & \textbf{76} & \textbf{80,03\% (linhas)} \\
+ & & & \textbf{71,83\% (branches)} \\
 \hline
 \end{tabular}
 \fonte{Elaborado pela autora (2026).}
 \label{qua:testes_backend}
 \end{quadro}
 
-A cobertura de linhas de 80,20\% e de branches de 70,27\% superam o critério mínimo de 70\% estabelecido em RNF10. Os módulos com menor cobertura são \textit{users} (64,31\%) e \textit{auth.service} (42,50\% de linhas nos testes unitários isolados), reflexo de operações administrativas e de recuperação de senha que não possuem testes de integração completos.
+A cobertura de linhas de 80,03\% e de branches de 71,83\% superam o critério mínimo de 70\% estabelecido em RNF10. Os módulos com menor cobertura são \textit{auth.service} (42,50\% de linhas nos testes unitários isolados), os utilitários do backend (64,17\%) e \textit{users} (64,31\%), reflexo de operações administrativas, de recuperação de senha e de envio de e-mail que não possuem testes de integração completos. O pacote compartilhado \textit{shared-utils} fica fora do diretório do backend e, por isso, não entra no relatório de cobertura: seus 7 testes unitários fazem parte do total de testes, mas não da porcentagem.
 
-O frontend conta com 51 testes distribuídos em 9 arquivos, cobrindo as páginas e componentes de maior complexidade de lógica: LoginPage, ProtectedRoute, AvaliacaoFormPage, AvaliacaoDetailPage, AplicacaoDetailPage, Auditoria, RelatorioDetailPage, StatusChip e a função utilitária de impressão. A cobertura do frontend atingiu 48,37\%.
+O frontend conta com 51 testes distribuídos em 9 arquivos, cobrindo as páginas e componentes de maior complexidade de lógica: LoginPage, ProtectedRoute, AvaliacaoFormPage, AvaliacaoDetailPage, AplicacaoDetailPage, Auditoria, RelatorioDetailPage, StatusChip e a função utilitária de impressão. A cobertura do frontend atingiu 48,35\%.
 
 Também foram definidos procedimentos para geração do cliente do Prisma, execução das migrações e população inicial do banco de dados. Essas operações permitem preparar o ambiente de desenvolvimento de forma padronizada e manter a estrutura do banco sincronizada com o modelo utilizado pela aplicação.
 

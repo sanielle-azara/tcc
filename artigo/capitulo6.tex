@@ -82,7 +82,7 @@ RNF06 & Usabilidade (média $\geq$ 4,0 em avaliação com usuários) & Atendido 
 RNF07 & Arquitetura em três camadas com módulos independentes por domínio & Atendido & 7 módulos de backend independentes; frontend separado em camadas de API, contexto, componentes e páginas (Seções~\ref{sec:arquitetura}, \ref{sec:backend}, \ref{sec:frontend}) \\
 RNF08 & Integridade e consistência dos dados & Atendido & Validação com Zod, chaves estrangeiras e restrições no banco (Seções~\ref{sec:modelagem}, \ref{sec:backend}) \\
 RNF09 & Tratamento adequado de erros & Atendido & Middleware centralizado de erros no backend (Seção~\ref{sec:backend}) \\
-RNF10 & Cobertura de testes do backend $\geq$ 70\% & Atendido & Cobertura de 80,20\% no backend (Seção~\ref{sec:testes}) \\
+RNF10 & Cobertura de testes do backend $\geq$ 70\% & Atendido & Cobertura de 80,03\% no backend (Seção~\ref{sec:testes}) \\
 RNF11 & Ausência de violações WCAG 2.2 (A e AA) detectáveis pelo axe-core & Atendido & Cinco tipos de violação corrigidos; nenhuma violação nas 18 telas após correção (Seção~\ref{sec:acessibilidade}) \\
 \hline
 \end{tabular}
@@ -144,7 +144,7 @@ A verificação técnica do sistema foi realizada por meio de testes automatizad
 
 Conforme o levantamento dos testes realizado durante a análise do código, foram identificados 18 arquivos de teste, sendo nove relacionados ao backend e nove ao frontend. Ao todo, foram executados 127 testes automatizados, dos quais 76 pertenciam ao backend e 51 ao frontend. Todos foram concluídos com sucesso, sem falhas.
 
-A cobertura de código identificada foi de 80,20\% para o backend e 48,37\% para o frontend, considerando a cobertura de linhas e instruções. Esses resultados demonstram que parte significativa das funcionalidades do backend possui testes automatizados, enquanto o frontend ainda apresenta áreas que podem receber maior cobertura.
+A cobertura de código identificada foi de 80,03\% para o backend e 48,35\% para o frontend, considerando a cobertura de linhas e instruções. Esses resultados demonstram que parte significativa das funcionalidades do backend possui testes automatizados, enquanto o frontend ainda apresenta áreas que podem receber maior cobertura.
 
 Além dos testes automatizados, foi realizada a execução prática da plataforma em ambiente Docker, com os serviços necessários para seu funcionamento. Durante essa execução, foi possível utilizar o sistema e verificar seu funcionamento geral, sem ocorrência de problemas que impedissem sua utilização.
 
