@@ -313,7 +313,7 @@ O registro de auditoria aparece em dois pontos. A página de auditoria, exclusiv
 
 \subsection{Principais telas do sistema}\label{sec:telas}
 
-Esta subseção apresenta as telas do fluxo principal de uso, do acesso à emissão do relatório. As capturas foram obtidas com a aplicação em execução no ambiente Docker descrito na Seção~\ref{sec:arquitetura}, com o perfil \textit{PSICOPEDAGOGO}. Todos os dados exibidos são fictícios, provenientes da carga inicial do banco de desenvolvimento. \preencher{refazer as capturas das Figuras~\ref{fig:tela_aprendente_form}, \ref{fig:tela_aprendente_detalhe} e \ref{fig:tela_relatorio_impresso} com um aprendente fictício da Educação Infantil (4 ou 5 anos, pré-escola) e um instrumento compatível com a faixa etária; corrigir também a data em formato 2026-08-10 no relatório}
+Esta subseção apresenta as telas do fluxo principal de uso, do acesso à emissão do relatório. As capturas foram obtidas com a aplicação em execução no ambiente Docker descrito na Seção~\ref{sec:arquitetura}, com o perfil \textit{PSICOPEDAGOGO}. Todos os dados exibidos são fictícios, provenientes da carga inicial do banco de desenvolvimento ou cadastrados para esta demonstração, como a aprendente da pré-escola e o instrumento voltado à Educação Infantil apresentados nas Figuras~\ref{fig:tela_aprendente_form}, \ref{fig:tela_aprendente_detalhe} e~\ref{fig:tela_relatorio_impresso}.
 
 A Figura~\ref{fig:tela_login} mostra a tela de \textit{login}, que, junto com as telas de autocadastro e de recuperação de senha, compõe a área pública do sistema. O botão ao lado do campo de senha permite exibir o texto digitado e possui nome acessível para leitores de tela.
 
@@ -387,7 +387,7 @@ Por fim, a Figura~\ref{fig:tela_relatorio_impresso} apresenta o relatório na fo
 
 \subsection{Testes do \textit{frontend}}
 
-Os testes do \textit{frontend} utilizam o Vitest e a React Testing Library, que renderiza os componentes em ambiente simulado (jsdom) e permite interagir com eles como um usuário faria, sem navegador real. Assim como no \textit{backend}, as chamadas à API são simuladas. Foram implementados 58 testes em 11 arquivos, concentrados nas páginas e componentes com mais lógica de apresentação, conforme o Quadro~\ref{qua:testes_frontend}.
+Os testes do \textit{frontend} utilizam o Vitest e a React Testing Library, que renderiza os componentes em ambiente simulado (jsdom) e permite interagir com eles como um usuário faria, sem navegador real. Assim como no \textit{backend}, as chamadas à API são simuladas. Foram implementados 59 testes em 11 arquivos, concentrados nas páginas e componentes com mais lógica de apresentação, conforme o Quadro~\ref{qua:testes_frontend}.
 
 \begin{quadro}[H]
 \centering
@@ -402,18 +402,18 @@ AvaliacaoFormPage.test.jsx & 8 & Formulário de criação e edição de instrume
 AvaliacaoDetailPage.test.jsx & 6 & Exibição do instrumento e ausência da edição para o administrador \\ \hline
 AplicacaoDetailPage.test.jsx & 9 & Preenchimento e finalização de aplicação \\ \hline
 Auditoria.test.jsx & 6 & Listagem, filtros e aviso de valores clínicos omitidos \\ \hline
-RelatorioDetailPage.test.jsx & 6 & Exibição e edição de relatório \\ \hline
+RelatorioDetailPage.test.jsx & 7 & Exibição e edição de relatório, inclusive a formatação das respostas \\ \hline
 DashboardPage.test.jsx & 2 & \textit{Dashboard} do administrador (só totais) e do psicopedagogo \\ \hline
 UsersListPage.test.jsx & 2 & Transferência de aprendentes entre profissionais \\ \hline
 StatusChip.test.jsx & 4 & Componente de status e suas variações visuais \\ \hline
 print.test.jsx & 3 & Função utilitária de impressão/PDF \\ \hline
-\textbf{Total} & \textbf{58} & \\ \hline
+\textbf{Total} & \textbf{59} & \\ \hline
 \end{tabular}
 \fonte{Elaborado pela autora (2026).}
 \label{qua:testes_frontend}
 \end{quadro}
 
-A cobertura de linhas do \textit{frontend} foi de 55,84\%. O valor é menor que o do \textit{backend} porque várias telas não têm testes próprios, como as listagens, o formulário e a página de detalhe do aprendente e as telas de autocadastro e de recuperação de senha. Os testes priorizaram os fluxos de maior risco: autenticação, controle de acesso por perfil, preenchimento e finalização das aplicações e relatórios. Não foi definido critério mínimo de cobertura para o \textit{frontend}.
+A cobertura de linhas do \textit{frontend} foi de 55,87\%. O valor é menor que o do \textit{backend} porque várias telas não têm testes próprios, como as listagens, o formulário e a página de detalhe do aprendente e as telas de autocadastro e de recuperação de senha. Os testes priorizaram os fluxos de maior risco: autenticação, controle de acesso por perfil, preenchimento e finalização das aplicações e relatórios. Não foi definido critério mínimo de cobertura para o \textit{frontend}.
 
 
 \section{Funcionalidades do processo avaliativo}\label{sec:funcionalidades}
@@ -451,7 +451,7 @@ Os campos destinados ao conteúdo do relatório são \textit{conclusao}, que reg
 
 A página do relatório tem uma função de impressão, que abre o diálogo do navegador e permite imprimir o documento ou salvá-lo em PDF. Uma folha de estilos aplicada apenas na impressão configura a página em A4, oculta o cabeçalho, o menu lateral e os botões, imprime as observações e a conclusão como texto corrido, mantém cada pergunta e sua resposta na mesma página e encerra o documento com um espaço para a assinatura do profissional. A geração do PDF, portanto, usa a capacidade nativa do navegador, sem bibliotecas no servidor.
 
-O documento inclui, na seção ``Dados da Avaliação'', o nome, a categoria e a versão do instrumento (por exemplo, ``v2''), como mostra a Figura~\ref{fig:tela_relatorio_impresso}. Como cada aplicação aponta para a versão do instrumento efetivamente utilizada, e não para a mais recente, o documento continua identificando corretamente o protocolo vigente no momento da avaliação mesmo após adaptações posteriores do instrumento.
+O documento inclui, na seção ``Dados da Avaliação'', o nome, a categoria e a versão do instrumento (por exemplo, ``v1''), como mostra a Figura~\ref{fig:tela_relatorio_impresso}. Como cada aplicação aponta para a versão do instrumento efetivamente utilizada, e não para a mais recente, o documento continua identificando corretamente o protocolo vigente no momento da avaliação mesmo após adaptações posteriores do instrumento.
 
 
 \section{Segurança e controle de acesso}\label{sec:seguranca}
@@ -497,7 +497,7 @@ A separação reduz, mas não elimina, a confiança depositada no administrador:
 
 \begin{itemize}
     \item quem gerencia as contas pode criar um usuário com perfil de psicopedagogo e transferir para ele os aprendentes de outro profissional, ou alterar o e-mail de uma conta existente e solicitar a recuperação de senha em nome dela. Essas operações ficam registradas na auditoria, e a transferência aparece no registro de acessos de cada criança, mas não são impedidas. Em uso real, exigiriam controles organizacionais complementares, como a aprovação da transferência por um segundo responsável ou a notificação do profissional de origem;
-    \item a tela de \textit{login} oferece autocadastro. \preencher{confirmar no código como a conta criada pelo autocadastro é tratada: se ela já nasce ativa com perfil PSICOPEDAGOGO, manter a frase a seguir; se depende de aprovação do administrador, substituir pela descrição desse fluxo}. Como a conta criada dessa forma recebe o perfil de psicopedagogo, qualquer pessoa com acesso à tela pode criar um usuário; ela não acessa dados de outros profissionais, graças ao filtro de titularidade, mas, em uso real, o autocadastro deveria ser desativado ou depender de aprovação do administrador;
+    \item a tela de \textit{login} oferece autocadastro, e a conta criada por ele já nasce ativa, com perfil de psicopedagogo, sem aprovação do administrador nem confirmação do e-mail informado, e o usuário é autenticado logo após o cadastro. Assim, qualquer pessoa com acesso à tela pode criar um usuário; ela não acessa dados de outros profissionais, graças ao filtro de titularidade, mas, em uso real, o autocadastro deveria ser desativado ou depender de aprovação do administrador;
     \item quem administra a infraestrutura, com acesso direto ao banco de dados ou às cópias de segurança, continua alcançando todos os dados, limitação que depende da criptografia em repouso discutida na subseção seguinte;
     \item o compartilhamento autorizado previsto no art. 7º, §1º, do Código de Ética não é representado no sistema: um psicopedagogo não pode conceder a outro o acesso a um aprendente específico, por exemplo para supervisão ou atendimento conjunto, sem transferir a responsabilidade inteira.
 \end{itemize}

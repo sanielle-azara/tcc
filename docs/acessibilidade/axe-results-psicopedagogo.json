@@ -1,0 +1,274 @@
+{
+  "date": "2026-11-15T22:57:11.728Z",
+  "tags": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "wcag22aa"
+  ],
+  "results": [
+    {
+      "name": "Login",
+      "path": "/login",
+      "finalPath": "/login",
+      "violations": [],
+      "passes": 23,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 3
+        }
+      ]
+    },
+    {
+      "name": "Cadastro",
+      "path": "/cadastro",
+      "finalPath": "/cadastro",
+      "violations": [],
+      "passes": 23,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 5
+        }
+      ]
+    },
+    {
+      "name": "Recuperação de senha",
+      "path": "/forgot-password",
+      "finalPath": "/forgot-password",
+      "violations": [],
+      "passes": 21,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "path": "/dashboard",
+      "finalPath": "/dashboard",
+      "violations": [],
+      "passes": 21,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 6
+        }
+      ]
+    },
+    {
+      "name": "Aprendentes (lista)",
+      "path": "/aprendentes",
+      "finalPath": "/aprendentes",
+      "violations": [],
+      "passes": 27,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 8
+        }
+      ]
+    },
+    {
+      "name": "Aprendente (formulário)",
+      "path": "/aprendentes/novo",
+      "finalPath": "/aprendentes/novo",
+      "violations": [],
+      "passes": 26,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 19
+        }
+      ]
+    },
+    {
+      "name": "Aprendente (detalhe)",
+      "path": "/aprendentes/seed-aprendente-001",
+      "finalPath": "/aprendentes/seed-aprendente-001",
+      "violations": [],
+      "passes": 24,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 10
+        }
+      ]
+    },
+    {
+      "name": "Instrumentos (lista)",
+      "path": "/avaliacoes",
+      "finalPath": "/avaliacoes",
+      "violations": [],
+      "passes": 27,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 8
+        }
+      ]
+    },
+    {
+      "name": "Instrumento (formulário)",
+      "path": "/avaliacoes/nova",
+      "finalPath": "/avaliacoes/nova",
+      "violations": [],
+      "passes": 26,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 14
+        }
+      ]
+    },
+    {
+      "name": "Instrumento (detalhe)",
+      "path": "/avaliacoes/seed-avaliacao-002",
+      "finalPath": "/avaliacoes/seed-avaliacao-002",
+      "violations": [],
+      "passes": 21,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 7
+        }
+      ]
+    },
+    {
+      "name": "Aplicações (lista)",
+      "path": "/aplicacoes",
+      "finalPath": "/aplicacoes",
+      "violations": [],
+      "passes": 25,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 7
+        }
+      ]
+    },
+    {
+      "name": "Aplicação (nova)",
+      "path": "/aplicacoes/nova",
+      "finalPath": "/aplicacoes/nova",
+      "violations": [],
+      "passes": 26,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 2
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 10
+        }
+      ]
+    },
+    {
+      "name": "Aplicação (preenchimento)",
+      "path": "/aplicacoes/3c0e0287-510c-4d4e-aeb7-5614b4feee73",
+      "finalPath": "/aplicacoes/3c0e0287-510c-4d4e-aeb7-5614b4feee73",
+      "violations": [],
+      "passes": 25,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 11
+        }
+      ]
+    },
+    {
+      "name": "Relatórios (lista)",
+      "path": "/relatorios",
+      "finalPath": "/relatorios",
+      "violations": [],
+      "passes": 25,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 6
+        }
+      ]
+    },
+    {
+      "name": "Relatório (detalhe)",
+      "path": "/relatorios/f80910ff-c115-4646-97a1-831070415bec",
+      "finalPath": "/relatorios/f80910ff-c115-4646-97a1-831070415bec",
+      "violations": [],
+      "passes": 24,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 10
+        }
+      ]
+    },
+    {
+      "name": "Usuários",
+      "path": "/users",
+      "finalPath": "/dashboard",
+      "violations": [],
+      "passes": 21,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 6
+        }
+      ]
+    },
+    {
+      "name": "Auditoria",
+      "path": "/auditoria",
+      "finalPath": "/dashboard",
+      "violations": [],
+      "passes": 21,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 6
+        }
+      ]
+    },
+    {
+      "name": "Alterar senha",
+      "path": "/perfil/senha",
+      "finalPath": "/perfil/senha",
+      "violations": [],
+      "passes": 24,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 10
+        }
+      ]
+    }
+  ]
+}

@@ -19,7 +19,9 @@ const SectionTitle = ({ children }) => (
 const hasAnswer = (valor) =>
   valor !== undefined && valor !== null && valor !== '' && !(Array.isArray(valor) && valor.length === 0);
 
-const formatAnswer = (valor) => {
+const formatAnswer = (valor, type) => {
+  // datas chegam no formato ISO (AAAA-MM-DD); exibe no padrão brasileiro
+  if (type === 'DATE' && !Number.isNaN(new Date(valor).getTime())) return formatDateOnly(valor);
   if (typeof valor === 'boolean') return valor ? 'Sim' : 'Não';
   if (Array.isArray(valor)) return valor.join(', ');
   return String(valor);
@@ -163,7 +165,7 @@ const RelatorioDetailPage = () => {
                   {q.required && <Chip className="no-print" label="Obrig." size="small" color="error" sx={{ ml: 1 }} />}
                 </Typography>
                 <Typography variant="body2" color={respondida ? 'text.primary' : 'text.disabled'} mt={0.5}>
-                  {respondida ? formatAnswer(valor) : 'Sem resposta'}
+                  {respondida ? formatAnswer(valor, q.type) : 'Sem resposta'}
                 </Typography>
               </Box>
             );

@@ -59,12 +59,14 @@ const relatorio = {
         { id: 'q1', text: 'Lê textos simples?', type: 'YES_NO', required: true },
         { id: 'q2', text: 'Reconhece letras?', type: 'YES_NO', required: true },
         { id: 'q3', text: 'Nota', type: 'NUMERIC', required: false },
+        { id: 'q4', text: 'Data da última avaliação escolar', type: 'DATE', required: false },
       ],
     },
     respostas: [
       { questionId: 'q1', valor: { v: false } },
       { questionId: 'q2', valor: { v: true } },
       { questionId: 'q3', valor: { v: 0 } },
+      { questionId: 'q4', valor: { v: '2026-08-10' } },
     ],
   },
 };
@@ -116,6 +118,13 @@ describe('RelatorioDetailPage – impressão', () => {
     expect(screen.getByText('Sim')).toBeInTheDocument();
     expect(screen.getByText('0')).toBeInTheDocument();
     expect(screen.queryByText('Sem resposta')).not.toBeInTheDocument();
+  });
+
+  it('mostra respostas de data no formato dd/mm/aaaa', async () => {
+    renderRelatorio();
+
+    expect(await screen.findByText('10/08/2026')).toBeInTheDocument();
+    expect(screen.queryByText('2026-08-10')).not.toBeInTheDocument();
   });
 
   it('o botão Imprimir abre a impressão do navegador', async () => {
