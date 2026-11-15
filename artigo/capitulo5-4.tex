@@ -2,9 +2,7 @@
 
 O backend do sistema foi desenvolvido utilizando Node.js como ambiente de execução e Express.js como framework para construção da API REST. A camada de persistência utiliza o Prisma ORM, com banco de dados MySQL, enquanto a autenticação dos usuários é realizada por meio de JSON Web Tokens (JWT), utilizando tokens de acesso e de renovação. Para a validação dos dados recebidos pela API foi utilizado o Zod, e a documentação dos recursos disponibilizados é realizada por meio do padrão Swagger/OpenAPI.
 
-A aplicação foi organizada em módulos de negócio, buscando separar as responsabilidades relacionadas às diferentes funcionalidades do sistema. A estrutura do backend contém módulos específicos para autenticação, usuários, aprendentes, avaliações, aplicações, relatórios, dashboard e auditoria. Além desses módulos, foram definidos diretórios específicos para configurações, middlewares, utilitários e para o mecanismo de auditoria, conforme apresentado na estrutura do projeto.
-
-Essa organização permite concentrar em cada módulo as operações relacionadas a um determinado domínio da aplicação. O módulo de autenticação, por exemplo, concentra as funcionalidades relacionadas ao acesso ao sistema, enquanto os módulos de aprendentes, avaliações e aplicações estão relacionados diretamente ao processo de avaliação psicopedagógica. O módulo de relatórios é responsável pelas operações relacionadas às devolutivas produzidas a partir das aplicações, e o módulo de dashboard disponibiliza informações destinadas à visualização geral dos dados do sistema.
+A aplicação foi organizada em módulos de negócio, um por domínio funcional (Seção~\ref{sec:arquitetura}), cada um com suas rotas, controladores e serviços, além de diretórios para configurações, middlewares, utilitários e para o mecanismo de auditoria.
 
 \subsection{Rotas da API}
 
@@ -66,11 +64,7 @@ GET  & /api/auditoria & Autenticado & Consulta do registro de auditoria (para o 
 
 \subsection{Organização dos módulos e middlewares}
 
-A estrutura interna da aplicação está dividida entre configurações, middlewares, módulos de negócio e utilitários. O diretório \textit{config} concentra configurações relacionadas ao ambiente, ao Prisma e ao Swagger. Já o diretório \textit{middlewares} contém mecanismos relacionados à autenticação, validação e tratamento de erros.
-
-Os middlewares são utilizados como uma camada intermediária no processamento das requisições. Dessa forma, a autenticação pode ser aplicada antes do acesso a recursos protegidos, os dados recebidos podem ser submetidos às regras de validação e erros ocorridos durante o processamento podem ser tratados de maneira centralizada.
-
-A validação das informações de entrada é realizada com o Zod. Essa abordagem permite definir as estruturas esperadas para os dados recebidos pela API e verificar se as informações fornecidas estão de acordo com essas estruturas antes de serem processadas pela aplicação.
+O diretório \textit{config} concentra as configurações do ambiente, do Prisma e do Swagger, e o diretório \textit{middlewares} reúne as etapas executadas antes dos controladores: a autenticação, aplicada antes do acesso a recursos protegidos; a validação, que confere os dados recebidos contra os esquemas Zod antes de processá-los; e o tratamento centralizado de erros, que evita expor detalhes internos da aplicação nas respostas.
 
 \subsection{Autenticação e controle de acesso}
 
@@ -128,11 +122,9 @@ router.get('/:id', controller.findById);
 \end{lstlisting}
 \fonte{Elaborado pela autora (2026).}
 
-\subsection{Gerenciamento de aprendentes e avaliações}
+\subsection{Filtro de titularidade}
 
-O módulo de aprendentes disponibiliza as operações necessárias para o cadastro e gerenciamento dos indivíduos acompanhados pelo profissional. Os dados são posteriormente utilizados nas aplicações dos instrumentos avaliativos, mantendo a associação entre o aprendente e os registros produzidos durante o processo de avaliação.
-
-A visibilidade dos aprendentes é controlada pelo campo \textit{responsavelId}, preenchido automaticamente com o identificador do usuário autenticado no momento do cadastro. Nas operações de listagem e consulta individual, o módulo aplica um filtro que restringe os resultados ao usuário responsável, sem exceção por perfil. Essa lógica é implementada na camada de serviço, antes da consulta ao banco de dados, sem expor ao cliente a distinção entre registros próprios e de outros usuários.
+A visibilidade dos aprendentes é controlada pelo campo \textit{responsavelId}, preenchido automaticamente com o identificador do usuário autenticado no momento do cadastro. Nas operações de listagem, consulta, alteração e exclusão, a camada de serviço aplica um filtro que restringe os resultados ao usuário responsável, sem exceção por perfil.
 
 O Código~\ref{cod:titularidade} mostra como essa regra é implementada. Cada serviço define uma função \textit{ownerFilter}, que devolve uma condição combinada à cláusula \textit{where} das consultas do Prisma. O filtro não depende do perfil: como as rotas clínicas já recusam o \textit{ADMIN}, ele atua como segunda barreira, de modo que um erro na configuração de uma rota não basta para expor registros de outro profissional. No caso dos relatórios, a condição percorre as relações até o aprendente, de modo que a titularidade é herdada do responsável pela criança, e não de quem redigiu o relatório. Como o filtro faz parte da própria consulta, um registro de outro profissional não é encontrado e a API responde com HTTP 404, sem revelar que o registro existe.
 
@@ -157,25 +149,13 @@ const item = await service.findById(req.params.id, req.user.id);
 \end{lstlisting}
 \fonte{Elaborado pela autora (2026).}
 
-O módulo de avaliações é responsável pelo gerenciamento dos instrumentos utilizados pelo sistema. A estrutura adotada permite representar avaliações compostas por diferentes questões e tipos de resposta. O versionamento desses instrumentos é mantido na camada de persistência, conforme apresentado na modelagem do banco de dados, permitindo relacionar diferentes versões de uma mesma avaliação.
-
-De maneira análoga ao módulo de aprendentes, a visibilidade das avaliações é controlada pelo campo \textit{autorId}, atribuído automaticamente ao usuário que criou o instrumento. As consultas de listagem e de detalhe aplicam o mesmo filtro de restrição por responsável, garantindo que cada profissional acesse somente os instrumentos que criou. Ao criar uma nova versão de uma avaliação, o campo \textit{autorId} recebe o usuário que realizou a alteração. Como a edição é exclusiva do perfil \textit{PSICOPEDAGOGO} e cada profissional só edita os próprios instrumentos, a titularidade se mantém entre as versões (Seção~\ref{sec:instrumentos}). O administrador pode consultar e excluir instrumentos, mas não criá-los nem editá-los.
-
-As aplicações são tratadas separadamente pelo módulo \textit{aplicacoes}, permitindo associar uma avaliação a um aprendente e registrar o andamento desse processo. Essa separação entre avaliação e aplicação possibilita que um mesmo instrumento seja utilizado em diferentes processos avaliativos, mantendo cada aplicação como um registro independente.
-
-\subsection{Relatórios e dashboard}
-
-O módulo \textit{relatorios} concentra as operações relacionadas aos relatórios produzidos a partir das aplicações realizadas. Esses registros permanecem associados à aplicação correspondente, permitindo relacionar a devolutiva produzida pelo profissional ao processo avaliativo que lhe deu origem.
-
-O backend também possui um módulo específico de \textit{dashboard}, disponibilizado por meio da rota \textit{GET /api/dashboard}. Esse módulo fornece os dados necessários para a apresentação das informações gerais do sistema na interface, evitando que o frontend precise realizar diretamente operações sobre o banco de dados.
-
-Nesse contexto, o backend atua como intermediário entre os dados persistidos e a interface do sistema, sendo responsável pelo processamento das requisições e pela disponibilização das informações necessárias às funcionalidades implementadas.
+A visibilidade das avaliações segue o mesmo princípio, pelo campo \textit{autorId}, atribuído ao usuário que criou o instrumento; a manutenção da titularidade entre versões é tratada na Seção~\ref{sec:instrumentos}. O dashboard (\textit{GET /api/dashboard}) aplica os mesmos filtros nas contagens que apresenta ao psicopedagogo.
 
 \subsection{Documentação e testes}
 
 A API possui documentação baseada em Swagger/OpenAPI, disponibilizada durante a execução do sistema no endereço \textit{/api-docs}. A documentação permite consultar os recursos disponibilizados pela API e auxilia na compreensão e utilização dos endpoints durante o desenvolvimento e os testes.
 
-Para os testes automatizados do backend foram utilizadas as ferramentas Vitest e Supertest. O Vitest é responsável pela execução e pela geração do relatório de cobertura, enquanto o Supertest possibilita a realização de requisições HTTP reais contra a aplicação em memória, sem necessidade de servidor externo. O frontend utiliza Vitest combinado com Testing Library para testes de componentes React.
+Para os testes automatizados do backend foram utilizadas as ferramentas Vitest e Supertest. O Vitest é responsável pela execução e pela geração do relatório de cobertura, enquanto o Supertest possibilita a realização de requisições HTTP reais contra a aplicação em memória, sem necessidade de servidor externo.
 
 O backend conta com 88 testes automatizados distribuídos em dois níveis: testes de integração, que exercitam as rotas da API de ponta a ponta, e testes unitários, voltados para as regras de negócio isoladas dos módulos de autenticação e do mecanismo de auditoria. A Tabela~\ref{qua:testes_backend} apresenta a distribuição por arquivo de teste e a cobertura de linhas por módulo obtida com o relatório gerado pelo Vitest com provider V8.
 
@@ -208,9 +188,6 @@ Utilitários do backend (JWT e e-mail) - sem arquivo próprio & Integração (in
 \end{quadro}
 
 A cobertura de linhas de 83,06\% e de branches de 73,05\% superam o critério mínimo de 70\% estabelecido em RNF10. Os módulos com menor cobertura são \textit{auth.service} (42,50\% de linhas nos testes unitários isolados) e os utilitários do backend (64,17\%), reflexo das operações de recuperação de senha e de envio de e-mail, que não possuem testes de integração completos. Os testes de \textit{users.test.js} verificam a separação entre administração e acesso clínico: a transferência de aprendentes, a recusa em excluir ou promover a administrador um profissional que ainda tem aprendentes e o dashboard do administrador sem a lista de aplicações; os testes de aprendentes, aplicações e relatórios verificam que o \textit{ADMIN} recebe HTTP 403 sem que o banco de dados seja consultado, e os de auditoria, que os valores dos registros clínicos não chegam a ele. O pacote compartilhado \textit{shared-utils} fica fora do diretório do backend e, por isso, não entra no relatório de cobertura: seus 7 testes unitários fazem parte do total de testes, mas não da porcentagem.
-
-O frontend conta com 58 testes distribuídos em 11 arquivos, cobrindo as páginas e componentes de maior complexidade de lógica: LoginPage, ProtectedRoute, AvaliacaoFormPage, AvaliacaoDetailPage, AplicacaoDetailPage, Auditoria, RelatorioDetailPage, DashboardPage, UsersListPage, StatusChip e a função utilitária de impressão. A cobertura do frontend atingiu 55,84\%.
-
 Também foram definidos procedimentos para geração do cliente do Prisma, execução das migrações e população inicial do banco de dados. Essas operações permitem preparar o ambiente de desenvolvimento de forma padronizada e manter a estrutura do banco sincronizada com o modelo utilizado pela aplicação.
 
 \subsection{Auditoria}
@@ -226,5 +203,3 @@ Nas entidades com dados clínicos de crianças (aprendentes, histórico de acomp
 A consulta ao registro é feita pelo endpoint \textit{GET /api/auditoria}, com filtros por aprendente, usuário, entidade, ação e período. O perfil \textit{ADMIN} consulta todo o registro, mas apenas seus metadados nas entidades clínicas (aprendentes, histórico, aplicações, respostas e relatórios): quem realizou a operação, quando, de qual IP, sobre qual entidade e qual ação. Os valores registrados não lhe são enviados; nas alterações, recebe somente os nomes dos campos alterados. A ocultação é feita na consulta, e não na gravação, de modo que o registro permanece completo. O perfil \textit{PSICOPEDAGOGO} consulta apenas o registro de acessos dos aprendentes sob sua responsabilidade, com os valores completos, o que inclui as operações feitas pelo administrador, como a transferência de responsabilidade.
 
 As limitações desse registro de auditoria são discutidas na Seção~\ref{sec:seguranca}.
-
-Dessa forma, o desenvolvimento do backend estabeleceu a camada responsável pela disponibilização da API REST, autenticação, validação das requisições, aplicação das operações relacionadas aos módulos do sistema, registro de auditoria, comunicação com o banco de dados e disponibilização dos dados utilizados pelo frontend. A organização modular adotada também fornece uma estrutura para a manutenção e evolução das funcionalidades relacionadas ao processo de avaliação psicopedagógica.

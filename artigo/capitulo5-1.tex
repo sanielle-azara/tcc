@@ -1,10 +1,6 @@
 \section{Levantamento e especificação dos requisitos}\label{sec:requisitos}
 
-O levantamento e a especificação dos requisitos constituíram uma etapa fundamental para orientar o desenvolvimento do sistema web de apoio à avaliação psicopedagógica na Educação Infantil. A definição dos requisitos teve como objetivo identificar as funcionalidades necessárias para apoiar a organização das informações dos aprendentes, o gerenciamento dos instrumentos avaliativos, o registro das etapas do processo de avaliação e a elaboração das devolutivas pelos profissionais.
-
-Os requisitos foram definidos a partir dos objetivos estabelecidos para o sistema, da revisão bibliográfica e documental realizada na etapa inicial do trabalho e da análise das características do processo de avaliação psicopedagógica. Nesse processo, foram consideradas tanto as funcionalidades diretamente relacionadas às atividades realizadas pelos profissionais quanto os aspectos técnicos necessários para garantir segurança, privacidade, rastreabilidade, usabilidade e organização das informações.
-
-A especificação foi dividida em requisitos funcionais e não funcionais, conforme a classificação apresentada na Seção~\ref{sec:fund_requisitos}. Os requisitos funcionais descrevem os serviços e comportamentos que o sistema deve oferecer aos usuários, enquanto os requisitos não funcionais estabelecem características e restrições relacionadas à qualidade, segurança, desempenho e utilização do sistema.
+Os requisitos foram definidos a partir dos objetivos do sistema, da revisão bibliográfica e documental, da entrevista com uma psicopedagoga (Capítulo~\ref{capitulo4}) e da análise do processo de avaliação psicopedagógica, e foram divididos em funcionais e não funcionais, conforme a classificação apresentada na Seção~\ref{sec:fund_requisitos}.
 
 \subsection{Requisitos funcionais}
 
@@ -18,7 +14,7 @@ Também deve ser possível registrar informações relacionadas ao processo de a
 
 Outro aspecto relevante é a rastreabilidade. Os registros do sistema devem conter informações suficientes para identificar quem os criou, quando foram criados e quando foram modificados. Os campos de controle presentes nas entidades (\textit{createdAt}, \textit{updatedAt} e, em parte delas, \textit{deletedAt}) e as referências ao usuário responsável por cada registro, como \textit{responsavelId} em aprendentes, \textit{autorId} em avaliações, \textit{aplicadorId} em aplicações e \textit{autorId} em relatórios, indicam quem criou cada dado e quando ele foi alterado pela última vez. Como esses campos não são suficientes para dados de saúde de crianças (Seção~\ref{sec:seguranca}), o sistema deve manter também um registro de auditoria das operações, incluindo as consultas aos dados clínicos e as operações realizadas pelo administrador.
 
-Durante a aplicação de um instrumento, o profissional deve poder vinculá-lo a um determinado aprendente e registrar as informações obtidas no atendimento. As adaptações realizadas em um instrumento são registradas por meio de versionamento automático: quando as questões de um instrumento já aplicado são alteradas, o sistema arquiva a versão anterior e cria uma nova, mantendo cada aplicação associada à versão utilizada no momento do atendimento. O sistema não oferece campo para que o profissional descreva textualmente a justificativa da adaptação, o que constitui uma limitação reconhecida da implementação. 
+Durante a aplicação de um instrumento, o profissional deve poder vinculá-lo a um determinado aprendente e registrar as informações obtidas no atendimento. As adaptações realizadas em um instrumento são registradas por meio de versionamento automático: quando as questões de um instrumento já aplicado são alteradas, o sistema arquiva a versão anterior e cria uma nova, mantendo cada aplicação associada à versão utilizada no momento do atendimento.
 
 O sistema deve permitir ainda a consulta ao histórico de avaliações e registros associados ao aprendente, possibilitando que o profissional acompanhe as informações produzidas em diferentes momentos do processo avaliativo. A organização longitudinal desses registros busca facilitar a consulta e a comparação das informações produzidas ao longo do acompanhamento.
 
@@ -67,21 +63,7 @@ Os requisitos funcionais foram representados também por meio de um diagrama de 
 
 \subsection{Requisitos não funcionais}
 
-Os requisitos não funcionais foram definidos a partir das características de qualidade necessárias para a utilização do sistema em um contexto que envolve o armazenamento e o processamento de informações relacionadas a crianças. Nesse sentido, aspectos como segurança, privacidade, controle de acesso, rastreabilidade, usabilidade e organização dos dados foram considerados durante a definição da solução.
-
-A segurança constitui um requisito essencial, uma vez que o sistema armazena informações relacionadas aos aprendentes e aos profissionais responsáveis pelos atendimentos. O acesso às informações deve ser restrito aos usuários autorizados, sendo necessário utilizar mecanismos de autenticação e autorização para proteger os recursos disponibilizados pela aplicação.
-
-A privacidade dos dados também deve ser considerada durante o desenvolvimento, de modo que as informações armazenadas sejam tratadas de acordo com os princípios de proteção de dados aplicáveis ao sistema. Além disso, os registros devem permanecer organizados e íntegros, evitando alterações não identificadas ou perda do histórico das informações.
-
-Outro aspecto relevante é a rastreabilidade. Os registros de aprendentes e de instrumentos de avaliação devem conter informações de autoria e temporalidade, como o identificador do profissional responsável e os campos de data de criação e de última atualização, de modo que seja possível identificar quem criou ou modificou cada dado e quando isso ocorreu. Além disso, operações sobre o banco de dados são registradas automaticamente em uma tabela de auditoria, permitindo rastrear ações realizadas, usuários envolvidos e os dados afetados.
-
-A usabilidade também foi considerada como requisito do sistema. Para que seja verificável, o atendimento a esse requisito é avaliado por meio de questionário aplicado a profissionais após a utilização da plataforma, adotando-se como critério uma média igual ou superior a 4,0 em escala de 1 a 5 nos aspectos de facilidade de uso, organização das informações e contribuição geral.
-
-A acessibilidade foi definida como requisito complementar à usabilidade, tomando como referência as diretrizes WCAG 2.2 \cite{w3c_wcag22_pt}. Como a conformidade plena com as diretrizes depende de avaliação manual, adotou-se como critério verificável a ausência de violações dos critérios de sucesso dos níveis A e AA detectáveis pela ferramenta automatizada axe-core \cite{deque_axe_core} nas telas principais do sistema.
-
-Além disso, a aplicação deve apresentar arquitetura em três camadas separadas, apresentação, aplicação e persistência, com o backend organizado em módulos independentes por domínio funcional. Essa separação permite que alterações em um módulo não exijam modificações nos demais e facilita a manutenção incremental do sistema. Como critério complementar de manutenibilidade, o backend deve atingir cobertura de testes automatizados de no mínimo 70\% das linhas de código, permitindo a detecção de regressões durante a evolução da aplicação.
-
-Os principais requisitos não funcionais definidos são apresentados no Quadro~\ref{qua:requisitos_nao_funcionais}.
+Os requisitos não funcionais, apresentados no Quadro~\ref{qua:requisitos_nao_funcionais}, decorrem do fato de o sistema armazenar informações de crianças e priorizam segurança, privacidade, rastreabilidade e usabilidade. Seguindo a recomendação de expressá-los de forma mensurável (Seção~\ref{sec:fund_requisitos}), três deles receberam critérios de verificação: a usabilidade, avaliada por questionário com profissionais (RNF06); a acessibilidade, tomada a partir das diretrizes WCAG 2.2 \cite{w3c_wcag22_pt} e verificada pela ausência de violações detectáveis pela ferramenta automatizada axe-core \cite{deque_axe_core}, já que a conformidade plena depende de avaliação manual (RNF11); e a manutenibilidade, associada a uma cobertura mínima de testes automatizados no backend (RNF10).
 
 \begin{quadro}[H]
 \centering
@@ -97,7 +79,7 @@ RNF03 & Os dados dos aprendentes devem ser armazenados de forma segura, consider
 RNF04 & O sistema deve manter um registro de auditoria que permita reconstituir quem criou, alterou, excluiu ou consultou cada dado, quando e com quais valores anteriores, inclusive nas operações realizadas pelo administrador. \\
 RNF05 & O sistema deve preservar o histórico das versões e alterações realizadas nos instrumentos avaliativos. \\
 RNF06 & A interface deve apresentar organização e usabilidade adequadas às atividades dos profissionais, verificada por meio de avaliação com usuários: média igual ou superior a 4,0 em escala de 1 a 5 nos aspectos de facilidade de uso, organização das informações e contribuição geral da plataforma. \\
-RNF07 & A aplicação deve apresentar arquitetura em três camadas separadas (apresentação, aplicação e persistência), com o backend organizado em módulos independentes por domínio funcional (autenticação, aprendentes, avaliações, aplicações, relatórios, auditoria e dashboard), de modo que alterações em um módulo não exijam modificações nos demais. \\
+RNF07 & A aplicação deve apresentar arquitetura em três camadas separadas (apresentação, aplicação e persistência), com o backend organizado em módulos independentes por domínio funcional (autenticação, usuários, aprendentes, avaliações, aplicações, relatórios, auditoria e dashboard), de modo que alterações em um módulo não exijam modificações nos demais. \\
 RNF08 & Os dados devem possuir mecanismos de integridade e consistência durante seu armazenamento e manipulação. \\
 RNF09 & O sistema deve possuir tratamento adequado de erros, evitando a exposição de informações internas da aplicação. \\
 RNF10 & O sistema deve possuir cobertura de testes automatizados de no mínimo 70\% das linhas de código do backend, de modo a permitir a detecção de regressões durante a evolução do sistema. \\

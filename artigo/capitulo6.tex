@@ -1,34 +1,10 @@
 \chapter[Resultados e discussões]{Resultados e discussões} \label{capitulo6}
 
-Este capítulo apresenta os resultados obtidos durante o desenvolvimento do sistema web de apoio à avaliação psicopedagógica na educação infantil. São descritas as funcionalidades implementadas, o fluxo de utilização da plataforma, os testes realizados e as limitações identificadas ao longo do desenvolvimento.
+Este capítulo apresenta os resultados do desenvolvimento: o atendimento aos requisitos, os testes realizados, a avaliação de acessibilidade, a avaliação com profissionais e a discussão dos resultados frente aos trabalhos relacionados.
 
 \section{Sistema desenvolvido}
 
-O sistema desenvolvido consiste em uma aplicação web destinada a apoiar a organização e o acompanhamento das atividades de avaliação psicopedagógica. A plataforma permite que profissionais realizem o cadastro de aprendentes, gerenciem instrumentos avaliativos, registrem aplicações e respostas e elaborem relatórios com observações e conclusões profissionais.
-
-A aplicação foi desenvolvida com arquitetura cliente-servidor, utilizando React 18 e Vite 5 no frontend, Node.js e Express.js no backend e MySQL 8 como sistema gerenciador de banco de dados. A comunicação entre as camadas ocorre por meio de uma API REST, com utilização do Prisma como ferramenta de mapeamento objeto-relacional (ORM). Também foram utilizadas bibliotecas como Material UI, React Router, TanStack Query e Zod, para construção da interface, gerenciamento de rotas, requisições e validação de dados.
-
-A estrutura do projeto foi organizada em módulos, contemplando autenticação, gerenciamento de usuários, aprendentes, avaliações, aplicações, relatórios, painel inicial e auditoria. Essa organização permite separar as responsabilidades de cada funcionalidade e facilita a manutenção e a evolução do sistema.
-
-O banco de dados foi estruturado para armazenar as informações dos usuários, aprendentes, instrumentos avaliativos, questões, aplicações, respostas, relatórios e registros de auditoria, além das estruturas relacionadas à autenticação. Ao todo, a implementação contempla 12 tabelas relacionadas entre si por meio de chaves primárias e estrangeiras.
-
-Quanto ao controle de acesso, foram implementados dois perfis: administrador (ADMIN) e psicopedagogo (PSICOPEDAGOGO). O administrador possui permissões para gerenciar usuários e acessar os recursos administrativos, enquanto o psicopedagogo pode utilizar as funcionalidades de avaliação e consultar os registros sob sua responsabilidade. Em respeito ao sigilo profissional, o administrador não acessa os dados clínicos das crianças: as rotas de aprendentes, aplicações e relatórios são exclusivas do psicopedagogo, o registro de auditoria lhe apresenta apenas os metadados das operações sobre esses dados, e a continuidade do atendimento é garantida pela transferência de aprendentes entre profissionais (Seção~\ref{sec:separacao_admin}). O controle de propriedade dos dados também é aplicado no backend, restringindo o acesso do profissional aos seus próprios aprendentes e instrumentos.
-
-\section{Funcionalidades implementadas}
-
-A plataforma contempla as principais etapas do fluxo de avaliação psicopedagógica, desde o cadastro do aprendente até a elaboração do relatório final.
-
-O cadastro de aprendentes permite registrar informações pessoais, dados dos responsáveis, informações escolares e observações. Cada aprendente possui uma página individual com acesso aos seus dados cadastrais, histórico de registros e logs de acesso.
-
-O gerenciamento de instrumentos avaliativos permite cadastrar e organizar instrumentos compostos por questões de diferentes tipos, incluindo texto, texto longo, número, data, seleção única, seleção múltipla, escala e respostas de sim ou não. Também é possível configurar a obrigatoriedade e a ordem das questões.
-
-Foi implementado um mecanismo de versionamento dos instrumentos. Quando um instrumento que já possui aplicações vinculadas tem suas questões alteradas, a versão anterior é arquivada e uma nova versão é criada. Dessa forma, as aplicações anteriores permanecem relacionadas à versão utilizada no momento de sua realização, preservando as respostas registradas.
-
-A aplicação de avaliações é realizada por meio da vinculação entre aprendente, instrumento e profissional responsável. Durante o preenchimento, as respostas podem ser salvas como rascunho, permitindo a continuidade em outro momento. Para finalizar a aplicação, o sistema verifica o preenchimento das questões obrigatórias. Após a finalização, as respostas ficam bloqueadas para edição.
-
-Ao concluir uma aplicação, o profissional pode elaborar um relatório contendo observações e conclusões. O relatório é vinculado à respectiva aplicação e pode ser impresso ou salvo em PDF utilizando a funcionalidade de impressão do navegador. Portanto, a geração do arquivo PDF não é realizada diretamente pelo servidor, mas pelo próprio navegador utilizado pelo profissional.
-
-O painel inicial apresenta indicadores gerais, como quantidade de aprendentes, instrumentos ativos, aplicações realizadas, aplicações pendentes e aplicações recentes.
+O resultado do desenvolvimento é uma aplicação web funcional, descrita no Capítulo~\ref{capitulo5}, que cobre o fluxo de avaliação psicopedagógica do cadastro do aprendente à emissão do relatório, apresentado em suas principais telas na Seção~\ref{sec:telas}. A aplicação é composta por um frontend em React, uma API REST em Node.js e Express organizada em oito módulos de negócio e um banco de dados MySQL com 11 tabelas, acessado por meio do Prisma. O acesso é controlado por dois perfis: o psicopedagogo, que acessa somente os próprios aprendentes e instrumentos, e o administrador, que gerencia os usuários sem acesso aos dados clínicos das crianças (Seção~\ref{sec:separacao_admin}).
 
 \section{Atendimento aos requisitos}
 
@@ -79,7 +55,7 @@ RNF03 & Armazenamento seguro dos dados dos aprendentes & Parcialmente atendido &
 RNF04 & Registro de auditoria das operações & Atendido & Seções~\ref{sec:backend}, \ref{sec:seguranca}; limitações descritas na Seção~\ref{sec:seguranca} \\
 RNF05 & Preservação do histórico de versões dos instrumentos & Atendido & Seção~\ref{sec:instrumentos} \\
 RNF06 & Usabilidade (média $\geq$ 4,0 em avaliação com usuários) & Atendido & Média geral de 4,43/5,0 no questionário com 5 profissionais (Seção~\ref{sec:avaliacao_usuarios}) \\
-RNF07 & Arquitetura em três camadas com módulos independentes por domínio & Atendido & 7 módulos de backend independentes; frontend separado em camadas de API, contexto, componentes e páginas (Seções~\ref{sec:arquitetura}, \ref{sec:backend}, \ref{sec:frontend}) \\
+RNF07 & Arquitetura em três camadas com módulos independentes por domínio & Atendido & 8 módulos de backend independentes; frontend separado em camadas de API, contexto, componentes e páginas (Seções~\ref{sec:arquitetura}, \ref{sec:backend}, \ref{sec:frontend}) \\
 RNF08 & Integridade e consistência dos dados & Atendido & Validação com Zod, chaves estrangeiras e restrições no banco (Seções~\ref{sec:modelagem}, \ref{sec:backend}) \\
 RNF09 & Tratamento adequado de erros & Atendido & Middleware centralizado de erros no backend (Seção~\ref{sec:backend}) \\
 RNF10 & Cobertura de testes do backend $\geq$ 70\% & Atendido & Cobertura de 83,06\% no backend (Seção~\ref{sec:testes}) \\
@@ -90,27 +66,11 @@ RNF11 & Ausência de violações WCAG 2.2 (A e AA) detectáveis pelo axe-core & 
 \label{qua:atendimento_requisitos_nao_funcionais}
 \end{quadro}
 
-Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois foram parcialmente atendidos. O RF09 (registro de adaptações) é atendido estruturalmente via versionamento automático, mas sem campo para justificativa textual. O RF12 (histórico do aprendente) é atendido para registros textuais, mas aplicações e relatórios não estão integrados à página individual do aprendente. Ambas as limitações estão descritas na seção~\ref{sec:limitacoes} deste capítulo. Dos onze requisitos não funcionais, dez foram atendidos e um, o RNF03 (armazenamento seguro), foi parcialmente atendido, em razão da ausência de criptografia em repouso e de política de retenção dos dados. As ressalvas quanto às limitações do registro de auditoria estão documentadas na Seção~\ref{sec:seguranca}.
-
-\section{Fluxo de utilização}
-
-O fluxo principal de utilização da plataforma foi organizado para acompanhar as etapas de registro e documentação da avaliação psicopedagógica. As telas desse fluxo foram apresentadas na Seção~\ref{sec:telas}.
-
-Inicialmente, o profissional realiza o login com suas credenciais, obtidas por meio do autocadastro na tela de cadastro, que cria uma conta com o perfil de psicopedagogo, ou do cadastro realizado pelo administrador no gerenciamento de usuários. Após a autenticação, é direcionado ao painel inicial (Figura~\ref{fig:tela_dashboard}), a partir do qual pode acessar os módulos disponíveis conforme suas permissões.
-
-O profissional pode cadastrar um novo aprendente ou consultar um registro existente (Figuras~\ref{fig:tela_aprendente_form} e~\ref{fig:tela_aprendente_detalhe}). Em seguida, pode acessar o gerenciamento de instrumentos para selecionar um instrumento já cadastrado ou criar um novo, configurando suas questões e respectivas propriedades.
-
-Para iniciar uma avaliação, o profissional seleciona o aprendente e o instrumento que será utilizado. O sistema registra a aplicação e permite o preenchimento das respostas (Figura~\ref{fig:tela_aplicacao}), com possibilidade de salvamento como rascunho. Após o preenchimento das questões obrigatórias, a aplicação pode ser finalizada.
-
-Por fim, o profissional elabora o relatório, no qual registra suas observações e conclusões. O documento pode ser consultado posteriormente e impresso ou salvo em PDF pelo navegador (Figura~\ref{fig:tela_relatorio_impresso}).
-
-Esse fluxo permite concentrar em uma única plataforma as informações relacionadas às etapas de registro e documentação da avaliação, mantendo a associação entre aprendente, instrumento, aplicação, respostas e relatório.
+Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois foram parcialmente atendidos. O RF09 (registro de adaptações) é atendido estruturalmente via versionamento automático, mas sem campo para justificativa textual. O RF12 (histórico do aprendente) é atendido para registros textuais, mas aplicações e relatórios não estão integrados à página individual do aprendente. Ambas as limitações são retomadas no Capítulo~\ref{capitulo7}. Dos onze requisitos não funcionais, dez foram atendidos e um, o RNF03 (armazenamento seguro), foi parcialmente atendido, em razão da ausência de criptografia em repouso e de política de retenção dos dados. As ressalvas quanto às limitações do registro de auditoria estão documentadas na Seção~\ref{sec:seguranca}.
 
 \section{Testes e execução do sistema}\label{sec:testes}
 
-A verificação técnica do sistema foi realizada por meio de testes automatizados no backend e no frontend, utilizando Vitest. No backend, também foi utilizada a biblioteca Supertest para realizar testes das rotas da API. No frontend, foram empregados React Testing Library e jsdom para verificar o comportamento dos componentes e das funcionalidades da interface.
-
-Conforme o levantamento dos testes realizado durante a análise do código, foram identificados 21 arquivos de teste, sendo dez relacionados ao backend e onze ao frontend. Ao todo, foram executados 146 testes automatizados, dos quais 88 pertenciam ao backend e 58 ao frontend. Todos foram concluídos com sucesso, sem falhas.
+Os testes automatizados, descritos nas Seções~\ref{sec:backend}, \ref{sec:frontend} e~\ref{sec:testes-validacao}, estão distribuídos em 21 arquivos, dez do backend e onze do frontend. Ao todo, foram executados 146 testes automatizados, dos quais 88 pertenciam ao backend e 58 ao frontend. Todos foram concluídos com sucesso, sem falhas.
 
 A cobertura de código identificada foi de 83,06\% para o backend e 55,84\% para o frontend, considerando a cobertura de linhas e instruções. Esses resultados demonstram que parte significativa das funcionalidades do backend possui testes automatizados, enquanto o frontend ainda apresenta áreas que podem receber maior cobertura.
 
@@ -185,10 +145,6 @@ Por outro lado, a geração dos relatórios obteve a menor média, de 3,8. Embor
 
 \section{Discussão dos resultados}
 
-Os resultados obtidos demonstram que os principais módulos previstos para a plataforma foram implementados, contemplando o cadastro de aprendentes, o gerenciamento de instrumentos, o registro de aplicações, o armazenamento de respostas e a elaboração de relatórios.
-
-A avaliação realizada com as profissionais complementou os testes técnicos, permitindo observar a percepção das participantes sobre a utilização da plataforma. As médias obtidas foram positivas nos diferentes aspectos avaliados, especialmente no cadastro e na consulta dos aprendentes, na organização das informações e na facilidade de utilização.
-
 A menor média atribuída à geração dos relatórios está relacionada às sugestões apresentadas na questão aberta. Entre as contribuições, foram mencionadas a possibilidade de organizar o relatório em seções predefinidas, incluindo campos para hipótese diagnóstica e encaminhamentos, e a inclusão de recursos que facilitem o preenchimento das informações profissionais.
 
 Também foram sugeridas funcionalidades para ampliar a documentação dos aprendentes, como a possibilidade de anexar laudos, pareceres escolares e registros de avaliações que utilizam protocolos específicos. Outras sugestões envolveram a inclusão de campos para planejamento das intervenções e registro dos objetivos de cada sessão, além de uma linha do tempo para acompanhamento do histórico e do progresso do aprendente.
@@ -197,38 +153,10 @@ Essas contribuições apontam que, além do registro das aplicações e dos rela
 
 A implementação do versionamento dos instrumentos representa outro recurso importante para a rastreabilidade das avaliações, pois permite preservar a versão utilizada em aplicações anteriores. Entretanto, o mecanismo ainda apresenta limitações: alterações realizadas antes de existir uma aplicação vinculada podem sobrescrever as questões existentes, e não há recursos completos para registrar justificativas de alterações ou comparar versões.
 
-Outro aspecto relevante é o controle de acesso aos dados dos aprendentes. A restrição de acesso por profissional contribui para a separação dos registros e para a proteção das informações armazenadas. O sistema também conta com autenticação baseada em JWT, validação de dados e registros de auditoria para determinadas operações de acesso e alteração.
-
-A funcionalidade de auditoria permite acompanhar eventos relacionados à utilização do sistema e às modificações realizadas nos registros. Sua implementação foi incorporada ao código versionado do projeto. Apesar disso, a abrangência e a integridade dos registros ainda podem ser aprimoradas, de modo a ampliar a rastreabilidade das operações.
-
 Em relação à consulta histórica, a plataforma disponibiliza registros textuais associados ao histórico do aprendente. Contudo, as aplicações e os relatórios ainda não são apresentados de forma integrada na página individual do aprendente, e as listagens correspondentes não possuem filtros específicos por aprendente. Essa limitação também se relaciona à sugestão das participantes de disponibilizar uma linha do tempo ou histórico visual.
-
-Os relatórios permitem documentar observações e conclusões elaboradas pelo profissional, mantendo a interpretação dos resultados sob sua responsabilidade. Essa característica está alinhada à proposta do sistema, que busca apoiar a organização das informações sem realizar diagnósticos ou interpretações automáticas.
-
-É necessário considerar que a avaliação contou com cinco participantes, constituindo uma amostra reduzida. Portanto, os resultados representam as percepções das profissionais que responderam ao questionário e não permitem generalizações para todo o público de psicopedagogos. Ainda assim, as respostas forneceram indicações relevantes sobre a experiência de utilização e possíveis melhorias.
 
 Em relação aos estudos apresentados no Capítulo~\ref{capitulo2}, o sistema desenvolvido compartilha com \citeonline{abreu2025_sistemas_web_gestao} e \citeonline{pedroso2025_integraedu} a ênfase na centralização de dados e no controle de acesso por perfil como requisitos essenciais de sistemas web voltados à educação. Assim como o IntegraEDU \cite{pedroso2025_integraedu}, o sistema adota perfis diferenciados e restringe a visibilidade dos registros ao usuário responsável. Em relação a \citeonline{carneiro2023_taep4}, que documentam a TAEP4.0, ambos convergem na necessidade de registro estruturado e exportação de relatórios; a diferença está no foco: enquanto a TAEP4.0 apoia a prática docente em sala de aula, este sistema é orientado ao processo clínico-pedagógico da avaliação psicopedagógica. Quanto ao aplicativo de \citeonline{silva2024_app_tdah}, a semelhança está na adoção de formulários personalizáveis e na validação com usuários especialistas; o presente trabalho expande esse escopo ao contemplar múltiplos instrumentos, versionamento e registro longitudinal.
 
 Entre os trabalhos mais próximos, o sistema de \citeonline{valgas2021_prontuario_neuropsicologico} também foi desenvolvido segundo a \textit{Design Science Research} e obteve avaliação de usabilidade positiva, resultado convergente com a média de 4,43/5,0 obtida neste trabalho. Aquele estudo, contudo, identificou a pontuação de testes como uma das tarefas mais custosas para os profissionais, e o sistema aqui desenvolvido não realiza pontuação automática das respostas, limitando-se ao seu registro; essa é uma diferença relevante, que poderia ser incorporada em versões futuras para os instrumentos cujas regras de pontuação possam ser definidas no cadastro. Em relação às ferramentas de triagem do desenvolvimento infantil, como o TEDI \cite{moreira2022_tedi} e o ASQ-3 aplicado pela \textit{web} \cite{schonhaut2023_asq_web}, o sistema não oferece instrumentos validados prontos, mas permite que o profissional cadastre e adapte os instrumentos que utiliza, preservando o histórico de versões. Por fim, a combinação entre respostas estruturadas e relatórios em texto livre responde à tensão apontada por \citeonline{kariotis2022_ehr_saude_mental} entre a padronização do registro e a natureza narrativa das informações clínicas.
 
 Em relação às soluções comerciais levantadas na Seção~\ref{sec:solucoes_mercado}, o sistema não cobre as rotinas administrativas do consultório, como agenda e financeiro, mas se diferencia no tratamento do instrumento avaliativo. Esse é o ponto central que distingue este trabalho: nenhum dos estudos analisados no Capítulo~\ref{capitulo2} nem das soluções comerciais levantadas divulga a combinação de instrumentos configuráveis, versionamento automático com rastreabilidade, registro de auditoria de dados de saúde infantil e geração de relatório clínico vinculado à aplicação. Os resultados da avaliação com as profissionais, em especial a média de 4,43/5,0 e as sugestões de evolução, indicam que o sistema representa uma contribuição concreta nessa direção, ainda que em estágio de protótipo.
-
-De modo geral, os resultados técnicos e a avaliação das participantes indicam que a plataforma apresenta funcionalidades capazes de apoiar a organização e a documentação das atividades de avaliação psicopedagógica. As sugestões recebidas também permitiram identificar aspectos que podem ser desenvolvidos em versões futuras.
-
-\section{Limitações e trabalhos futuros}\label{sec:limitacoes}
-
-Embora as funcionalidades principais tenham sido implementadas e a avaliação inicial tenha apresentado resultados positivos, foram identificadas limitações que podem orientar a continuidade do projeto.
-
-Entre as possibilidades de evolução, destacam-se:
-
-\begin{itemize}
-    \item Aprimoramento do histórico do aprendente: integrar as aplicações e os relatórios à página individual do aprendente, além de implementar filtros e uma linha do tempo que facilitem a consulta dos registros.
-    \item Evolução do versionamento dos instrumentos: incluir um campo para que o profissional registre a justificativa textual de cada adaptação, permitir a comparação direta entre versões e ampliar o controle sobre as alterações realizadas.
-    \item Aprimoramento da auditoria: ampliar a cobertura dos eventos registrados e fortalecer os mecanismos de integridade e consulta dos logs.
-    \item Aprimoramento da segurança: implementar medidas adicionais de proteção dos dados, incluindo configurações de comunicação segura e políticas de retenção e exclusão.
-    \item Evolução dos relatórios: implementar seções predefinidas, como hipótese diagnóstica e encaminhamentos, além de ampliar as possibilidades de formatação e organização dos documentos.
-    \item Anexos e documentação complementar: permitir o armazenamento de arquivos relacionados ao aprendente, como laudos, pareceres escolares e registros de avaliações realizadas com protocolos específicos.
-    \item Planejamento das intervenções: disponibilizar campos para registrar os objetivos de cada sessão e o planejamento das intervenções propostas pelo profissional.
-\end{itemize}
-
-Dessa forma, o sistema desenvolvido atende ao propósito de oferecer uma ferramenta para apoiar a organização e a documentação das etapas da avaliação psicopedagógica. Os testes técnicos e a avaliação inicial com profissionais forneceram evidências favoráveis ao funcionamento e à utilidade percebida da plataforma. As limitações identificadas e as sugestões recebidas constituem possibilidades de aprimoramento para versões futuras.
