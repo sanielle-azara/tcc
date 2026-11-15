@@ -6,12 +6,4 @@ Os campos destinados ao conteúdo do relatório são \textit{conclusao}, que reg
 
 A página do relatório disponibiliza uma função de impressão, que abre o diálogo de impressão do navegador e permite imprimir o documento ou exportá-lo em formato PDF. O layout foi adaptado por meio de uma folha de estilos aplicada apenas no momento da impressão: a página é configurada no formato A4, com margens definidas; os elementos da interface, como o cabeçalho, o menu lateral e os botões, são ocultados; as observações e a conclusão, editadas em campos de texto na tela, são impressas como texto corrido completo; cada pergunta e sua resposta são mantidas na mesma página; e o documento é encerrado com um espaço para a assinatura do profissional responsável. As respostas do tipo sim/não são apresentadas por extenso. Essa abordagem não depende de bibliotecas de geração de PDF no servidor, utilizando a capacidade nativa dos navegadores.
 
-O documento impresso inclui, na seção ``Dados da Avaliação'', o nome do instrumento, sua categoria e sua versão (por exemplo, ``v2''), como mostra a Figura~\ref{fig:relatorio_versao}. Como cada aplicação aponta para a versão do instrumento efetivamente utilizada, e não para a mais recente, o documento continua identificando corretamente o protocolo vigente no momento da avaliação mesmo após adaptações posteriores do instrumento.
-
-\begin{figure}[H]
-    \centering
-    \caption{Bloco ``Dados da Avaliação'' no relatório impresso, com identificação da versão do instrumento}
-    \label{fig:relatorio_versao}
-    \includegraphics[width=0.60\textwidth]{relatorio_versao.png}
-    \fonte{Elaborado pela autora (2026).}
-\end{figure}
+O documento impresso inclui, na seção ``Dados da Avaliação'', o nome do instrumento, sua categoria e sua versão (por exemplo, ``v2''), como mostra o relatório impresso na Figura~\ref{fig:tela_relatorio_impresso}. Como cada aplicação aponta para a versão do instrumento efetivamente utilizada, e não para a mais recente, o documento continua identificando corretamente o protocolo vigente no momento da avaliação mesmo após adaptações posteriores do instrumento.

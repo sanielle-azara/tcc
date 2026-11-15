@@ -26,9 +26,7 @@ As chamadas à API são feitas com Axios, por funções organizadas no diretóri
 
 \subsection{Autenticação e perfis de acesso}
 
-O \textit{AuthContext} mantém a sessão do usuário autenticado, e o componente \textit{ProtectedRoute} separa as páginas públicas das que exigem autenticação. Foram definidos dois perfis de acesso no sistema, com atribuições separadas. O perfil \textit{ADMIN} administra o sistema: gerencia usuários, consulta e exclui instrumentos avaliativos (sem criá-los nem editá-los), transfere aprendentes entre profissionais e consulta o registro de auditoria, mas não acessa aprendentes, aplicações nem relatórios, conforme a separação discutida na Seção~\ref{sec:seguranca}. O perfil \textit{PSICOPEDAGOGO} cria e edita aprendentes, avaliações, aplicações e relatórios, visualizando somente os registros vinculados ao seu próprio usuário.
-
-O controle efetivo das permissões por perfil é aplicado no backend, por meio do middleware \textit{authorize}, que restringe ao perfil \textit{ADMIN} as operações de administração e ao perfil \textit{PSICOPEDAGOGO} as de atendimento. A interface, por sua vez, utiliza o perfil do usuário autenticado para condicionar a exibição de elementos interativos, reduzindo a exposição de ações que o usuário não pode executar: o menu de usuários e de auditoria e o botão de exclusão de instrumentos aparecem somente ao administrador, enquanto os itens de aprendentes, aplicações e relatórios são omitidos do seu menu. As rotas correspondentes também são protegidas pelo componente \textit{ProtectedRoute}, que redireciona ao dashboard o perfil não autorizado. Para o administrador, o dashboard exibe apenas os totais, sem a lista das últimas aplicações, que identifica as crianças atendidas.
+O \textit{AuthContext} mantém a sessão do usuário autenticado, e o componente \textit{ProtectedRoute} separa as páginas públicas das que exigem autenticação. As atribuições dos perfis \textit{ADMIN} e \textit{PSICOPEDAGOGO} foram definidas na Seção~\ref{sec:requisitos}, e o controle efetivo das permissões é aplicado no backend (Seção~\ref{sec:backend}). A interface utiliza o perfil do usuário autenticado para condicionar a exibição de elementos interativos, reduzindo a exposição de ações que o usuário não pode executar: o menu de usuários e de auditoria e o botão de exclusão de instrumentos aparecem somente ao administrador, enquanto os itens de aprendentes, aplicações e relatórios são omitidos do seu menu. As rotas correspondentes também são protegidas pelo componente \textit{ProtectedRoute}, que redireciona ao dashboard o perfil não autorizado. Para o administrador, o dashboard exibe apenas os totais, sem a lista das últimas aplicações, que identifica as crianças atendidas.
 
 Na página de usuários, uma coluna informa quantos aprendentes estão sob a responsabilidade de cada profissional, sem identificá-los, e a ação ``Transferir aprendentes'' permite escolher o psicopedagogo ativo que assumirá esses aprendentes e os instrumentos do profissional de origem, como no caso de um profissional que deixa o serviço.
 
@@ -50,7 +48,7 @@ A Figura~\ref{fig:tela_login} mostra a tela de login, única área pública do s
     \fonte{Elaborado pela autora (2026).}
 \end{figure}
 
-Após a autenticação, o usuário é direcionado ao dashboard (Figura~\ref{fig:tela_dashboard}). A estrutura da tela se repete nas demais páginas autenticadas: a barra superior e o menu lateral são fornecidos pelo componente \textit{AppLayout}, e o menu exibe somente os módulos permitidos ao perfil, de modo que os itens de usuários e de auditoria não aparecem para o psicopedagogo. Os indicadores mostram os totais de aprendentes, de avaliações ativas e de aplicações, além das aplicações mais recentes com o respectivo status. Esses números são calculados pela rota \textit{GET /api/dashboard} já com o filtro de titularidade, isto é, consideram apenas os registros do profissional autenticado.
+Após a autenticação, o usuário é direcionado ao dashboard (Figura~\ref{fig:tela_dashboard}). A estrutura da tela se repete nas demais páginas autenticadas: a barra superior e o menu lateral são fornecidos pelo componente \textit{AppLayout}. Os indicadores mostram os totais de aprendentes, de avaliações ativas e de aplicações, além das aplicações mais recentes com o respectivo status, considerando apenas os registros do profissional autenticado.
 
 \begin{figure}[H]
     \centering
@@ -70,7 +68,7 @@ O cadastro de aprendentes (Figura~\ref{fig:tela_aprendente_form}) organiza os ca
     \fonte{Elaborado pela autora (2026).}
 \end{figure}
 
-A página de detalhe do aprendente (Figura~\ref{fig:tela_aprendente_detalhe}) reúne, em abas, os dados cadastrais, o histórico de acompanhamento e o registro de acessos, no qual o psicopedagogo responsável consulta quem visualizou ou alterou os dados daquela criança.
+A página de detalhe do aprendente (Figura~\ref{fig:tela_aprendente_detalhe}) reúne, em abas, os dados cadastrais, o histórico de acompanhamento e o registro de acessos.
 
 \begin{figure}[H]
     \centering
@@ -143,4 +141,4 @@ print.test.jsx & 3 & Função utilitária de impressão/PDF \\
 \label{qua:testes_frontend}
 \end{quadro}
 
-A cobertura de linhas do frontend atingiu 55,84\%, valor inferior ao do backend em razão da natureza da camada de apresentação: componentes visuais, estilos e integrações com bibliotecas de UI têm menor aderência a testes automatizados do que serviços de negócio. Os testes implementados cobrem os fluxos de maior risco: autenticação, controle de acesso, preenchimento de avaliações e geração de relatórios.
+A cobertura de linhas do frontend atingiu 55,84\%, valor inferior ao do backend em razão da natureza da camada de apresentação: componentes visuais, estilos e integrações com bibliotecas de interface têm menor aderência a testes automatizados do que serviços de negócio. Os testes implementados cobrem os fluxos de maior risco: autenticação, controle de acesso, preenchimento de avaliações e geração de relatórios.

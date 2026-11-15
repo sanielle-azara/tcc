@@ -66,13 +66,11 @@ RNF11 & Ausência de violações WCAG 2.2 (A e AA) detectáveis pelo axe-core & 
 \label{qua:atendimento_requisitos_nao_funcionais}
 \end{quadro}
 
-Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois foram parcialmente atendidos. O RF09 (registro de adaptações) é atendido estruturalmente via versionamento automático, mas sem campo para justificativa textual. O RF12 (histórico do aprendente) é atendido para registros textuais, mas aplicações e relatórios não estão integrados à página individual do aprendente. Ambas as limitações são retomadas no Capítulo~\ref{capitulo7}. Dos onze requisitos não funcionais, dez foram atendidos e um, o RNF03 (armazenamento seguro), foi parcialmente atendido, em razão da ausência de criptografia em repouso e de política de retenção dos dados. As ressalvas quanto às limitações do registro de auditoria estão documentadas na Seção~\ref{sec:seguranca}.
+Dos quinze requisitos funcionais, treze foram plenamente atendidos e dois (RF09 e RF12) foram parcialmente atendidos. Dos onze requisitos não funcionais, dez foram atendidos e um, o RNF03, foi parcialmente atendido. As ressalvas indicadas nos quadros são retomadas no Capítulo~\ref{capitulo7}.
 
 \section{Testes e execução do sistema}\label{sec:testes}
 
-Os testes automatizados, descritos nas Seções~\ref{sec:backend}, \ref{sec:frontend} e~\ref{sec:testes-validacao}, estão distribuídos em 21 arquivos, dez do backend e onze do frontend. Ao todo, foram executados 146 testes automatizados, dos quais 88 pertenciam ao backend e 58 ao frontend. Todos foram concluídos com sucesso, sem falhas.
-
-A cobertura de código identificada foi de 83,06\% para o backend e 55,84\% para o frontend, considerando a cobertura de linhas e instruções. Esses resultados demonstram que parte significativa das funcionalidades do backend possui testes automatizados, enquanto o frontend ainda apresenta áreas que podem receber maior cobertura.
+Os testes automatizados, descritos nas Seções~\ref{sec:backend}, \ref{sec:frontend} e~\ref{sec:testes-validacao}, estão distribuídos em 21 arquivos, dez do backend e onze do frontend. Ao todo, foram executados 146 testes automatizados, dos quais 88 pertenciam ao backend e 58 ao frontend. Todos foram concluídos com sucesso, sem falhas, com cobertura de linhas de 83,06\% no backend e 55,84\% no frontend.
 
 Além dos testes automatizados, foi realizada a execução prática da plataforma em ambiente Docker, com os serviços necessários para seu funcionamento. Durante essa execução, foi possível utilizar o sistema e verificar seu funcionamento geral, sem ocorrência de problemas que impedissem sua utilização.
 
@@ -109,9 +107,7 @@ Como as causas estavam concentradas em poucos componentes, as correções foram 
 
 \subsection{Avaliação com usuários}
 
-\label{sec:avaliacao_usuarios}Para complementar a avaliação técnica, foi aplicado um questionário com profissionais da área de psicopedagogia, com o objetivo de conhecer suas percepções sobre a facilidade de utilização, a organização das informações e a contribuição da plataforma para as atividades de avaliação psicopedagógica.
-
-O questionário foi respondido por cinco participantes, entre os dias 9 e 13 de novembro de 2026. Foram utilizadas sete questões fechadas, avaliadas em uma escala de 1 a 5, em que 1 representava discordância total e 5, concordância total. Também foi disponibilizada uma questão aberta para sugestões de melhorias.
+\label{sec:avaliacao_usuarios}O questionário de avaliação (Seção~\ref{sec:testes-validacao}) foi respondido por cinco participantes, entre os dias 9 e 13 de novembro de 2026. Foram utilizadas sete questões fechadas, avaliadas em uma escala de 1 a 5, em que 1 representava discordância total e 5, concordância total. Também foi disponibilizada uma questão aberta para sugestões de melhorias.
 
 Os resultados das questões fechadas estão apresentados no Quadro~\ref{qua:medias_avaliacoes_participantes}.
 
@@ -151,9 +147,7 @@ Também foram sugeridas funcionalidades para ampliar a documentação dos aprend
 
 Essas contribuições apontam que, além do registro das aplicações e dos relatórios, existe interesse em recursos que apoiem a organização de informações complementares e o acompanhamento longitudinal do processo avaliativo.
 
-A implementação do versionamento dos instrumentos representa outro recurso importante para a rastreabilidade das avaliações, pois permite preservar a versão utilizada em aplicações anteriores. Entretanto, o mecanismo ainda apresenta limitações: alterações realizadas antes de existir uma aplicação vinculada podem sobrescrever as questões existentes, e não há recursos completos para registrar justificativas de alterações ou comparar versões.
-
-Em relação à consulta histórica, a plataforma disponibiliza registros textuais associados ao histórico do aprendente. Contudo, as aplicações e os relatórios ainda não são apresentados de forma integrada na página individual do aprendente, e as listagens correspondentes não possuem filtros específicos por aprendente. Essa limitação também se relaciona à sugestão das participantes de disponibilizar uma linha do tempo ou histórico visual.
+A implementação do versionamento dos instrumentos representa outro recurso importante para a rastreabilidade das avaliações, pois permite preservar a versão utilizada em aplicações anteriores. Entretanto, alterações realizadas antes de existir uma aplicação vinculada sobrescrevem as questões existentes, e não há recursos para registrar justificativas de alterações ou comparar versões. Na consulta histórica, as aplicações e os relatórios não são apresentados na página individual do aprendente, e as listagens correspondentes não possuem filtros por aprendente, limitação que se relaciona à sugestão das participantes de disponibilizar uma linha do tempo.
 
 Em relação aos estudos apresentados no Capítulo~\ref{capitulo2}, o sistema desenvolvido compartilha com \citeonline{abreu2025_sistemas_web_gestao} e \citeonline{pedroso2025_integraedu} a ênfase na centralização de dados e no controle de acesso por perfil como requisitos essenciais de sistemas web voltados à educação. Assim como o IntegraEDU \cite{pedroso2025_integraedu}, o sistema adota perfis diferenciados e restringe a visibilidade dos registros ao usuário responsável. Em relação a \citeonline{carneiro2023_taep4}, que documentam a TAEP4.0, ambos convergem na necessidade de registro estruturado e exportação de relatórios; a diferença está no foco: enquanto a TAEP4.0 apoia a prática docente em sala de aula, este sistema é orientado ao processo clínico-pedagógico da avaliação psicopedagógica. Quanto ao aplicativo de \citeonline{silva2024_app_tdah}, a semelhança está na adoção de formulários personalizáveis e na validação com usuários especialistas; o presente trabalho expande esse escopo ao contemplar múltiplos instrumentos, versionamento e registro longitudinal.
 

@@ -2,26 +2,15 @@
 
 A segurança foi considerada como um requisito transversal do sistema, em razão da natureza das informações armazenadas durante o processo de avaliação psicopedagógica. Os mecanismos de autenticação (JWT com tokens de acesso e de renovação, limitação de taxa e recuperação de senha), de autorização por perfil e por titularidade e de validação das entradas foram descritos nas Seções~\ref{sec:backend} e~\ref{sec:frontend}. Esta seção discute o que eles garantem, a rastreabilidade das operações e as limitações para o uso com dados reais.
 
-Os papéis \textit{ADMIN} e \textit{PSICOPEDAGOGO} diferenciam as permissões de cada tipo de usuário. O perfil administrador é responsável pela gestão do sistema, como o gerenciamento de usuários, e não acessa os dados clínicos das crianças, enquanto o perfil de psicopedagogo realiza as operações relacionadas aos aprendentes, avaliações, aplicações e relatórios sob sua responsabilidade. As razões dessa separação são discutidas na Seção~\ref{sec:separacao_admin}.
+Todas as decisões de acesso são tomadas no backend: a interface oculta menus e botões conforme o perfil, mas essa restrição é apenas um auxílio à experiência do usuário, e não o mecanismo de segurança. Os dois controles se complementam. O perfil (RBAC) separa a administração do sistema do atendimento, pelas razões discutidas na Seção~\ref{sec:separacao_admin}, e a titularidade garante que psicopedagogos distintos não acessem os registros uns dos outros, mesmo tendo o mesmo perfil. Registros de outros profissionais são tratados como inexistentes, sem revelar que existem, e a criação de uma aplicação exige que o aprendente e o instrumento pertençam ao próprio profissional. O campo \textit{status} da entidade \textit{users} permite ainda desativar uma conta, que deixa de ser aceita na validação de cada requisição.
 
-Todas as decisões de acesso são tomadas no backend: a interface oculta menus e botões conforme o perfil, mas essa restrição é apenas um auxílio à experiência do usuário, e não o mecanismo de segurança. Os dois controles se complementam. O perfil (RBAC) separa a administração do sistema do atendimento, e a titularidade garante que psicopedagogos distintos não acessem os registros uns dos outros, mesmo tendo o mesmo perfil. Registros de outros profissionais são tratados como inexistentes, sem revelar que existem, e a criação de uma aplicação exige que o aprendente e o instrumento pertençam ao próprio profissional. O campo \textit{status} da entidade \textit{users} permite ainda desativar uma conta, que deixa de ser aceita na validação de cada requisição.
-
-As senhas dos usuários não são armazenadas em texto plano. No cadastro, na redefinição e na alteração de senha, o backend gera um \textit{hash} com o algoritmo bcrypt, utilizando fator de custo 12, e somente esse \textit{hash} é gravado no campo \textit{passwordHash} da entidade \textit{users}. Na autenticação, a senha informada é comparada ao \textit{hash} armazenado, sem que a senha original precise ser recuperada.
+No cadastro, na redefinição e na alteração de senha, o backend gera um \textit{hash} com o algoritmo bcrypt, utilizando fator de custo 12, e somente esse \textit{hash} é gravado no campo \textit{passwordHash} da entidade \textit{users}. Na autenticação, a senha informada é comparada ao \textit{hash} armazenado, sem que a senha original precise ser recuperada.
 
 Para a rastreabilidade, os campos de controle temporal (\textit{createdAt} e \textit{updatedAt}) e os vínculos de autoria do modelo (\textit{responsavelId}, \textit{autorId} e \textit{aplicadorId}) não são suficientes quando se trata de dados de saúde de crianças. Eles indicam quem criou cada registro e quando ele foi alterado pela última vez, mas não registram quem fez cada alteração, quais eram os valores anteriores nem quem consultou as informações. Este último ponto é justamente o que a Lei Geral de Proteção de Dados e o sigilo profissional mais exigem. Além disso, operações do administrador que afetam as crianças sem envolver a leitura de seus dados, como a transferência de responsabilidade entre profissionais, também não deixariam rastro.
 
-Por esses motivos, o sistema mantém um registro de auditoria na entidade \textit{audit\_logs}, preenchido automaticamente por uma extensão do Prisma Client, conforme descrito na Seção~\ref{sec:backend}. O registro atende aos quatro pontos acima:
+Por esses motivos, o sistema mantém o registro de auditoria descrito na Seção~\ref{sec:backend}, que atende aos quatro pontos acima: identifica o autor de cada operação, guarda os valores anteriores das alterações, registra as consultas a dados clínicos associando-as ao aprendente e registra as operações do administrador como as de qualquer outro usuário, de modo que uma transferência de responsabilidade aparece no registro de acessos da criança.
 
-\begin{itemize}
-    \item cada criação, alteração e exclusão identifica o usuário que a realizou, o seu perfil, o IP de origem e o momento da operação;
-    \item as alterações guardam os valores anteriores e os novos dos campos modificados, e as exclusões guardam o conteúdo excluído;
-    \item as consultas e listagens de dados clínicos (aprendentes, histórico de acompanhamento, aplicações e relatórios) são registradas e associadas ao aprendente, permitindo saber quem acessou os dados de cada criança;
-    \item as operações do administrador são registradas como as de qualquer outro usuário; a transferência de um aprendente, por exemplo, aparece na aba ``Registro de Acessos'' do aprendente, com o responsável anterior e o novo, para consulta do psicopedagogo responsável.
-\end{itemize}
-
-Os logins bem-sucedidos e as tentativas recusadas também são registrados, e o hash da senha nunca é gravado no registro.
-
-O registro de auditoria, entretanto, possui limitações que precisam ser consideradas:
+Esse registro, entretanto, possui limitações que precisam ser consideradas:
 
 \begin{itemize}
     \item o registro é gravado após a operação, em uma conexão separada, e não faz parte da mesma transação. Se a gravação da auditoria falhar, a operação é mantida e a falha aparece apenas no log do servidor. Em operações executadas dentro de uma transação, o registro pode permanecer mesmo que a transação seja desfeita;
@@ -33,7 +22,7 @@ O registro de auditoria, entretanto, possui limitações que precisam ser consid
     \item o endereço IP registrado depende da configuração do proxy reverso. Se a API estiver acessível diretamente, sem passar pelo proxy, o cabeçalho que informa o IP de origem pode ser falsificado.
 \end{itemize}
 
-Essas limitações indicam que o registro implementado constitui um mecanismo básico de rastreabilidade, adequado ao estágio de protótipo do sistema, mas não substitui as medidas organizacionais e técnicas exigidas para o uso com dados reais, como a imutabilidade do registro, a política de retenção e o controle do acesso direto à infraestrutura.
+O registro implementado constitui, portanto, um mecanismo básico de rastreabilidade, adequado ao estágio de protótipo.
 
 \subsection{Separação entre administração e acesso aos dados clínicos}\label{sec:separacao_admin}
 
@@ -62,7 +51,7 @@ A separação reduz, mas não elimina, a confiança depositada no administrador:
 
 \subsection{Adequação à LGPD e limitações para uso em produção}
 
-O sistema armazena dois tipos de dados com proteção legal reforçada pela Lei Geral de Proteção de Dados \cite{brasil2018_lgpd}.Os dados dos aprendentes envolvem crianças, categoria sujeita ao art. 14 da LGPD, que exige tratamento no melhor interesse do menor e, em regra, consentimento do responsável legal. As respostas das avaliações e os relatórios podem conter dados de saúde, classificados como dados pessoais sensíveis pelo art. 5º, inciso II, e sujeitos às restrições do art. 11, que limita as bases legais admissíveis para seu tratamento.
+O sistema armazena dois tipos de dados com proteção legal reforçada pela Lei Geral de Proteção de Dados \cite{brasil2018_lgpd}. Os dados dos aprendentes envolvem crianças, categoria sujeita ao art. 14 da LGPD, que exige tratamento no melhor interesse do menor e, em regra, consentimento do responsável legal. As respostas das avaliações e os relatórios podem conter dados de saúde, classificados como dados pessoais sensíveis pelo art. 5º, inciso II, e sujeitos às restrições do art. 11, que limita as bases legais admissíveis para seu tratamento.
 
 Do ponto de vista da minimização de dados, os campos opcionais da entidade \textit{aprendentes} — contato secundário, e-mail, escola, série e turno — permitem que o profissional registre apenas as informações necessárias ao atendimento. Os campos obrigatórios (nome, data de nascimento, sexo, responsável e contato principal) foram definidos com base nas informações mínimas identificadas como necessárias ao processo avaliativo. Ainda assim, a decisão sobre quais campos preencher é do profissional, e o sistema não impede o registro de informações além do estritamente necessário.
 
@@ -77,5 +66,3 @@ As seguintes medidas foram implementadas em relação à proteção dos dados: c
 \end{itemize}
 
 Essas limitações são inerentes ao estágio de protótipo do sistema e não inviabilizam sua avaliação funcional. Para uso em produção com dados reais de crianças, seria necessário endereçar cada um desses pontos, além de elaborar um Relatório de Impacto à Proteção de Dados Pessoais (RIPD) conforme previsto no art. 38 da LGPD.
-
-Assim, a segurança implementada combina autenticação por JWT, armazenamento de senhas com bcrypt, controle de acesso por perfis, separação entre administração e acesso aos dados clínicos, restrição de visibilidade por titularidade, proteção das rotas, gerenciamento de sessão, validação das informações recebidas pela API e registro de auditoria. Esses mecanismos estabelecem uma camada de proteção adequada ao estágio de protótipo do sistema, mas não substituem as medidas organizacionais e técnicas exigidas para o tratamento de dados pessoais sensíveis de crianças em ambiente de produção.
